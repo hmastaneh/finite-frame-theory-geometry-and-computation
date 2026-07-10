@@ -1,0 +1,503 @@
+\chapter{The Geometry of Dual Frames}
+\label{ch:dual-geometry}
+\fancyhead[R]{\small\textit{Chapter 6: The Geometry of Dual Frames}}
+\section{Overview: Making the Affine Family Visible}
+\label{sec:ch6-overview}
+
+Chapter~5 proved, algebraically, that the set of all dual frames of a
+fixed frame $\{f_i\}_{i=1}^m$ forms an \emph{affine family}
+$G = \tilde F + Z$ with $ZF^*=0$ (Theorem~5.4.1), that the canonical
+dual $\tilde F$ is the unique member minimizing total energy
+$\norm{G}_F^2$ (Theorem~5.5.1), and that this minimality translates
+directly into superior noise robustness (Section~5.6). Every one of
+these facts was proved by algebra: trace identities, adjoint rules,
+Pythagorean decompositions of Frobenius norms.
+
+This chapter does not prove anything new. Instead, it makes Chapter~5's
+algebra \emph{visible}. For the simplest genuinely redundant frame ---
+one extra vector beyond a basis, so $m=n+1$ --- the affine family of
+duals turns out to be parametrized by an ordinary $2$-dimensional plane,
+small enough to draw. On that plane, the energy function $\norm{G}_F^2$
+is an exact paraboloid, the canonical dual sits at its unique minimum,
+and the Pythagorean decomposition of Theorem~5.5.1 becomes literally the
+Pythagorean theorem for a right triangle you can see. We then push the
+geometric picture one step further than Chapter~5 did: the
+reconstruction error under random noise is not just a single number
+$\norm{G}_F^2$, but an entire \emph{error ellipse}, and the shape of
+that ellipse --- not only its size --- turns out to depend on the frame
+in a clean, computable way that the algebra alone does not make obvious.
+
+\section{The Smallest Interesting Case: One Redundant Vector}
+\label{sec:smallest-case}
+
+To draw a picture, we need the parameter space of duals to be
+low-dimensional. By Theorem~5.4.1, the family of valid duals is
+parametrized by matrices $Z$ with $ZF^*=0$, i.e.\ each row of $Z$ lies
+in $\ker F\subset\F^m$. Since $\dim\ker F = m-n$ (rank--nullity, as
+$F$ has full row rank $n$ when $\{f_i\}$ is a frame), the space of valid
+$Z$ has real dimension $n\cdot(m-n)$ (each of the $n$ rows of $Z$ ranges
+independently over the $(m-n)$-dimensional space $\ker F$).
+
+\begin{keyidea}
+For the dual family to be visualizable as a plane, we want
+$n\cdot(m-n)=2$. The cleanest choice satisfying this is $n=2$, $m=3$:
+\textbf{one redundant vector beyond a basis of $\R^2$.} Then
+$\dim\ker F = 1$, but the parameter space of $Z$ is still
+$2$-dimensional, since $Z=w\,k^T$ for $w\in\R^2$ ranging freely and
+$k\in\R^3$ a fixed unit vector spanning $\ker F$. \textbf{The parameter
+$w$, not the kernel direction $k$, is what we will plot.}
+\end{keyidea}
+
+We use the triangular frame from Chapters~1, 3, and 5 throughout this
+section: $f_1=(1,0)^T$, $f_2=(-\tfrac12,\tfrac{\sqrt3}{2})^T$,
+$f_3=(-\tfrac12,-\tfrac{\sqrt3}{2})^T$, with frame operator $S=\tfrac32I$
+and canonical dual $\tilde f_i = \tfrac23f_i$ (Example~3.2,
+Example~5.1). Its kernel was already computed in Chapter~1: $\ker F$ is
+spanned by $(1,1,1)^T$, since $f_1+f_2+f_3=0$; the corresponding unit
+vector is $k = (1,1,1)^T/\sqrt3$.
+
+\begin{proposition}[The dual family as a plane]
+\label{prop:dual-plane}
+For the triangular frame, every dual frame's synthesis matrix has the
+form
+\[
+  G(w) = \tilde F + w\,k^T, \qquad w=(w_1,w_2)\in\R^2,
+\]
+where $\tilde F$ is the canonical dual's synthesis matrix and
+$k=(1,1,1)^T/\sqrt3$. Distinct $w$ give distinct dual frames, and every
+dual frame arises this way for exactly one $w$.
+\end{proposition}
+
+\begin{proof}
+By Theorem~5.4.1, every dual has the form $\tilde F+Z$ with $ZF^*=0$,
+i.e.\ each row of $Z$ lies in $\ker F=\spn\{k\}$ (one-dimensional). So
+row $j$ of $Z$ is $w_jk^T$ for a unique scalar $w_j$, $j=1,2$; stacking
+the two rows gives $Z=wk^T$ for the unique vector $w=(w_1,w_2)$. Distinct
+$w$ give distinct $Z$ (since $k\ne0$), hence distinct $G(w)$.
+\end{proof}
+
+\section{The Energy Paraboloid}
+\label{sec:energy-paraboloid}
+
+We now compute the total energy $\norm{G(w)}_F^2=\sum_i\norm{g_i}^2$ as
+an explicit function of $w$, and discover that it is exactly a
+paraboloid of revolution.
+
+\begin{theorem}[The energy function is a paraboloid]
+\label{thm:energy-paraboloid}
+For the triangular frame, with $G(w)=\tilde F+wk^T$ as in
+Proposition~\ref{prop:dual-plane},
+\[
+  \norm{G(w)}_F^2 = \norm{\tilde F}_F^2 + \norm{w}^2
+  = \frac43 + w_1^2+w_2^2.
+\]
+\end{theorem}
+
+\begin{proof}
+By the Pythagorean decomposition of Theorem~5.5.1,
+$\norm{G(w)}_F^2=\norm{\tilde F}_F^2+\norm{Z}_F^2$ where $Z=wk^T$. Since
+$k$ is a \emph{unit} vector, $\norm{Z}_F^2=\tr(Z Z^T)=\tr(wk^Tkw^T)
+=\norm{k}^2\tr(ww^T)=\norm{w}^2$ (using $\norm{k}^2=1$ and
+$\tr(ww^T)=\norm{w}^2$ for any vector $w$). The value
+$\norm{\tilde F}_F^2=\tr(S^{-1})=\tr(\tfrac23I)=\tfrac43$ was computed in
+Example~5.3.
+\end{proof}
+
+\begin{keyidea}
+Because $k$ is normalized to unit length, the energy function over the
+parameter plane is the \textbf{exact} paraboloid $E(w)=\tfrac43+\|w\|^2$
+--- no cross terms, no distortion, a perfect circular bowl. Its unique
+minimum is at $w=0$, which by Proposition~\ref{prop:dual-plane} is
+exactly the canonical dual $G(0)=\tilde F$. \textbf{Theorem~5.5.1's
+abstract minimality statement is, in this picture, nothing more than
+the obvious fact that a paraboloid has one lowest point, directly
+above the origin.}
+\end{keyidea}
+
+This is genuinely a different way of seeing the same theorem: Chapter~5
+proved minimality by an algebraic Pythagorean argument; here, minimality
+is a visual fact about a bowl-shaped surface, and the Pythagorean
+decomposition $\norm{G}_F^2=\norm{\tilde F}_F^2+\norm{w}^2$ \emph{is}
+literally the equation of that paraboloid, height above the plane equals
+a constant plus squared distance from the origin.
+
+\section{The Error Ellipse}
+\label{sec:error-ellipse}
+
+Chapter~5, Section~5.6 showed that under coefficient noise
+$\varepsilon=(\varepsilon_1,\ldots,\varepsilon_m)$ with independent
+components of variance $\sigma^2$, the reconstruction error
+$\hat x - x = G\varepsilon$ has expected squared norm
+$\sigma^2\norm{G}_F^2$. This is a single number: the \emph{total}
+expected error. But $\hat x-x=G\varepsilon$ is itself a random
+\emph{vector} in $\R^n$, and its distribution has a shape, not just a
+size. We now compute that shape.
+
+\begin{definition}[Error covariance]
+\label{def:error-covariance}
+For a dual frame with synthesis matrix $G$, under coefficient noise with
+covariance $\sigma^2I_m$, the reconstruction error $\hat x-x=G\varepsilon$
+has covariance matrix
+\[
+  \Sigma_G := \sigma^2\, GG^T \quad\in\R^{n\times n}.
+\]
+The level sets of the resulting error distribution are ellipses
+(in $\R^2$) or ellipsoids (in higher dimensions) centered at the origin,
+with semi-axis lengths $\sigma\sqrt{\lambda_i(GG^T)}$ along the
+eigenvectors of $GG^T$.
+\end{definition}
+
+\begin{proposition}[The canonical dual's error covariance]
+\label{prop:canonical-error-covariance}
+For \emph{any} frame (not just the triangular one), the canonical
+dual's error covariance is
+\[
+  \Sigma_{\tilde F} = \sigma^2 S^{-1}.
+\]
+\end{proposition}
+
+\begin{proof}
+$\tilde F\tilde F^T = (S^{-1}F)(S^{-1}F)^T = S^{-1}FF^TS^{-1} =
+S^{-1}SS^{-1}=S^{-1}$, using $S^{-1}$ symmetric (Proposition~3.4.2(i)
+applied to $S^{-1}$, itself symmetric since $S$ is) and $FF^T=S$.
+\end{proof}
+
+\begin{keyidea}
+The canonical dual's error ellipse is, up to the noise scale $\sigma^2$,
+literally $S^{-1}$ --- \textbf{the inverse of the frame operator
+itself.} Since the eigenvalues of $S^{-1}$ are exactly $1/\lambda_i(S)$,
+and Theorem~3.5.1 identified $\lambda_i(S)$ as the frame bounds, the
+error ellipse's axes have lengths $\sigma/\sqrt{A}$ and $\sigma/\sqrt{B}$
+(in $\R^2$): \textbf{a tighter frame (closer $A,B$) gives a rounder
+error ellipse; a perfectly tight frame gives a perfectly circular
+error region.} This is a genuinely new fact, not visible from Chapter
+5's total-energy bookkeeping alone: tightness controls not only the
+\emph{average} reconstruction error but its \emph{directional
+uniformity}.
+\end{keyidea}
+
+\begin{examplebox}[title={Example 6.1: Circular vs.\ elliptical error regions}]
+\label{ex:circular-vs-elliptical}
+For the triangular frame ($A=B=\tfrac32$, tight), Proposition~
+\ref{prop:canonical-error-covariance} gives $\Sigma_{\tilde F}=
+\sigma^2\cdot\tfrac23I$: a perfect circle of radius $\sigma\sqrt{2/3}$,
+independent of direction. For the non-tight frame $\{h_1,h_2,h_3\}$
+($A=1$, $B=3$, Example~3.3), the same proposition gives
+$\Sigma_{\tilde F}=\sigma^2S^{-1}$ with eigenvalues $1/3$ and $1$ ---
+an ellipse with one axis \emph{three times longer} than the other.
+Reconstruction error is three times more spread out along the
+$B$-eigenvector direction (the direction of $h_3$ itself, as found in
+Example~3.3) than along the $A$-eigenvector direction. This is the
+precise, quantitative version of the informal Chapter~1 idea that an
+``unbalanced'' frame treats some directions worse than others: now we
+can say exactly how much worse, and exactly which direction is
+penalized.
+\end{examplebox}
+
+\section{Visualizing Both Pictures}
+\label{sec:visualizing}
+
+We now render both geometric pictures developed above: the energy
+paraboloid over the space of dual frames, and the error ellipses for
+tight versus non-tight frames.
+
+The figure above shows this chapter's two pictures side by side: the
+left panel is the parameter plane of Proposition~\ref{prop:dual-plane},
+with energy level sets as concentric circles around the canonical dual
+at the origin; dragging the point traces out the paraboloid of
+Theorem~\ref{thm:energy-paraboloid} indirectly, through its height
+(displayed as the energy readout). The right panel shows the
+corresponding error ellipse of Definition~\ref{def:error-covariance}, which
+is a perfect circle exactly at the canonical dual ($w=0$) and stretches
+into a longer and longer ellipse as $w$ moves away from the origin ---
+the visual content of Theorem~5.5.1 and Proposition~
+\ref{prop:canonical-error-covariance} happening simultaneously, in real
+time, as you drag.
+
+\section{Reproducing the Pictures in Python}
+\label{sec:numpy-geometry}
+
+The interactive figure above is built from exactly the same formulas
+proved in Sections~\ref{sec:energy-paraboloid}--\ref{sec:error-ellipse}.
+We now reproduce both pictures as static Matplotlib plots, so that the
+geometric content of this chapter is fully captured in code you can run
+and modify offline.
+
+\begin{lstlisting}[caption={The energy paraboloid and error ellipses, reproduced in Matplotlib}]
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
+
+# --- Triangular frame setup (Chapters 1, 3, 5) ---
+f1 = np.array([1.0, 0.0])
+f2 = np.array([-0.5, np.sqrt(3)/2])
+f3 = np.array([-0.5, -np.sqrt(3)/2])
+F = np.column_stack([f1, f2, f3])          # shape (2, 3)
+S = F @ F.T
+F_tilde = np.linalg.solve(S, F)            # canonical dual, S^{-1} F
+k = np.array([1.0, 1.0, 1.0]) / np.sqrt(3) # unit vector spanning ker(F)
+
+def G_of_w(w):
+    """Synthesis matrix of the dual frame at parameter w in R^2."""
+    Z = np.outer(w, k)
+    return F_tilde + Z
+
+def energy(w):
+    G = G_of_w(w)
+    return np.trace(G @ G.T)
+
+def error_covariance(w, sigma=1.0):
+    G = G_of_w(w)
+    return sigma**2 * (G @ G.T)
+
+# --- Panel 1: energy paraboloid (as a contour plot over the w-plane) ---
+fig, axes = plt.subplots(1, 2, figsize=(11, 5))
+
+ax = axes[0]
+w1_grid, w2_grid = np.meshgrid(np.linspace(-2, 2, 200), np.linspace(-2, 2, 200))
+E_grid = 4/3 + w1_grid**2 + w2_grid**2       # Theorem 6.3.1, closed form
+contours = ax.contour(w1_grid, w2_grid, E_grid, levels=10, cmap='viridis')
+ax.clabel(contours, inline=True, fontsize=8)
+ax.plot(0, 0, 'ko', markersize=8)
+ax.annotate('canonical dual\n(global minimum)', (0, 0),
+            xytext=(0.3, 1.5), fontsize=9)
+ax.set_xlabel('$w_1$'); ax.set_ylabel('$w_2$')
+ax.set_title('Energy $\\|G(w)\\|_F^2 = 4/3 + \\|w\\|^2$')
+ax.set_aspect('equal')
+
+# --- Panel 2: error ellipses at several choices of dual ---
+ax = axes[1]
+colors = ['#0F6E56', '#185FA5', '#993C1D', '#993556']
+for w, color in zip([(0,0), (1,0), (0,1), (0.7,0.7)], colors):
+    Cov = error_covariance(np.array(w))
+    eigvals, eigvecs = np.linalg.eigh(Cov)
+    angle = np.degrees(np.arctan2(eigvecs[1, -1], eigvecs[0, -1]))
+    width, height = 2*np.sqrt(eigvals[-1]), 2*np.sqrt(eigvals[0])
+    ell = Ellipse((0, 0), width, height, angle=angle,
+                  facecolor='none', edgecolor=color, linewidth=2,
+                  label=f'w={w}')
+    ax.add_patch(ell)
+ax.set_xlim(-3, 3); ax.set_ylim(-3, 3)
+ax.set_aspect('equal')
+ax.legend(fontsize=8, loc='upper right')
+ax.set_title('Reconstruction error ellipses by choice of dual')
+ax.set_xlabel('error in $x$-direction'); ax.set_ylabel('error in $y$-direction')
+
+plt.tight_layout()
+plt.savefig('dual_frame_geometry.png', dpi=150)
+plt.show()
+\end{lstlisting}
+
+\begin{remark*}
+Running this code produces exactly the two pictures shown earlier: a
+perfectly circular contour plot (since the energy function has no cross
+terms in $w_1, w_2$, by Theorem~\ref{thm:energy-paraboloid}), and a
+family of ellipses that are circular at $w=(0,0)$ and progressively more
+elongated as $w$ moves away from the origin, confirming
+Example~\ref{ex:circular-vs-elliptical} visually rather than just
+algebraically.
+\end{remark*}
+
+\section{What Changes for Non-Tight Frames}
+\label{sec:nontight-geometry}
+
+Everything in Sections~\ref{sec:energy-paraboloid}--\ref{sec:error-ellipse}
+used the triangular frame, which is tight. It is worth checking which
+parts of the picture survive for a non-tight frame, using
+$\{h_1,h_2,h_3\}$ ($A=1$, $B=3$, Example~3.3) as our test case.
+
+\begin{proposition}[The paraboloid survives; the base ellipse does not]
+\label{prop:nontight-geometry}
+For \emph{any} frame $\{f_i\}_{i=1}^m$ with $m=n+1$ (one redundant
+vector), parametrize duals by $G(w)=\tilde F+wk^T$ for the unit vector
+$k$ spanning $\ker F$. Then:
+\begin{enumerate}[label=(\roman*)]
+  \item The energy function is still an exact paraboloid,
+        $\norm{G(w)}_F^2=\norm{\tilde F}_F^2+\norm{w}^2$, regardless of
+        whether the original frame is tight.
+  \item The error covariance at $w=0$ (the canonical dual) is $S^{-1}$,
+        which is a circle if and only if the original frame is tight.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Part (i) is exactly the proof of Theorem~\ref{thm:energy-paraboloid},
+which used only that $k$ is a unit vector spanning the (here,
+one-dimensional) kernel --- tightness of $\{f_i\}$ was never invoked.
+Part (ii) is Proposition~\ref{prop:canonical-error-covariance}: $S^{-1}$
+has equal eigenvalues iff $S$ does, iff $\{f_i\}$ is tight (Theorem
+3.5.1(iii)).
+\end{proof}
+
+\begin{keyidea}
+\textbf{The paraboloid picture (which member of the dual family is
+``smallest'') and the ellipse picture (how the error is distributed
+directionally) are answering two different questions, and tightness
+only controls the second one.} No matter how unbalanced the original
+frame is, the canonical dual is still the unique bottom of a perfectly
+circular paraboloid in $w$-space --- minimality of total energy is a
+\emph{universal} fact about every frame. But the resulting error
+ellipse, even at the very bottom of that paraboloid, inherits whatever
+anisotropy the original frame had. \textbf{Choosing the canonical dual
+fixes ``how much'' freedom you waste; it cannot fix ``which directions''
+the original frame under- or over-samples.} Only redesigning the frame
+itself (Chapter~4's tightness machinery) can fix that.
+\end{keyidea}
+
+\section{Chapter Summary}
+\label{sec:summary-ch6}
+
+\begin{itemize}
+  \item For the smallest redundant case ($m=n+1$), the affine family of
+        dual frames (Theorem~5.4.1) is parametrized by an ordinary
+        $2$-dimensional plane $w\in\R^2$
+        (Proposition~\ref{prop:dual-plane}), even though $\ker F$ itself
+        is only $1$-dimensional --- the extra dimension comes from $w$
+        ranging independently over each of the $n=2$ rows.
+  \item The total energy $\norm{G(w)}_F^2$ is an \textbf{exact
+        paraboloid} over this plane
+        (Theorem~\ref{thm:energy-paraboloid}), with its unique minimum
+        at $w=0$, the canonical dual. This is Theorem~5.5.1, seen as a
+        picture rather than an algebraic identity.
+  \item The reconstruction error under coefficient noise is not just a
+        number but an \textbf{error ellipse}, with covariance
+        $\sigma^2GG^T$. At the canonical dual, this covariance equals
+        $\sigma^2S^{-1}$ exactly
+        (Proposition~\ref{prop:canonical-error-covariance}) --- a fact
+        not visible from Chapter~5's total-energy bookkeeping alone.
+  \item The error ellipse is a \textbf{circle exactly when the frame is
+        tight}: tightness controls the \emph{directional uniformity} of
+        reconstruction error, while minimal-norm duality (any frame,
+        tight or not) controls only its \emph{total size}.
+        Proposition~\ref{prop:nontight-geometry} shows these are
+        genuinely separate facts: the paraboloid picture is universal,
+        but the base ellipse it sits on top of is shaped by the
+        original frame's own tightness.
+\end{itemize}
+
+\section{Lab Exercises}
+\label{sec:lab-ch6}
+
+\begin{exercisebox}[title={Lab Exercise 6.1: Reproducing the Paraboloid}]
+Implement \texttt{G\_of\_w}, \texttt{energy}, and
+\texttt{error\_covariance} from Section~\ref{sec:numpy-geometry} for the
+triangular frame. Verify numerically, for at least $10$ random values of
+$w\in\R^2$, that \texttt{energy(w)} matches the closed form
+$\tfrac43+\norm{w}^2$ to within $10^{-10}$. Then find the value of $w$
+(other than the origin) for which the energy equals exactly $\tfrac{10}{3}$,
+and verify your answer numerically.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 6.2: The Non-Tight Case}]
+Repeat the construction of Section~\ref{sec:numpy-geometry} for the
+frame $\{h_1,h_2,h_3\}$ ($A=1,B=3$) instead of the triangular frame.
+\begin{enumerate}[label=(\alph*)]
+  \item Find the unit vector $k$ spanning $\ker H$ (Lab Exercise 5.1
+        from Chapter 5 may already have this).
+  \item Verify that the energy function is \emph{still} an exact
+        paraboloid $\norm{\tilde H}_F^2+\norm{w}^2$ in this new $w$, as
+        guaranteed by Proposition~\ref{prop:nontight-geometry}(i).
+  \item Plot the error ellipse at $w=0$ and confirm it is the
+        non-circular ellipse with axis ratio $3:1$ found in
+        Example~\ref{ex:circular-vs-elliptical}.
+  \item Numerically search the parameter plane (e.g.\ a grid search, or
+        \texttt{scipy.optimize.minimize} on the squared eigenvalue gap)
+        for a value of $w\ne0$ at which the error ellipse becomes
+        exactly circular. You should find one. Report the energy
+        $\norm{G(w)}_F^2$ at that point and compare it to the canonical
+        dual's minimal energy $\tfrac43$ --- is circularity ``free,'' or
+        does it cost extra total energy compared to the canonical
+        choice?
+  \item Having found $w$ numerically in part (d), guess its exact
+        closed form (it has a clean expression involving small
+        integers and a square root), and verify algebraically by hand
+        that $G(w)G(w)^T=I$ exactly at your guessed value. This shows
+        that \textbf{minimal total energy and perfectly isotropic error
+        are generally different points on the same paraboloid} ---
+        the canonical dual is optimal for one criterion but not, in
+        general, for the other.
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 6.3: A Larger Parameter Space}]
+The clean $2$-dimensional picture in this chapter relied on $m=n+1$
+(so $\dim\ker F=1$). For $m=n+2$ (two redundant vectors), the parameter
+space of $Z$ becomes $n\cdot 2$-dimensional --- $4$-dimensional in
+$\R^2$ --- too large to plot directly. However, you can still plot
+\emph{slices}. Using four vectors in $\R^2$ (e.g.\ the square vertices
+of Chapter~4), find a $2$-dimensional basis $\{k_1,k_2\}$ of
+$\ker F\subset\R^4$, parametrize $Z=w_1e_1k_1^T+w_2e_1k_2^T$ (varying
+only the \emph{first} row of $Z$, freezing the second row at zero), and
+plot the resulting $1$-row-restricted energy function over
+$(w_1,w_2)\in\R^2$. Is it still an exact paraboloid? (Hint: think about
+whether $k_1$ and $k_2$ need to be orthogonal for the cross terms to
+vanish, and check this for your chosen basis.)
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 6.4 (Optional, Challenge): Animating the Family}]
+Using \texttt{matplotlib.animation}, create a short animation that
+sweeps $w$ around a circle of radius $1.5$ in the parameter plane (i.e.\
+$w(t)=1.5(\cos t,\sin t)$ for $t\in[0,2\pi]$) for the triangular frame,
+and shows the corresponding error ellipse rotating and breathing in a
+second panel, synchronized frame-by-frame. Confirm that the energy
+$\norm{G(w(t))}_F^2$ stays exactly constant throughout the sweep (since
+$\norm{w(t)}=1.5$ is constant) even though the error ellipse's
+\emph{orientation} changes continuously --- a clean illustration that
+total energy and error-ellipse orientation are independent pieces of
+information, even when one of them (total energy) is held fixed.
+\end{exercisebox}
+\newpage
+\section{Supplementary Exercises}
+\label{sec:extra-ch6}
+
+\subsection*{Theoretical Exercises}
+\begin{theoexercises}
+	\item For the $m=n+1$ case with unit vector $k$ spanning $\ker F$,
+	prove the explicit formula
+	$\Sigma_{G(w)}=\sigma^2\bigl(S^{-1}+ww^T\bigr)$
+	directly from $G(w)=\tilde F+wk^T$ and the fact $\tilde F k=0$.
+	
+	\item Using T1, re-derive the trace (total energy) formula of
+	Theorem~6.3.1 in one line: $\tr(\Sigma_{G(w)})=
+	\sigma^2\bigl(\tr(S^{-1})+\norm{w}^2\bigr)$.
+	
+	\item Using the matrix determinant lemma
+	$\det(A+uv^T)=\det(A)(1+v^TA^{-1}u)$, prove that
+	$\det(\Sigma_{G(w)})$ is also uniquely minimized at $w=0$ ---
+	i.e.\ the canonical dual minimizes not only total error variance
+	(trace) but also the error ellipse's area (determinant).
+	
+	\item Generalize T1 to $\dim\ker F=r>1$: if $K$ is an $m\times r$
+	matrix with orthonormal columns spanning $\ker F$ and
+	$Z=WK^T$ for $W\in\R^{n\times r}$, prove
+	$\Sigma_{G(W)}=\sigma^2\bigl(S^{-1}+WW^T\bigr)$.
+	
+	\item Using T1 and the fact that $ww^T$ is positive semidefinite,
+	prove that every eigenvalue of $\Sigma_{G(w)}$ is at least the
+	corresponding eigenvalue of $\sigma^2S^{-1}$. Conclude that moving
+	away from the canonical dual can only inflate the error ellipse's
+	axes, never shrink any of them.
+\end{theoexercises}
+
+\subsection*{Computational Exercises}
+\begin{compexercises}
+	\item Verify the formula from T1 numerically for $\{h_1,h_2,h_3\}$ at
+	five random values of $w$, confirming
+	$\Sigma_{G(w)}=S^{-1}+ww^T$ (with $\sigma=1$) to machine
+	precision.
+	
+	\item Using a grid search or \texttt{scipy.optimize.minimize}, confirm
+	that $\det(\Sigma_{G(w)})$ is minimized at $w=0$ for
+	$\{h_1,h_2,h_3\}$, matching the trace-minimizing point found in
+	Chapter~6's own worked example.
+	
+	\item For the square frame (Lab Exercise~6.3, $\dim\ker F=2$), verify
+	the generalized formula from T4 numerically: build $K$ from
+	\texttt{null\_space}, pick a random $2\times2$ matrix $W$, and
+	confirm $\Sigma_{G(W)}=S^{-1}+WW^T$.
+	
+	\item For $\{h_1,h_2,h_3\}$, compute the eigenvalues of
+	$\Sigma_{G(w)}$ for $\norm{w}=0,0.5,1,2,5$ (any fixed direction),
+	and confirm both eigenvalues are non-decreasing in $\norm{w}$,
+	illustrating T5.
+\end{compexercises}

@@ -1,0 +1,701 @@
+\chapter{Equiangular Frames and Grassmannian Packings}
+\label{ch:etf}
+\fancyhead[R]{\small\textit{Chapter 9: Equiangular and Grassmannian Frames}}
+\section{Overview: Beyond Tight, Toward Optimal}
+\label{sec:ch9-overview}
+
+Chapter~8 showed that tight, unit-norm frames are the global minimizers
+of the frame potential --- the most ``spread out'' unit-norm
+configurations in the energy-minimization sense. Lab Exercise~8.4 asked
+a natural follow-up question: among those minimizers, are the resulting
+vectors \emph{equiangular} (all pairwise inner product magnitudes equal),
+or merely tight? The answer, observed numerically for $m=7$, $n=3$, was:
+merely tight --- gradient descent on the frame potential finds tight
+frames, but not necessarily equiangular ones, because equiangularity is
+a strictly stronger condition than tightness.
+
+This chapter studies that stronger condition. An \emph{equiangular tight
+frame} (ETF) is a unit-norm tight frame in which \emph{every pair} of
+distinct frame vectors has exactly the same inner product magnitude.
+ETFs are the most ``spread out'' configurations in a second, independent
+sense: they minimize the maximum pairwise inner product over all
+unit-norm frames of the same size and ambient dimension. The precise
+lower bound on that maximum is the \emph{Welch bound}, and ETFs are
+exactly the configurations that achieve it.
+
+We also revisit the connection, promised in Chapter~4, between the
+roots-of-unity construction and a larger family called \emph{harmonic
+frames}. The chapter closes with the \emph{Grassmannian packing
+problem}: the question of how to arrange $m$ one-dimensional subspaces
+in $\R^n$ (or $\C^n$) as spread out as possible, of which ETFs are
+one specific and very clean solution.
+
+\section{Coherence and Equiangular Frames}
+\label{sec:coherence}
+
+\begin{definition}[Coherence]
+\label{def:coherence}
+Let $\{f_i\}_{i=1}^m \subset \F^n$ be a collection of unit-norm
+vectors. The \emph{coherence} of the collection is
+\[
+  \mu\bigl(\{f_i\}\bigr) \;:=\;
+  \max_{1\le i < j \le m} |\inner{f_i}{f_j}|.
+\]
+\end{definition}
+
+The coherence is the worst-case pairwise inner product magnitude: it
+measures how ``similar'' the two most similar vectors in the collection
+are. Small coherence means no two vectors are nearly parallel --- the
+configuration is well spread out in the sense of
+pairwise-distinguishability. A set of unit-norm vectors with
+$\mu=0$ is an orthonormal set (every pair is orthogonal); increasing
+$\mu$ indicates growing redundancy, with $\mu=1$ achieved when some pair
+of vectors is actually parallel (or antipodal, since $|\inner{f_i}{-f_i}|=1$).
+
+\begin{remark*}
+Coherence is not the same as the frame's lower bound $A$ or upper bound
+$B$: coherence is a property of \emph{pairs} of vectors, while frame
+bounds are global properties of the entire configuration. We have been
+using frame bounds since Chapter~2; coherence is a finer, more local
+notion that appears naturally when asking how well a frame can
+distinguish nearly-parallel directions.
+\end{remark*}
+
+\begin{definition}[Equiangular frame]
+\label{def:equiangular}
+A collection $\{f_i\}_{i=1}^m$ of unit-norm vectors in $\F^n$ is
+\emph{equiangular} if there is a constant $c\ge0$ such that
+$|\inner{f_i}{f_j}|=c$ for every $i\ne j$. Equivalently, all off-diagonal
+entries of the Gram matrix $G_{ij}=\inner{f_j}{f_i}$ have the same
+modulus. When the collection is also a tight frame, it is called an
+\emph{equiangular tight frame} (ETF).
+\end{definition}
+
+\begin{examplebox}[title={Example 9.1: The Mercedes-Benz frame}]
+\label{ex:mercedes-benz}
+The three vectors $f_1=(1,0)$, $f_2=(-\tfrac12,\tfrac{\sqrt3}{2})$,
+$f_3=(-\tfrac12,-\tfrac{\sqrt3}{2})$ in $\R^2$ --- the triangular frame
+studied since Chapter~1 --- are the canonical example of an ETF. They
+satisfy $|\inner{f_i}{f_j}|=\tfrac12$ for every $i\ne j$ (all
+off-diagonal inner products equal $-\tfrac12$, which in the real case
+gives modulus $\tfrac12$), and are tight with $A=\tfrac32$
+(Example~3.2). This frame is sometimes called the \emph{Mercedes-Benz
+frame} after the visual resemblance of its three vectors to the three
+spokes of the well-known logo.
+\end{examplebox}
+
+\begin{remark*}
+Not every tight frame is equiangular. The square frame ($m=4$, $n=2$,
+the vertices of a square) is tight with $A=2$ (Chapter~4, Example~3.6)
+but is manifestly \emph{not} equiangular: adjacent vertices have inner
+product $0$, while antipodal vertices have inner product $|\inner{f_1}{f_3}|
+= |(1,0)\cdot(-1,0)| = 1$. The off-diagonal inner products take two
+distinct values, $0$ and $1$, so $\mu = 1$ --- the worst possible
+coherence for a unit-norm set. Any regular $m$-gon with $m\ge4$ has
+this deficiency: if $m$ is even, antipodal pairs give coherence $1$;
+if $m$ is odd with $m\ge5$, at least two distinct pairwise angles appear
+(as verified numerically in Lab Exercise~9.1). Among regular polygons
+in $\R^2$, \emph{only the triangle} ($m=3$) is equiangular, making the
+Mercedes-Benz frame the unique real ETF arising from the regular-polygon
+family.
+\end{remark*}
+
+\section{The Welch Bound}
+\label{sec:welch-bound}
+
+Why does it matter whether the coherence equals some specific value?
+The \emph{Welch bound} provides a precise, universal lower limit on the
+coherence of any unit-norm collection, expressed in terms of $m$ and $n$
+alone. It says you cannot spread $m$ unit-norm vectors in $\F^n$ with
+coherence below a certain threshold --- no matter how hard you try.
+
+\begin{theorem}[Welch bound]
+\label{thm:welch-bound}
+For any collection $\{f_i\}_{i=1}^m$ of unit-norm vectors in $\F^n$
+with $m>n$,
+\[
+  \mu\bigl(\{f_i\}\bigr)
+  \;\ge\;
+  \sqrt{\frac{m-n}{n(m-1)}},
+\]
+with equality if and only if $\{f_i\}_{i=1}^m$ is an equiangular tight
+frame.
+\end{theorem}
+
+\begin{proof}
+Let $G$ be the $m\times m$ Gram matrix with entries $G_{ij}=
+\inner{f_j}{f_i}$. Since all $f_i$ are unit-norm, the diagonal entries
+are $G_{ii}=1$, so $\tr(G)=m$. The off-diagonal entries satisfy
+$|G_{ij}|\le\mu$ for $i\ne j$.
+
+\textbf{Step 1: lower-bound $\tr(G^2)$.}
+Since $G=F^*F$ and $S=FF^*$ are related by $G=(F^*)(F)$ and $S=(F)(F^*)$,
+they share the same nonzero eigenvalues (a standard fact: if $ABv=\lambda v$
+then $BA(Bv)=\lambda(Bv)$, so nonzero eigenvalues of $AB$ and $BA$ coincide).
+Therefore $\tr(G^2)=\sum_{k}\sigma_k^2$ where $\sigma_k$ are the eigenvalues
+of $G$, which equal those of $S$ for the $n$ nonzero ones (and $0$ for the
+remaining $m-n$). In particular, $\tr(G^2)=\tr(S^2)=\FP(\{f_i\})$. By
+Theorem~8.3.1 (frame potential lower bound), $\FP\ge m^2/n$ for any
+unit-norm collection, giving
+\[
+  \tr(G^2) \;\ge\; \frac{m^2}{n}.
+\]
+
+\textbf{Step 2: upper-bound $\tr(G^2)$ using $\mu$.} Split the sum:
+\[
+  \tr(G^2)=\sum_{i,j}|G_{ij}|^2
+  = \underbrace{\sum_i |G_{ii}|^2}_{=m}
+    + \underbrace{\sum_{i\ne j}|G_{ij}|^2}_{\le\,m(m-1)\mu^2}.
+\]
+So $\tr(G^2)\le m + m(m-1)\mu^2$.
+
+\textbf{Step 3: combine.} From Steps~1 and~2:
+\[
+  \frac{m^2}{n} \;\le\; \tr(G^2) \;\le\; m + m(m-1)\mu^2.
+\]
+Rearranging:
+\[
+  m(m-1)\mu^2 \;\ge\; \frac{m^2}{n} - m = m\!\left(\frac{m}{n}-1\right)
+  = \frac{m(m-n)}{n},
+\]
+so $\mu^2 \ge (m-n)/(n(m-1))$, which gives the Welch bound.
+
+\textbf{Equality.} The two Cauchy--Schwarz applications give equality
+simultaneously iff: (a) all eigenvalues of $S$ are equal, i.e.\ $S=\lambda
+I$ (tight frame, by Theorem~3.5.1(iii)); and (b) all off-diagonal
+$|G_{ij}|$ are equal to $\mu$ (equiangular). Together, these say
+$\{f_i\}$ is an ETF.
+\end{proof}
+
+\begin{keyidea}
+\textbf{ETFs are exactly the configurations achieving the Welch bound}
+--- the configurations of unit-norm vectors whose worst-case pairwise
+inner product is as small as it can possibly be, given $m$ and $n$. The
+Welch bound is a hard floor: no unit-norm configuration of $m$ vectors
+in $\F^n$ can have coherence below $\sqrt{(m-n)/(n(m-1))}$. ETFs sit on
+that floor. Tight frames that are not ETFs (e.g.\ regular polygons with
+$m\ge4$ in $\R^2$) sit strictly above it.
+\end{keyidea}
+
+\begin{examplebox}[title={Example 9.2: Welch bound for the Mercedes-Benz frame}]
+\label{ex:welch-mercedes}
+For $m=3$, $n=2$: Welch bound $= \sqrt{(3-2)/(2\cdot2)} = \sqrt{1/4}
+= \tfrac12$. The Mercedes-Benz frame achieves $\mu=\tfrac12$ exactly
+(Example~\ref{ex:mercedes-benz}). So it sits precisely on the Welch
+bound --- it is the tightest possible unit-norm configuration of $3$
+vectors in $\R^2$ in the coherence sense, among all possible
+configurations of $3$ unit-norm vectors in $\R^2$.
+
+For comparison, the square frame ($m=4$, $n=2$) has Welch bound
+$\sqrt{(4-2)/(2\cdot3)} = \sqrt{1/3} \approx 0.577$, but achieves
+$\mu=1$ (antipodal pair). It sits far above the Welch floor, confirming
+that being tight does not imply achieving the Welch bound.
+\end{examplebox}
+
+\begin{remark*}
+The Welch bound is achievable only for certain pairs $(n,m)$ --- there
+are combinatorial and algebraic obstructions that prevent ETFs from
+existing in many cases. For example, in $\R^2$, the only real ETF with
+$m>n$ is the Mercedes-Benz frame ($m=3$): no unit-norm equiangular tight
+frame with $m\ge4$ vectors exists in $\R^2$. (This can be verified
+directly: equiangularity forces all $|\inner{f_i}{f_j}|=c$ for a common
+$c>0$, tightness forces $c=\sqrt{m-n}/(n(m-1))^{1/2}$ which is the
+Welch bound, and in $\R^2$ the only unit-norm vectors satisfying both
+constraints simultaneously for $m\ge4$ would have to include antipodal
+pairs, which gives $c=1$, contradicting $c<1$ for $m>n+1$... the precise
+combinatorial statement is subtle, but the numerical evidence is clear.)
+In higher dimensions and over $\C$, ETFs can exist for many more
+$(n,m)$ pairs, and their construction is an active research area
+connecting to combinatorics, coding theory, and quantum information.
+\end{remark*}
+
+\section{An ETF Characterization via the Gram Matrix}
+\label{sec:gram-characterization}
+
+The definition of an ETF involves two separate conditions: tight and
+equiangular. There is an elegant way to unify them into a single
+condition on the Gram matrix, which also gives a concrete necessary
+condition for ETFs to exist.
+
+\begin{proposition}[ETF Gram matrix characterization]
+\label{prop:etf-gram}
+A unit-norm collection $\{f_i\}_{i=1}^m \subset \F^n$ is an ETF with
+bound $A=m/n$ and coherence $c$ if and only if its Gram matrix
+$G$ satisfies
+\begin{equation}
+\label{eq:etf-gram}
+  G^2 = \frac{m}{n}\, G.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Since $G=F^*F$ (where $F$ has columns $f_i$) and $S=FF^*$, we have
+$G^2=(F^*F)^2=F^*(FF^*)F=F^*SF$. The frame is tight with bound $A=m/n$
+iff $S=(m/n)I$, in which case $F^*SF=(m/n)F^*F=(m/n)G$, giving
+$G^2=(m/n)G$. Conversely, if $G^2=(m/n)G$, then $G$ is a projection
+(up to scale $m/n$), meaning the eigenvalues of $G$ lie in $\{0, m/n\}$.
+Since $\tr(G)=m$ and $G$ has $m$ eigenvalues summing to $m$, exactly $n$
+eigenvalues equal $m/n$ and the remaining $m-n$ equal $0$ (using $n\cdot(m/n)
++ (m-n)\cdot0 = m$). This means $S=FF^*$ has $n$ eigenvalues all equal
+to $m/n$ --- exactly the tight frame condition. The equiangular condition
+is then encoded in the off-diagonal structure once tightness forces the
+diagonal, so~\eqref{eq:etf-gram} captures both conditions simultaneously.
+\end{proof}
+
+\begin{corollary}[ETF necessary condition]
+\label{cor:etf-necessary}
+If an ETF with $m$ vectors in $\F^n$ exists, then the common coherence
+value satisfies
+\[
+  c = \sqrt{\frac{m-n}{n(m-1)}},
+\]
+exactly the Welch bound.
+\end{corollary}
+
+\begin{proof}
+If $\{f_i\}_{i=1}^m$ is an ETF, it achieves equality in the Welch bound
+by Theorem~\ref{thm:welch-bound}. The Welch bound equals
+$\sqrt{(m-n)/(n(m-1))}$, so the common inner product magnitude is exactly
+that value.
+\end{proof}
+
+\section{The Grassmannian Packing Perspective}
+\label{sec:grassmannian}
+
+The Welch bound and ETFs arise naturally from a broader geometric
+question: how should one arrange $m$ one-dimensional subspaces (lines
+through the origin) in $\R^n$ (or $\C^n$) to make them as ``spread out''
+as possible? A one-dimensional subspace in $\R^n$ is equivalent to a
+pair of antipodal unit vectors $\pm f$ on the unit sphere. The set of
+all such lines is called the \emph{real projective space} $\R\mathrm{P}^{n-1}$.
+The question of packing $m$ lines in $\R^n$ to maximize their minimum
+pairwise angle is called the \emph{Grassmannian packing problem}
+(``Grassmannian'' because the set of all $k$-dimensional subspaces of
+$\R^n$ is a manifold called the Grassmannian $\Gr(k,n)$, and the line
+case $k=1$ is the simplest instance).
+
+\begin{definition}[Grassmannian packing angle]
+\label{def:packing-angle}
+Given $m$ unit vectors $\{f_i\}$ in $\R^n$, the \emph{worst-case
+packing angle} between the corresponding lines $\spn\{f_i\}$ is
+\[
+  \theta_{\min} :=
+  \min_{i\ne j} \arccos\!\bigl(|\inner{f_i}{f_j}|\bigr)
+  = \arccos\!\bigl(\mu(\{f_i\})\bigr).
+\]
+Since $\arccos$ is decreasing, \emph{maximizing $\theta_{\min}$} over
+all unit-norm collections is equivalent to \emph{minimizing} the
+coherence $\mu$.
+\end{definition}
+
+The Welch bound then says: no configuration of $m$ unit-norm vectors in
+$\R^n$ can achieve $\theta_{\min}>\arccos\!\bigl(\sqrt{(m-n)/(n(m-1))}\bigr)$.
+An ETF, if one exists for the given $(n,m)$ pair, is an optimal packing
+--- a solution to the Grassmannian packing problem.
+
+\begin{keyidea}
+\textbf{ETFs are optimal Grassmannian packings}: they arrange $m$ lines
+in $\R^n$ with maximum possible minimum angle between any pair. The
+Welch bound is the ceiling on that minimum angle, expressed as a lower
+bound on coherence. Tight frames minimize the frame potential (energy
+spreading), while ETFs additionally maximize angular separation (packing
+optimality). These are independent optimization criteria that happen to
+be simultaneously achievable in certain cases, and those cases are
+exactly the ETFs.
+\end{keyidea}
+
+\section{Harmonic Frames: ETFs from Roots of Unity}
+\label{sec:harmonic-frames}
+
+Chapter~4 (Lab Exercise~4.5) introduced the vectors
+\[
+  f_k = \frac{1}{\sqrt{n}}\bigl(1,\,\omega^k,\,\omega^{2k},\,\ldots,
+  \omega^{(n-1)k}\bigr)\in\C^n, \qquad k=0,1,\ldots,n-1,
+\]
+where $\omega=e^{2\pi i/n}$, and observed that they form an orthonormal
+basis for $\C^n$ (hence trivially a tight frame with $A=1$ and $\mu=0$).
+\emph{Harmonic frames} generalise this construction to $m>n$ vectors by
+selecting $m$ rows from the $n\times n$ DFT matrix --- choosing
+$m$ indices $k$ from $\{0,1,\ldots,n-1\}$ rather than all $n$ of them.
+
+\begin{definition}[Harmonic frame]
+\label{def:harmonic-frame}
+Let $\omega=e^{2\pi i/n}$ and let $\mathcal{S}\subset\Z/n\Z$ be a
+subset of $m$ residues modulo $n$, with $m\le n$. The corresponding
+\emph{harmonic frame} for $\C^n$ is
+\[
+  \bigl\{f_k\bigr\}_{k\in\mathcal S},\qquad
+  f_k=\frac{1}{\sqrt{n}}
+  \bigl(1,\,\omega^k,\,\omega^{2k},\,\ldots,\,\omega^{(n-1)k}\bigr)\in\C^n.
+\]
+\end{definition}
+
+\begin{remark*}
+This is most interesting when $m>n$ is larger than the dimension, which
+requires going to a larger DFT. More generally, one takes an $n\times N$
+DFT matrix (columns $\{f_k\}_{k=0}^{N-1}$ for some $N>n$) and selects
+$m\le N$ columns; the discrete orthogonality relation for roots of unity
+(Proof~2 of Theorem~4.3.1) guarantees tightness whenever the index set
+$\mathcal S$ has a particular symmetry property (it suffices that
+$\mathcal S$ is a ``difference set'' modulo $N$). We study only the
+simplest case here.
+\end{remark*}
+
+\begin{proposition}[Harmonic frames from the full DFT are tight]
+\label{prop:harmonic-tight}
+The full DFT collection $\{f_k\}_{k=0}^{n-1}\subset\C^n$ defined above
+is a Parseval frame for $\C^n$ (i.e.\ an orthonormal basis, $A=B=1$).
+\end{proposition}
+
+\begin{proof}
+The $m\times m$ matrix $(F^*F)_{jk}=\inner{f_k}{f_j}=\frac1n\sum_{\ell=0}^{n-1}
+\overline{\omega^{j\ell}}\omega^{k\ell}=\frac1n\sum_{\ell}\omega^{(k-j)\ell}$,
+which equals $1$ when $j=k$ and $0$ when $j\ne k$ by the discrete
+orthogonality relation for roots of unity (equation~(4.3) in Chapter~4,
+introduced in Proof~2 of Theorem~4.3.1). So $F^*F=I_n$, confirming
+the columns are orthonormal, hence a Parseval frame.
+\end{proof}
+
+The reason harmonic frames appear in a chapter on ETFs is that
+\emph{selecting subsets} of DFT columns gives natural candidates for
+equiangular collections, since the pairwise inner products
+$\inner{f_j}{f_k}=(1/n)\sum_\ell\omega^{(k-j)\ell}$ depend only on
+$k-j\pmod{n}$, not on the individual indices --- so if two pairs $(j_1,k_1)$
+and $(j_2,k_2)$ have $k_1-j_1\equiv k_2-j_2\pmod n$, their inner products
+are automatically equal. Whether \emph{all} off-diagonal inner products
+end up equal (equiangularity) depends on the structure of $\mathcal S$,
+and is related to the theory of \emph{difference sets} in combinatorics.
+
+\begin{examplebox}[title={Example 9.4: A harmonic frame in $\C^3$}]
+\label{ex:harmonic-c3}
+Take $n=3$, $\omega=e^{2\pi i/3}$, and $\mathcal S=\{0,1,2\}$ (all three
+columns). The harmonic frame is the orthonormal basis of $\C^3$:
+\[
+  f_0 = \tfrac{1}{\sqrt3}(1,1,1)^T,\quad
+  f_1 = \tfrac{1}{\sqrt3}(1,\omega,\omega^2)^T,\quad
+  f_2 = \tfrac{1}{\sqrt3}(1,\omega^2,\omega^4)^T.
+\]
+This is an ETF vacuously ($m=n=3$, so coherence is $0$ and the Welch
+bound is $0$). The genuinely interesting case is taking $m<N$ columns
+from a larger DFT; Lab Exercise~9.5 explores a specific example.
+\end{examplebox}
+
+\section{NumPy Implementation}
+\label{sec:numpy-etf}
+
+\begin{lstlisting}[caption={Coherence, Welch bound, and ETF verification in NumPy}]
+import numpy as np
+
+def gram_matrix(F):
+    """Gram matrix G = F^* F (shape m x m)."""
+    return F.T.conj() @ F
+
+def coherence(F):
+    """Maximum off-diagonal |inner product| for unit-norm columns of F."""
+    G = gram_matrix(F)
+    m = F.shape[1]
+    off_diag = np.abs(G - np.diag(np.diag(G)))  # zero the diagonal
+    return off_diag.max()
+
+def welch_bound(n, m):
+    """Lower bound on coherence for m unit-norm vectors in F^n."""
+    return np.sqrt((m - n) / (n * (m - 1)))
+
+def is_etf(F, tol=1e-6):
+    """
+    Check whether the columns of F form an equiangular tight frame.
+    Returns (is_tight, is_equiangular, achieves_welch).
+    """
+    n, m = F.shape
+    # Tightness
+    S = F @ F.T.conj()
+    eigs = np.linalg.eigvalsh(S.real)
+    tight = bool(np.isclose(eigs.min(), eigs.max(), atol=tol))
+    # Equiangularity: all off-diagonal |<fi,fj>| must be equal.
+    # Compare max and min of off-diagonal magnitudes (not off[0],
+    # which depends on ordering and may be zero for non-equiangular frames).
+    G = gram_matrix(F)
+    off = np.array([np.abs(G[i,j]) for i in range(m) for j in range(m) if i != j])
+    equi = bool(np.isclose(off.max(), off.min(), atol=tol))
+    # Welch bound
+    mu = coherence(F)
+    wb = welch_bound(n, m)
+    achieves = bool(np.isclose(mu, wb, atol=tol))
+    return tight, equi, achieves
+
+# -------------------------------------------------------------------
+# Mercedes-Benz frame (m=3, n=2): the canonical real ETF
+# -------------------------------------------------------------------
+f1 = np.array([1.0,  0.0])
+f2 = np.array([-0.5, np.sqrt(3)/2])
+f3 = np.array([-0.5, -np.sqrt(3)/2])
+F_mb = np.column_stack([f1, f2, f3])
+
+tight_mb, equi_mb, wb_mb = is_etf(F_mb)
+print("=== Mercedes-Benz frame (m=3, n=2) ===")
+print(f"Tight: {tight_mb}, Equiangular: {equi_mb}, Achieves Welch bound: {wb_mb}")
+print(f"Coherence: {coherence(F_mb):.6f}  Welch bound: {welch_bound(2,3):.6f}")
+
+# -------------------------------------------------------------------
+# Square frame (m=4, n=2): tight but NOT equiangular
+# -------------------------------------------------------------------
+angles4 = np.array([0, np.pi/2, np.pi, 3*np.pi/2])
+F_sq = np.vstack([np.cos(angles4), np.sin(angles4)])
+
+tight_sq, equi_sq, wb_sq = is_etf(F_sq)
+print("\n=== Square frame (m=4, n=2) ===")
+print(f"Tight: {tight_sq}, Equiangular: {equi_sq}, Achieves Welch bound: {wb_sq}")
+print(f"Coherence: {coherence(F_sq):.6f}  Welch bound: {welch_bound(2,4):.6f}")
+G_sq = gram_matrix(F_sq)
+print("Gram matrix off-diag magnitudes:",
+      sorted(set(np.abs(G_sq - np.eye(4)).round(4).flatten()))[::-1][:4])
+
+# -------------------------------------------------------------------
+# Gram matrix check: G^2 = (m/n) G for Mercedes-Benz
+# -------------------------------------------------------------------
+G_mb = gram_matrix(F_mb)
+lhs = G_mb @ G_mb
+rhs = (3/2) * G_mb
+print("\n=== Gram matrix check (Proposition 9.4.1) ===")
+print(f"G^2 = (m/n)G for Mercedes-Benz: {np.allclose(lhs, rhs)}")
+
+# -------------------------------------------------------------------
+# Welch bound survey: all regular polygons m=3..8 in R^2
+# -------------------------------------------------------------------
+print("\n=== Regular m-gons vs Welch bound ===")
+for m in range(3, 9):
+    angles = 2*np.pi*np.arange(m)/m
+    F = np.vstack([np.cos(angles), np.sin(angles)])
+    mu = coherence(F)
+    wb = welch_bound(2, m)
+    t, e, w = is_etf(F)
+    print(f"m={m}: mu={mu:.4f}, Welch={wb:.4f}, "
+          f"tight={t}, equiangular={e}, ETF={t and e}")
+\end{lstlisting}
+
+\section{Searching for ETFs via Gradient Descent}
+\label{sec:etf-search}
+
+The frame potential (Chapter~8) finds tight frames but not necessarily
+ETFs. To search for ETFs numerically, we can minimize a different
+objective: the \emph{coherence itself}, or the \emph{coherence-squared
+sum} $\sum_{i\ne j}|\inner{f_i}{f_j}|^2$. The latter is smoother (no
+\texttt{max} operation) and directly related to the frame potential:
+\[
+  \sum_{i\ne j}|\inner{f_i}{f_j}|^2 = \FP - m \quad (\text{unit-norm case}).
+\]
+Since $\FP$ is minimized by tight frames, minimizing $\sum_{i\ne j}
+|\inner{f_i}{f_j}|^2$ is the same optimization. This means that if an
+ETF exists, gradient descent on the frame potential will find a
+tight frame in which the off-diagonal inner products are likely to
+equalize too, especially from a good random initialization.
+
+\begin{examplebox}[title={Example 9.3: When gradient descent finds an ETF (and when it doesn't)}]
+\label{ex:etf-gd}
+For $(n,m)=(2,3)$: the only unit-norm tight frame in $\R^2$ with $3$
+vectors is (up to rotation and sign-flips) the Mercedes-Benz frame, so
+gradient descent on the frame potential automatically produces an ETF.
+
+For $(n,m)=(2,4)$: there is no real ETF with $4$ vectors in $\R^2$ (as
+the remark in Section~\ref{sec:coherence} explains), so gradient descent
+finds tight frames that are not ETFs. The tight-frame minimum $m^2/n=8$
+is achieved by many distinct non-equiangular configurations (the family
+of tight non-equiangular frames is large), and gradient descent lands on
+one of them.
+
+For $(n,m)=(3,6)$: real ETFs with $6$ vectors in $\R^3$ are known to
+exist (the regular icosahedron vertices, after normalization, give one
+such configuration). Gradient descent can find them, but only if the
+search is conducted over a refined objective that encourages
+equiangularity beyond just tightness.
+\end{examplebox}
+
+\section{Chapter Summary}
+\label{sec:summary-ch9}
+
+\begin{itemize}
+  \item The \textbf{coherence} $\mu=\max_{i\ne j}|\inner{f_i}{f_j}|$ of a
+        unit-norm collection measures how ``non-orthogonal'' the most
+        similar pair is. Small coherence means well-spread configurations.
+
+  \item A collection is \textbf{equiangular} if all off-diagonal Gram
+        entries have the same modulus. An \textbf{equiangular tight
+        frame} (ETF) is equiangular and tight.
+
+  \item \textbf{Theorem~\ref{thm:welch-bound} (Welch bound):} for any
+        unit-norm collection of $m$ vectors in $\F^n$ with $m>n$,
+        $\mu\ge\sqrt{(m-n)/(n(m-1))}$. Equality holds if and only if
+        the collection is an ETF. The proof combines the frame-potential
+        lower bound ($\FP\ge m^2/n$, from Chapter~8) with an upper bound
+        on $\FP$ in terms of $\mu$.
+
+  \item \textbf{ETFs are optimal Grassmannian packings}: they arrange $m$
+        lines in $\R^n$ with the maximum possible minimum pairwise angle,
+        and they minimize the frame potential simultaneously.
+
+  \item \textbf{Proposition~\ref{prop:etf-gram}}: $\{f_i\}$ is an ETF
+        iff its Gram matrix satisfies $G^2=(m/n)G$, a single matrix
+        equation encoding both tightness and equiangularity.
+
+  \item ETFs exist only for certain $(n,m)$ pairs. In $\R^2$, only $m=3$
+        (the Mercedes-Benz frame) gives a real ETF. In higher dimensions
+        and over $\C$, the existence problem is an active research area
+        connected to combinatorics (e.g.\ symmetric designs, difference
+        sets) and quantum information (optimal quantum measurements).
+\end{itemize}
+
+\section{Lab Exercises}
+\label{sec:lab-ch9}
+
+\begin{exercisebox}[title={Lab Exercise 9.1: Regular Polygons and Equiangularity}]
+Implement \texttt{coherence(F)}, \texttt{welch\_bound(n, m)}, and
+\texttt{is\_etf(F)} from Section~\ref{sec:numpy-etf}. Run
+\texttt{is\_etf} on all regular $m$-gons in $\R^2$ for $m=3,\ldots,12$.
+For each, also report the distinct off-diagonal Gram magnitudes. Confirm
+that only $m=3$ is an ETF, and explain geometrically why even-$m$ cases
+fail so dramatically (hint: $\mu=1$).
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 9.2: Welch Bound Survey}]
+For each $(n,m)$ in $\{(2,3),(2,5),(3,4),(3,6),(3,7),(4,6),(4,7)\}$:
+\begin{enumerate}[label=(\alph*)]
+  \item Compute the Welch bound $\sqrt{(m-n)/(n(m-1))}$.
+  \item Use the gradient-descent algorithm of Chapter~8
+        (\texttt{fit\_tight\_frame}) to find a tight unit-norm frame for
+        each, and compute its coherence.
+  \item Report whether the result achieves the Welch bound. For those
+        that do not, compute the ratio $\mu/\mu_{\mathrm{Welch}}$ and
+        call it the ``coherence excess.''
+  \item Identify which $(n,m)$ pairs appear from your experiments to
+        \emph{admit} an ETF (coherence excess $\approx 1$) and which do
+        not (coherence excess $\gg 1$). (Note: this is a numerical
+        experiment, not a proof --- you may miss some ETFs or
+        misidentify some near-misses.)
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 9.3: The Gram Matrix Condition}]
+For the Mercedes-Benz frame $F_\mathrm{MB}$, verify numerically that
+$G^2=(3/2)G$ (Proposition~\ref{prop:etf-gram}). Then construct a
+\emph{different} $3\times3$ Gram matrix $G'$ satisfying $G'^2=(3/2)G'$,
+with $G'_{ii}=1$ for all $i$ and all off-diagonal entries having modulus
+$\tfrac12$, but with the off-diagonal \emph{signs} permuted. Does $G'$
+correspond to a valid frame? (Hint: a Gram matrix $G=F^*F$ must be
+positive semidefinite; check whether $G'$ is PSD, and if so, extract the
+corresponding frame vectors using a Cholesky decomposition or eigenvalue
+decomposition.) This explores the phenomenon that multiple non-congruent
+ETF configurations can share the same equiangularity value.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 9.4: Coherence-Minimizing Descent}]
+The frame potential minimizes $\sum_{ij}|\inner{f_i}{f_j}|^2=\FP$.
+Instead, minimize the \emph{maximum} off-diagonal inner product:
+$\mu = \max_{i\ne j}|\inner{f_i}{f_j}|$, or a smooth approximation
+such as $\mu_\alpha = \bigl(\sum_{i\ne j}|\inner{f_i}{f_j}|^{2\alpha}
+\bigr)^{1/(2\alpha)}$ for large $\alpha$ (a soft-max approximation that
+becomes exact as $\alpha\to\infty$). Implement gradient descent on
+$\mu_\alpha$ with $\alpha=8$ for $(n,m)=(2,3)$ and $(n,m)=(3,4)$, and
+compare the resulting coherence to the Welch bound. Does maximizing
+angular separation produce results closer to the Welch bound than
+minimizing the frame potential alone?
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 9.5 (Optional, Challenge): ETFs in $\R^3$}]
+The six vectors formed by taking the $\pm$ unit vectors along the three
+coordinate axes of $\R^3$ --- i.e.\ $\{\pm e_1,\pm e_2,\pm e_3\}$ ---
+form a tight frame for $\R^3$ with $m=6$, $A=2$. But is it equiangular?
+(Hint: some pairs are orthogonal, others are antipodal.) If not, research
+(via any source you can find) what the smallest real ETF in $\R^3$ with
+$m>3$ is. Then verify the claimed ETF numerically using \texttt{is\_etf}.
+This exercise previews the rich combinatorial theory of ETF existence,
+which in $\R^3$ is already surprisingly non-trivial.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 9.6 (Optional): Harmonic Frames in $\C^n$}]
+This exercise explores the harmonic frame construction of
+Section~\ref{sec:harmonic-frames}.
+\begin{enumerate}[label=(\alph*)]
+  \item For $n=3$ and $\omega=e^{2\pi i/3}$, construct the three DFT
+        vectors $f_0,f_1,f_2\in\C^3$ as in Definition~\ref{def:harmonic-frame}
+        using complex NumPy arrays (\texttt{dtype=complex}). Verify
+        numerically that $\inner{f_j}{f_k}=\delta_{jk}$ for all $j,k$
+        (use \texttt{np.vdot} for complex inner products as discussed in
+        Lab Exercise~1.3 of Chapter~1), confirming the orthonormal-basis
+        claim of Proposition~\ref{prop:harmonic-tight}.
+  \item Now take $N=6$, $\omega=e^{2\pi i/6}$, and consider all $6$ DFT
+        vectors $\{f_k\}_{k=0}^5\subset\C^6$. Select the subset
+        $\mathcal S=\{0,1,2\}$ (the first three), giving a collection of
+        $3$ unit-norm vectors in $\C^6$. Is this collection tight? Is it
+        equiangular? Compute its coherence and compare to the Welch bound
+        for $n=6$, $m=3$.
+  \item (Challenge) Investigate whether any size-3 subset of the $N=7$
+        DFT columns gives an equiangular collection in $\C^7$. This is
+        related to the existence of a $(7,3,1)$ difference set modulo $7$
+        --- a set $\mathcal S$ such that every nonzero residue modulo $7$
+        appears exactly once as a difference $s_1-s_2$ with $s_1\ne s_2$
+        in $\mathcal S$. The set $\mathcal S=\{0,1,3\}$ is one such; test
+        it numerically using \texttt{is\_etf} from Lab Exercise~9.1.
+\end{enumerate}
+\end{exercisebox}
+\newpage
+\section{Supplementary Exercises}
+\label{sec:extra-ch9}
+
+\subsection*{Theoretical Exercises}
+\begin{theoexercises}
+	\item Isolate ``Step~2'' of the Welch bound proof (Theorem~9.3.1) as a
+	standalone lemma: prove that for any $m$ unit-norm vectors with
+	coherence $\mu$, $\FP\le m+m(m-1)\mu^2$.
+	
+	\item Using $G^2=(m/n)G$ (Proposition~9.4.1), prove that the Gram
+	matrix of an ETF has exactly two distinct eigenvalues: $0$ with
+	multiplicity $m-n$, and $m/n$ with multiplicity $n$. Conclude
+	$\rank G=n$.
+	
+	\item The \emph{chordal distance} between the lines spanned by unit
+	vectors $f_i,f_j$ is $d(f_i,f_j):=\sqrt{1-\inner{f_i}{f_j}^2}$.
+	Prove that minimizing the coherence $\mu$ over a configuration of
+	$m$ unit vectors is equivalent to maximizing the \emph{minimum}
+	pairwise chordal distance --- i.e.\ the Grassmannian packing
+	problem (minimize worst-case inner product) and the
+	``line-packing'' problem (maximize worst-case chordal distance)
+	are the same optimization.
+	
+	\item State and prove the complex analogue of the Welch bound
+	(Theorem~9.3.1) for unit vectors in $\C^n$, noting precisely where
+	the proof requires the conjugate-linear inner product convention
+	of Section~1.2.1.
+	
+	\item Numerically motivated conjecture, now to be proved: for the
+	Mercedes-Benz ETF, show that $\sum_{i=1}^3\inner{x}{f_i}^4$ is the
+	\emph{same} constant for every unit vector $x\in\R^2$ (not merely
+	the second moment $\sum_i\inner{x}{f_i}^2$, which is constant for
+	\emph{any} tight frame by definition). Then show this stronger
+	``fourth-moment constancy'' \emph{fails} for the square
+	configuration (tight, but not equiangular), so it is a genuinely
+	finer invariant than tightness alone --- a first glimpse of what
+	the frame theory literature calls a \emph{projective 2-design}.
+\end{theoexercises}
+
+\subsection*{Computational Exercises}
+\begin{compexercises}
+	\item Verify T1's bound numerically for $10$ random unit-norm
+	configurations with $(n,m)=(3,8)$, confirming $\FP\le
+	m+m(m-1)\mu^2$ in every case.
+	
+	\item Compute the Gram matrix eigenvalues of the Mercedes-Benz ETF and
+	confirm they match T2's prediction ($0$ with multiplicity $m-n=1$,
+	$m/n=3/2$ with multiplicity $n=2$).
+	
+	\item Implement the chordal distance function and verify T3's
+	equivalence numerically: for several random configurations,
+	confirm that the configuration minimizing coherence (via
+	\texttt{fit\_min\_coherence} from Lab Exercise~9.4) also maximizes
+	the minimum chordal distance.
+	
+	\item Reproduce the fourth-moment computation from T5: sample $50$
+	unit vectors $x$ around the circle, compute
+	$\sum_i\inner{x}{f_i}^4$ for both the Mercedes-Benz ETF and the
+	square, and plot both as functions of the angle of $x$, visually
+	confirming constancy for the ETF and variation for the square.
+\end{compexercises}

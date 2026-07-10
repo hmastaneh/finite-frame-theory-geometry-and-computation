@@ -1,0 +1,488 @@
+\chapter{Midterm Review}
+\label{ch:review}
+\fancyhead[R]{\small\textit{Chapter 7: Midterm Review}}
+\section{How to Use This Chapter}
+\label{sec:ch7-overview}
+
+Chapters~1--6 built the entire foundational apparatus of finite frame
+theory: the definition of a frame, the frame operator and its
+eigenvalues, tight frames, dual frames, and the geometric picture
+underlying duality. This chapter does not introduce new theory.
+Instead, it reorganizes everything you have learned around five central
+questions, gives you a single reference page for every major definition
+and theorem, and then provides a substantial bank of practice problems
+--- a mix of proof-style and computational questions, in the spirit of
+the midterm itself.
+
+The material is reorganized \emph{thematically} rather than
+chapter-by-chapter, because the five central questions below cut across
+the original chapter boundaries, and reviewing this way is a better test
+of whether you have internalized the ideas rather than just the order in
+which they were presented.
+
+\begin{keyidea}
+\textbf{The five central questions of Chapters 1--6:}
+\begin{enumerate}[label=(\arabic*)]
+  \item \emph{When is a set of vectors a frame?} (Spanning is
+        sufficient and necessary in finite dimensions.)
+  \item \emph{How do we compute its bounds exactly?} (Eigenvalues of
+        the frame operator $S=FF^*$.)
+  \item \emph{When is a frame tight, and why does it matter?}
+        ($S=AI$; resolution of the identity; roots-of-unity symmetry as
+        one mechanism among several.)
+  \item \emph{How do we reconstruct a signal from frame coefficients,
+        and is the reconstruction unique?} (Always possible via the
+        canonical dual; unique only when the frame is a basis;
+        otherwise an entire affine family of valid duals exists, and the
+        canonical one is optimal in a precise sense.)
+  \item \emph{What does that family of duals actually look like?}
+        (For the smallest redundant case, an ordinary plane with an
+        exact paraboloid of energy over it; the canonical dual sits at
+        the bottom, and the shape of the resulting reconstruction-error
+        ellipse is governed separately by the frame's own tightness.)
+\end{enumerate}
+\end{keyidea}
+
+\section{Question 1: When Is a Set of Vectors a Frame?}
+\label{sec:review-q1}
+
+\begin{definition}[Finite frame --- Chapter 2]
+\label{rev:def-frame}
+$\{f_i\}_{i=1}^m\subset\F^n$ is a frame for $\F^n$ if there exist
+$0<A\le B<\infty$ with
+\[
+  A\norm{x}^2 \le \sum_{i=1}^m|\inner{x}{f_i}|^2 \le B\norm{x}^2
+  \qquad\forall x\in\F^n.
+\]
+\end{definition}
+
+\begin{theorem}[Spanning $\Leftrightarrow$ frame --- Chapter 2, Theorem 2.2.1]
+\label{rev:thm-spanning}
+A finite set $\{f_i\}_{i=1}^m\subset\F^n$ is a frame for $\F^n$ if and
+only if it spans $\F^n$.
+\end{theorem}
+
+\begin{reviewbox}
+This is the single fact that makes finite frame theory tractable:
+existence of frame bounds is \emph{automatic} once you check spanning
+(equivalently, $\rank F = n$). The upper bound always exists (Cauchy--
+Schwarz, $B=\sum_i\norm{f_i}^2$ works); the lower bound is where
+spanning is essential (compactness argument: a continuous function on
+the unit sphere attains its minimum, and that minimum is forced
+positive exactly because no nonzero vector is orthogonal to a spanning
+set). \textbf{If an exam question asks ``is this a frame,'' check the
+rank of the synthesis matrix --- nothing else is needed.}
+\end{reviewbox}
+
+\section{Question 2: How Do We Compute the Bounds Exactly?}
+\label{sec:review-q2}
+
+\begin{definition}[Synthesis, analysis, frame operators --- Chapter 3]
+\label{rev:def-operators}
+$F:\F^m\to\F^n$, $Fc=\sum_ic_if_i$ (matrix with columns $f_i$);
+$F^*:\F^n\to\F^m$, $F^*x=(\inner{x}{f_i})_i$ (conjugate transpose);
+$S:=FF^*=\sum_if_if_i^*$, the \emph{frame operator}.
+\end{definition}
+
+\begin{theorem}[Frame bounds are eigenvalues --- Chapter 3, Theorem 3.5.1]
+\label{rev:thm-eigenvalues}
+$A_{\mathrm{opt}}=\lambda_{\min}(S)$, $B_{\mathrm{opt}}=\lambda_{\max}(S)$.
+\end{theorem}
+
+\begin{reviewbox}
+Computationally: \texttt{S = F @ F.T}, then
+\texttt{eigh(S)} gives both bounds in one call. \textbf{Always use
+\texttt{eigh}, never \texttt{eig}}, since $S$ is symmetric by
+construction --- \texttt{eigh} guarantees real, sorted eigenvalues and
+an orthonormal eigenbasis, while \texttt{eig} does not.
+The proof of Theorem~\ref{rev:thm-eigenvalues} hinges on the
+\emph{Rayleigh quotient}: $\inner{Sx}{x}/\norm{x}^2$ is a convex
+combination of the eigenvalues of $S$, hence trapped between
+$\lambda_{\min}$ and $\lambda_{\max}$, with equality exactly at the
+corresponding eigenvectors. This is a proof technique you should be
+able to reproduce from scratch, not just cite.
+\end{reviewbox}
+
+\begin{proposition}[Trace formula --- Chapter 3, Proposition 3.4.2(iv)]
+\label{rev:prop-trace}
+$\tr(S) = \sum_{i=1}^m\norm{f_i}^2$. For a tight, unit-norm frame with
+$m$ vectors in $\R^n$: $A = m/n$.
+\end{proposition}
+
+\section{Question 3: When Is a Frame Tight, and Why?}
+\label{sec:review-q3}
+
+\begin{definition}[Tight / Parseval frame --- Chapter 2]
+\label{rev:def-tight}
+Tight: $A=B$. Equivalently (Chapter 4): $S=AI$. Parseval: tight with
+$A=1$.
+\end{definition}
+
+\begin{theorem}[Regular polygons --- Chapter 4, Theorem 4.3.1]
+\label{rev:thm-polygon}
+The vertices of a regular $m$-gon ($m\ge3$) inscribed in the unit
+circle form a tight frame for $\R^2$ with $A=m/2$.
+\end{theorem}
+
+\begin{theorem}[Projection construction --- Chapter 4, Theorem 4.4.1]
+\label{rev:thm-projection}
+Projecting any orthonormal basis of $\F^N$ onto a subspace $V$ always
+produces a Parseval frame for $V$.
+\end{theorem}
+
+\begin{reviewbox}
+Two genuinely different \emph{mechanisms} produce tight frames: (a)
+\textbf{symmetry} (roots of unity / cyclic group orbits force
+trigonometric cross-terms to cancel) and (b) \textbf{projection} (any
+orthonormal basis of a bigger space, projected down, is automatically
+Parseval, regardless of symmetry). Neither mechanism is the
+\emph{definition} of tightness --- tightness is fundamentally an
+energy-balance condition, $S=AI$, and these are just two reliable ways
+to engineer it. \textbf{Do not write ``tight frames are symmetric'' as
+if it were an if-and-only-if statement} --- Proposition 4.5.1 gives an
+explicit asymmetric, unequal-norm tight frame.
+\end{reviewbox}
+
+\section{Question 4: Reconstruction and Duality}
+\label{sec:review-q4}
+
+\begin{definition}[Dual frame --- Chapter 5]
+\label{rev:def-dual}
+$\{g_i\}$ is dual to $\{f_i\}$ if $x=\sum_i\inner{x}{f_i}g_i$ for all
+$x$; equivalently $GF^*=I_n$. The relationship is mutual.
+\end{definition}
+
+\begin{proposition}[Canonical dual --- Chapter 5, Proposition 5.3.1]
+\label{rev:prop-canonical}
+$\tilde f_i := S^{-1}f_i$ is always a valid dual, with $\tilde S=S^{-1}$
+and bounds $\tilde A=1/B$, $\tilde B=1/A$.
+\end{proposition}
+
+\begin{theorem}[All duals --- Chapter 5, Theorem 5.4.1]
+\label{rev:thm-dual-family}
+Every valid dual synthesis matrix is $G=\tilde F+Z$ with $ZF^*=0$
+(rows of $Z$ in $\ker F$). Unique iff $m=n$ (basis case).
+\end{theorem}
+
+\begin{theorem}[Minimal norm --- Chapter 5, Theorem 5.5.1]
+\label{rev:thm-minimal-norm}
+$\tilde F$ uniquely minimizes $\norm{G}_F^2=\sum_i\norm{g_i}^2$ among
+all valid duals, via the Pythagorean decomposition
+$\norm{G}_F^2=\norm{\tilde F}_F^2+\norm{Z}_F^2$. Consequently $\tilde F$
+also minimizes expected reconstruction error under uncorrelated
+coefficient noise.
+\end{theorem}
+
+\begin{reviewbox}
+\textbf{A commonly confused dimension-counting point, worth getting
+exactly right:} for a frame with $m$ vectors in $\F^n$ ($m>n$), the
+space of valid perturbations $Z$ (with $ZF^*=0$) has real dimension
+$n\cdot(m-n)$ --- \emph{not} $m-n$. The kernel $\ker F\subset\F^m$
+itself has dimension $m-n$, but each of the $n$ \emph{rows} of $Z$
+ranges independently over that kernel, so the total freedom is $n$
+copies of it. For the triangular frame ($m=3$, $n=2$), $\dim\ker F=1$
+but the dual family is $2\cdot1=2$-dimensional --- this is exactly the
+fact that made the parameter plane of Chapter~6 a genuine \emph{plane}
+rather than a line. \textbf{Do not say ``the dual family has dimension
+$m-n$''} without the factor of $n$; this is a frequent and easy
+mistake.
+\end{reviewbox}
+
+\section{Question 5: What Does the Dual Family Look Like?}
+\label{sec:review-q5}
+
+\begin{proposition}[The dual family as a plane --- Chapter 6, Proposition 6.2.1]
+\label{rev:prop-dual-plane}
+For a frame with $m=n+1$ vectors, the affine family of duals is
+parametrized by $G(w)=\tilde F+wk^T$, $w\in\R^n$, where $k$ is a unit
+vector spanning the (one-dimensional) kernel of $F$.
+\end{proposition}
+
+\begin{theorem}[Energy paraboloid --- Chapter 6, Theorem 6.3.1]
+\label{rev:thm-paraboloid}
+$\norm{G(w)}_F^2=\norm{\tilde F}_F^2+\norm{w}^2$: an exact paraboloid
+over the parameter plane, with unique minimum at $w=0$ (the canonical
+dual). This holds whether or not the original frame is tight.
+\end{theorem}
+
+\begin{proposition}[Error covariance --- Chapter 6, Proposition 6.4.2]
+\label{rev:prop-error-cov}
+The canonical dual's reconstruction-error covariance under coefficient
+noise of variance $\sigma^2$ is $\Sigma_{\tilde F}=\sigma^2S^{-1}$
+exactly. Its level sets are circular if and only if the original frame
+is tight.
+\end{proposition}
+
+\begin{reviewbox}
+\textbf{Two different optimization criteria, easy to conflate:} the
+canonical dual minimizes \emph{total} energy $\norm{G}_F^2$ over the
+\emph{entire} affine family --- always, for any frame, tight or not.
+But minimizing total energy is not the same as making the
+reconstruction error \emph{isotropic} (equal in every direction): the
+shape of the error ellipse at the canonical dual is inherited from
+$S^{-1}$, and is only circular if the frame itself was tight to begin
+with. Chapter~6's Lab Exercise 6.2 showed explicitly that for a
+non-tight frame, there can exist a \emph{different} point on the same
+paraboloid where the error ellipse becomes circular --- at the cost of
+\emph{more} total energy than the canonical choice. \textbf{Minimal
+total error and balanced directional error are, in general, different
+points on the paraboloid; the canonical dual only optimizes the
+former.}
+\end{reviewbox}
+
+\section{Worked Review Problems}
+\label{sec:worked-review}
+
+These problems are worked in full, modeling the level of detail expected
+on the midterm itself.
+
+\begin{examplebox}[title={Review Problem 1: Is it a frame? Find the bounds.}]
+\label{rev:problem1}
+Let $u_1=(1,1)^T$, $u_2=(1,-1)^T$, $u_3=(2,0)^T$ in $\R^2$.
+\textbf{(a)} Is $\{u_1,u_2,u_3\}$ a frame for $\R^2$? \textbf{(b)} If
+so, find the exact frame bounds $A,B$. \textbf{(c)} Is it tight?
+
+\smallskip
+\textit{Solution.} (a) Since $u_1,u_2$ alone are linearly independent
+(not parallel), they already span $\R^2$; adding $u_3$ keeps the
+spanning property. By Theorem~\ref{rev:thm-spanning}, $\{u_1,u_2,u_3\}$
+is a frame for $\R^2$.
+
+(b) The synthesis matrix is $F=\begin{pmatrix}1&1&2\\1&-1&0\end{pmatrix}$.
+The frame operator is
+\[
+  S = FF^T = \begin{pmatrix}1&1&2\\1&-1&0\end{pmatrix}
+  \begin{pmatrix}1&1\\1&-1\\2&0\end{pmatrix}
+  = \begin{pmatrix}1+1+4 & 1-1+0\\1-1+0&1+1+0\end{pmatrix}
+  = \begin{pmatrix}6&0\\0&2\end{pmatrix}.
+\]
+This is already diagonal, so the eigenvalues are read off directly:
+$\lambda_1=6$, $\lambda_2=2$. By Theorem~\ref{rev:thm-eigenvalues},
+$B=6$ and $A=2$.
+
+(c) Since $A\ne B$, the frame is \emph{not} tight.
+
+\textit{Check:} the trace formula (Proposition~\ref{rev:prop-trace})
+gives $\tr(S)=\norm{u_1}^2+\norm{u_2}^2+\norm{u_3}^2=2+2+4=8$, and
+indeed $6+2=8$, confirming the computation.
+\end{examplebox}
+
+\begin{examplebox}[title={Review Problem 2: Canonical dual and reconstruction}]
+\label{rev:problem2}
+Using $\{u_1,u_2,u_3\}$ from Review Problem 1, find the canonical dual
+frame, and reconstruct $x=(4,2)^T$ from its frame coefficients.
+
+\smallskip
+\textit{Solution.} Since $S=\begin{pmatrix}6&0\\0&2\end{pmatrix}$ is
+diagonal, $S^{-1}=\begin{pmatrix}1/6&0\\0&1/2\end{pmatrix}$ directly.
+The canonical dual vectors are
+\[
+  \tilde u_1 = S^{-1}u_1 = (\tfrac16,\tfrac12)^T,\quad
+  \tilde u_2 = S^{-1}u_2 = (\tfrac16,-\tfrac12)^T,\quad
+  \tilde u_3 = S^{-1}u_3 = (\tfrac13,0)^T.
+\]
+The frame coefficients of $x=(4,2)^T$ are
+\[
+  c_1=\inner{x}{u_1}=4+2=6,\quad c_2=\inner{x}{u_2}=4-2=2,\quad
+  c_3=\inner{x}{u_3}=8.
+\]
+Reconstruction:
+\[
+  \hat x = \sum_i c_i\tilde u_i
+  = 6(\tfrac16,\tfrac12)^T + 2(\tfrac16,-\tfrac12)^T + 8(\tfrac13,0)^T
+  = (1,3)^T+(\tfrac13,-1)^T+(\tfrac83,0)^T = (4,2)^T = x.
+\]
+The reconstruction is exact, as guaranteed by
+Proposition~\ref{rev:prop-canonical}.
+\end{examplebox}
+
+\begin{examplebox}[title={Review Problem 3: A tightness proof}]
+\label{rev:problem3}
+Let $v_1=(1,0)^T$, $v_2=(0,1)^T$, $v_3=(-1,0)^T$, $v_4=(0,-1)^T$ in
+$\R^2$. Prove $\{v_i\}_{i=1}^4$ is a tight frame and find its bound.
+
+\smallskip
+\textit{Solution.} This is the $m=4$ regular polygon case of
+Theorem~\ref{rev:thm-polygon} (vertices at angles $0,\pi/2,\pi,3\pi/2$),
+so it is automatically tight with $A=m/2=2$. As a direct check via the
+resolution-of-the-identity characterization of tightness (Chapter 4,
+Proposition 4.2.1): $S=\sum_iv_iv_i^T
+= 2e_1e_1^T+2e_2e_2^T=2I$, confirming $A=B=2$ without needing the
+general theorem at all --- a useful sanity check technique when the
+configuration is simple enough to verify directly by hand.
+\end{examplebox}
+
+\begin{examplebox}[title={Review Problem 4: The dual family, dimension and minimum}]
+\label{rev:problem4}
+For the frame $\{u_1,u_2,u_3\}$ of Review Problem 1, (a) find a vector
+spanning $\ker F$, (b) state the dimension of the full affine family of
+dual frames, and (c) confirm that the canonical dual found in Review
+Problem 2 minimizes $\norm{G}_F^2$ over that family.
+
+\smallskip
+\textit{Solution.} (a) We need $c=(c_1,c_2,c_3)$ with
+$c_1u_1+c_2u_2+c_3u_3=0$, i.e.\ $(c_1+c_2+2c_3,\,c_1-c_2)=(0,0)$. From
+the second equation $c_1=c_2$; substituting into the first,
+$2c_1+2c_3=0$, so $c_3=-c_1$. Taking $c_1=1$: $\ker F=\spn\{(1,1,-1)^T\}$.
+
+(b) By the dimension-counting fact above (Section~\ref{sec:review-q4}),
+with $n=2$ and $\dim\ker F=1$, the affine family of duals has dimension
+$n\cdot1=2$ --- a plane, exactly as in Chapter~6.
+
+(c) By Theorem~\ref{rev:thm-paraboloid} (which did not depend on the
+specific frame, only on $m=n+1$), the energy function over this plane
+is $\norm{\tilde F}_F^2+\norm{w}^2$, minimized uniquely at $w=0$, which
+by construction is the canonical dual of Review Problem 2. No further
+computation is needed: minimality is guaranteed by the general theorem.
+\end{examplebox}
+
+\section{Practice Problem Set}
+\label{sec:practice-problems}
+
+The following problems are unworked. They mirror the format of the
+midterm: a mix of short computational problems and proof-style
+questions. Problems marked \textbf{(C)} are intended as the take-home
+computational component; all others are intended to be solvable by hand
+within exam time constraints.
+
+\begin{exercisebox}[title={Problem 1}]
+Let $w_1=(3,4)^T$, $w_2=(4,-3)^T$ in $\R^2$ (note: $\norm{w_1}=\norm{w_2}=5$
+and $\inner{w_1}{w_2}=0$). Without computing $S$ explicitly, determine
+whether $\{w_1,w_2\}$ is tight, and if so, find $A$. (Hint: what kind of
+configuration is this?)
+\end{exercisebox}
+
+\begin{exercisebox}[title={Problem 2}]
+Let $\{f_i\}_{i=1}^m$ be \emph{any} frame for $\R^n$ with frame bounds
+$A, B$. Prove that $\{cf_i\}_{i=1}^m$ (every vector scaled by a fixed
+nonzero constant $c\in\R$) is also a frame for $\R^n$, and find its
+frame bounds in terms of $A$, $B$, and $c$.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Problem 3}]
+Let $\{f_i\}_{i=1}^m$ be a tight frame for $\R^n$ with bound $A$, and
+suppose additionally that every $f_i$ has the same norm $\norm{f_i}=r$
+for all $i$. Express $A$ in terms of $m$, $n$, and $r$ only. (This
+generalizes the unit-norm case, Proposition~\ref{rev:prop-trace}, to
+arbitrary common norm $r$.)
+\end{exercisebox}
+
+\begin{exercisebox}[title={Problem 4}]
+True or false, with justification (a one-line counterexample suffices
+for any false statement):
+\begin{enumerate}[label=(\alph*)]
+  \item Every frame with $m=n$ vectors in $\F^n$ is an orthonormal
+        basis.
+  \item If $\{f_i\}_{i=1}^m$ is a tight frame for $\R^n$, then so is
+        every subset $\{f_i\}_{i\in J}$ for $J\subsetneq\{1,\ldots,m\}$.
+  \item The canonical dual of a Parseval frame is the frame itself.
+  \item A frame operator $S$ always has $n$ distinct eigenvalues.
+  \item If $A=B$ for a frame, the frame vectors must all have the same
+        norm.
+  \item The dimension of the affine family of dual frames for $m$
+        vectors in $\R^n$ ($m>n$) equals $m-n$.
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}[title={Problem 5}]
+Let $\{f_i\}_{i=1}^m$ be a frame for $\R^n$ with frame operator $S$,
+and let $T:\R^n\to\R^n$ be an invertible linear map. Show that
+$\{Tf_i\}_{i=1}^m$ is also a frame for $\R^n$, and express its frame
+operator in terms of $T$ and $S$. Under what condition on $T$ is the
+new frame tight whenever the original one is?
+\end{exercisebox}
+
+\begin{exercisebox}[title={Problem 6}]
+Let $\{f_1,f_2,f_3\}$ be the triangular frame of Chapters~1/3/6
+($A=B=\tfrac32$). Using the parametrization $G(w)=\tilde F+wk^T$ from
+Chapter~6 with $k=(1,1,1)^T/\sqrt3$, find the value of $w\in\R^2$ for
+which $\norm{G(w)}_F^2=\tfrac{13}{3}$. (There are two such values by
+symmetry; finding either is sufficient.) Verify your answer using
+Theorem~\ref{rev:thm-paraboloid}.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Problem 7 (C)}]
+Computational. Generate $20$ random unit vectors in $\R^4$
+(\texttt{rng.standard\_normal((4,20))}, columns normalized). Compute the
+exact frame bounds $A, B$ via the frame operator's eigenvalues. Then use
+gradient information (or simple coordinate-wise perturbation) to adjust
+the vectors slightly to reduce the ratio $B/A$ --- you do not need a
+sophisticated optimizer; even a simple loop that nudges each vector
+toward better balance and re-normalizes will do. Report your starting
+and ending $B/A$ ratio. (This is a hands-on preview of the frame
+potential minimization in Chapter 9.)
+\end{exercisebox}
+
+\begin{exercisebox}[title={Problem 8 (C)}]
+Computational. For $m=3,4,5,6,7,8,9,10$, construct the regular $m$-gon
+frame in $\R^2$, compute its canonical dual, and verify numerically
+that the canonical dual is simply $\tfrac1A$ times the original frame in
+every case (as predicted for tight frames). Then, for each $m$, compute
+$\norm{\tilde F}_F^2$ (the canonical dual's total energy) and verify it
+equals $m/A$ for these unit-norm configurations (derive the predicted
+formula yourself before checking it numerically).
+\end{exercisebox}
+
+\begin{exercisebox}[title={Problem 9}]
+Prove: if $\{f_i\}_{i=1}^m$ is a frame for $\R^n$ with canonical dual
+$\{\tilde f_i\}$, then the canonical dual of $\{\tilde f_i\}$ is
+$\{f_i\}$ again (i.e.\ the canonical-dual operation is an involution).
+(Hint: use Proposition~\ref{rev:prop-canonical} twice, recalling that
+the frame operator of $\{\tilde f_i\}$ is $S^{-1}$.)
+\end{exercisebox}
+
+\begin{exercisebox}[title={Problem 10}]
+A frame $\{f_i\}_{i=1}^m$ for $\R^n$ is called \emph{equal-norm} if
+$\norm{f_i}=\norm{f_j}$ for all $i,j$. Is every tight frame equal-norm?
+Is every equal-norm frame tight? Justify each answer with either a short
+proof or an explicit counterexample drawn from frames appearing
+somewhere in Chapters 1--6.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Problem 11 (C)}]
+Computational. For the frame $\{h_1,h_2,h_3\}$ ($A=1$, $B=3$), use
+\texttt{scipy.optimize} to find the point $w$ on the dual-family plane
+(parametrized as in Chapter~6, with the appropriate kernel vector for
+this frame) at which the reconstruction-error ellipse is exactly
+circular, and report both $w$ and the resulting total energy
+$\norm{G(w)}_F^2$. Compare this energy to the canonical dual's minimal
+energy $\tfrac43$ found in Example~5.3. (This reproduces Chapter~6, Lab
+Exercise 6.2(d)--(e); if you completed that exercise already, this
+problem is a direct check of your earlier work.)
+\end{exercisebox}
+
+\section{Self-Assessment Checklist}
+\label{sec:checklist}
+
+Before the midterm, you should be able to do each of the following
+without consulting these notes:
+
+\begin{itemize}[label=$\square$]
+  \item State the frame definition and explain, in one sentence, why
+        spanning alone suffices in finite dimensions.
+  \item Given an explicit small set of vectors, determine by hand
+        whether it spans, and if so compute the frame operator and its
+        eigenvalues.
+  \item State the relationship $S=FF^*=\sum_if_if_i^*$ and use both
+        forms appropriately.
+  \item Explain what it means for a frame to be tight, in three
+        equivalent ways: (i) $A=B$, (ii) $S=AI$, (iii) every direction
+        is ``illuminated'' equally.
+  \item Prove that the vertices of a regular polygon form a tight
+        frame, using either the trigonometric or roots-of-unity
+        argument.
+  \item Compute the canonical dual of a small explicit frame, by hand,
+        via $S^{-1}$.
+  \item State and use the characterization of all dual frames as
+        $\tilde F + Z$ with $ZF^*=0$, and correctly count the
+        \emph{dimension} of that family ($n\cdot(m-n)$, not $m-n$).
+  \item Explain, in your own words, why the canonical dual is optimal
+        in the minimal-norm / minimal-noise sense, and why this is
+        \emph{not} the same as minimizing the anisotropy of the error
+        ellipse.
+  \item Sketch, for the smallest redundant case $m=n+1$, the energy
+        paraboloid over the dual-family plane and the resulting error
+        ellipse at an arbitrary point $w$.
+  \item Translate any of the above into working NumPy code without
+        referring to previous listings.
+\end{itemize}

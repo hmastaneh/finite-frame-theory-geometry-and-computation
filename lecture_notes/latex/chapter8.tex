@@ -1,0 +1,506 @@
+\chapter{Frame Potential and Optimal Frame Design}
+\label{ch:frame-potential}
+\fancyhead[R]{\small\textit{Chapter 8: Frame Potential}}
+\section{Overview: Tightness as the Bottom of a Bowl}
+\label{sec:ch8-overview}
+
+Chapter~4 made a promise it did not keep. While proving that regular
+polygons are tight frames, a remark observed that tight frames need not
+be regular polygons at all (Proposition~4.5.1), and offered a
+reinterpretation: tightness is better understood as an
+\emph{energy-minimization} condition than as a symmetry condition,
+with the precise statement deferred to ``Chapter~8.'' This chapter is
+that promise, kept.
+
+We introduce a single scalar quantity, the \emph{frame potential},
+attached to any finite collection of vectors. It measures the total
+pairwise correlation in the collection --- how much the vectors overlap
+with one another, summed over all pairs. The central theorem of this
+chapter shows that, among configurations of $m$ unit-norm vectors in
+$\R^n$, the frame potential is minimized \emph{exactly} by the tight
+frames, and by nothing else. Symmetry (the roots-of-unity mechanism of
+Chapter~4) and projection (the construction of Chapter~4, Section~4.4)
+are then revealed as two different \emph{routes} to the same minimum,
+not as alternative definitions of tightness. We close by using the
+frame potential as an objective function for a numerical optimization
+algorithm: gradient descent that constructs tight frames from scratch,
+with no symmetry assumed in advance --- the computational payoff
+promised back in the original course description.
+
+\section{The Frame Potential}
+\label{sec:fp-definition}
+
+\begin{definition}[Frame potential]
+\label{def:frame-potential}
+For a finite collection of vectors $\{f_i\}_{i=1}^m\subset\F^n$, the
+\emph{frame potential} is
+\[
+  \FP(\{f_i\}_{i=1}^m) \;:=\; \sum_{i=1}^m\sum_{j=1}^m |\inner{f_i}{f_j}|^2.
+\]
+\end{definition}
+
+The sum includes the diagonal terms $i=j$, where
+$|\inner{f_i}{f_i}|^2=\norm{f_i}^4$, as well as every off-diagonal pair
+counted twice (once as $(i,j)$ and once as $(j,i)$, which contribute
+equally since $|\inner{f_i}{f_j}|=|\inner{f_j}{f_i}|$). The frame
+potential is large when the vectors point in similar directions
+(large pairwise inner products) and small when they are spread out
+(small pairwise inner products) --- exactly the kind of ``total
+correlation'' or ``total redundancy'' energy that the phrase
+``energy-minimization condition,'' used informally in Chapter~4, was
+gesturing toward.
+
+\begin{proposition}[Frame potential is $\tr(S^2)$]
+\label{prop:fp-is-trace-S2}
+For any finite collection $\{f_i\}_{i=1}^m\subset\F^n$ with frame
+operator $S=\sum_if_if_i^*$,
+\[
+  \FP(\{f_i\}_{i=1}^m) = \tr(S^2).
+\]
+\end{proposition}
+
+\begin{proof}
+Write $S=\sum_if_if_i^*$. Then
+\[
+  S^2 = \Bigl(\sum_if_if_i^*\Bigr)\Bigl(\sum_jf_jf_j^*\Bigr)
+      = \sum_{i,j} f_i(f_i^*f_j)f_j^* = \sum_{i,j}\inner{f_j}{f_i}\,f_if_j^*,
+\]
+using $f_i^*f_j=\inner{f_j}{f_i}$ (a scalar). Taking the trace and using
+linearity together with $\tr(f_if_j^*)=\inner{f_j}{f_i}$ (the trace of a
+rank-one outer product $uv^*$ is $\inner{v}{u}$... more directly here,
+$\tr(f_if_j^*)=f_j^*f_i=\inner{f_i}{f_j}$):
+\[
+  \tr(S^2) = \sum_{i,j}\inner{f_j}{f_i}\,\tr(f_if_j^*)
+           = \sum_{i,j}\inner{f_j}{f_i}\,\inner{f_i}{f_j}
+           = \sum_{i,j}|\inner{f_i}{f_j}|^2,
+\]
+using $\inner{f_j}{f_i}\inner{f_i}{f_j}=\inner{f_i}{f_j}\overline{\inner{f_i}{f_j}}=|\inner{f_i}{f_j}|^2$.
+This is exactly $\FP(\{f_i\}_{i=1}^m)$.
+\end{proof}
+
+\begin{keyidea}
+The frame potential is not really a new object: it is the trace of the
+\emph{square} of the frame operator you already know everything about.
+Since $S$ has eigenvalues $\lambda_1,\ldots,\lambda_n\ge0$ (Chapter~3),
+\[
+  \FP(\{f_i\}_{i=1}^m)=\tr(S^2)=\sum_{k=1}^n\lambda_k^2.
+\]
+This single formula is the engine behind everything in this chapter:
+minimizing frame potential is exactly minimizing the sum of squared
+eigenvalues of $S$, subject to whatever constraint the vectors satisfy
+(typically, fixed total norm).
+\end{keyidea}
+
+\begin{examplebox}[title={Example 8.1: Frame potential of the triangular frame}]
+\label{ex:fp-triangle}
+For the triangular frame ($S=\tfrac32I$, Example~3.2), $\tr(S^2)=
+\tr(\tfrac94I)=\tfrac94\cdot2=\tfrac92$. Direct computation confirms this:
+each $f_i$ has unit norm, contributing $1$ to the diagonal three times
+($i=j$), and each of the $3\times2=6$ ordered off-diagonal pairs has
+$\inner{f_i}{f_j}=-\tfrac12$ (computed in Chapter~2), contributing
+$(-\tfrac12)^2=\tfrac14$ each: total $\FP = 3(1) + 6(\tfrac14) =
+3+\tfrac32=\tfrac92$, matching $\tr(S^2)=\tfrac92$ exactly.
+\end{examplebox}
+
+\section{The Minimization Theorem}
+\label{sec:fp-minimization}
+
+We now prove the theorem that makes the frame potential worth studying:
+among unit-norm configurations, it is minimized exactly by tight frames.
+
+\begin{theorem}[Tight frames minimize frame potential]
+\label{thm:fp-minimization}
+Fix $m\ge n\ge1$. Among all collections $\{f_i\}_{i=1}^m\subset\R^n$
+with $\norm{f_i}=1$ for every $i$,
+\[
+  \FP(\{f_i\}_{i=1}^m) \;\ge\; \frac{m^2}{n},
+\]
+with equality if and only if $\{f_i\}_{i=1}^m$ is a tight frame for
+$\R^n$ (necessarily with bound $A=m/n$).
+\end{theorem}
+
+\begin{proof}
+By Proposition~\ref{prop:fp-is-trace-S2}, $\FP=\sum_{k=1}^n\lambda_k^2$
+where $\lambda_1,\ldots,\lambda_n\ge0$ are the eigenvalues of $S$. By the
+trace formula (Proposition~3.4.2(iv)), $\sum_{k=1}^n\lambda_k=\tr(S)=
+\sum_{i=1}^m\norm{f_i}^2=m$, using the unit-norm hypothesis. Apply the
+Cauchy--Schwarz inequality (Theorem~1.2.3) to the vectors
+$\lambda=(\lambda_1,\ldots,\lambda_n)$ and $\mathbf{1}=(1,\ldots,1)$ in
+$\R^n$:
+\[
+  \Bigl(\sum_{k=1}^n\lambda_k\cdot1\Bigr)^2 \le
+  \Bigl(\sum_{k=1}^n\lambda_k^2\Bigr)\Bigl(\sum_{k=1}^n1^2\Bigr)
+  = n\sum_{k=1}^n\lambda_k^2.
+\]
+The left side is $m^2$ (using $\sum_k\lambda_k=m$), so
+$m^2\le n\sum_k\lambda_k^2=n\cdot\FP$, i.e.\ $\FP\ge m^2/n$.
+
+Equality in Cauchy--Schwarz holds if and only if $\lambda$ and
+$\mathbf1$ are parallel, i.e.\ $\lambda_1=\cdots=\lambda_n$ (a positive
+scalar multiple of $\mathbf 1$, since all $\lambda_k\ge0$ and they
+cannot all be zero --- their sum is $m\ge n\ge1>0$). This is exactly the
+condition $S=\lambda I$ for $\lambda=m/n$ (using $\sum_k\lambda_k=
+n\lambda=m$), i.e.\ the frame is tight with bound $A=m/n$ (Theorem~
+3.5.1(iii), together with Proposition~4.2.1).
+\end{proof}
+
+\begin{keyidea}
+This theorem is the rigorous version of the claim deferred from
+Chapter~4: \textbf{tight, unit-norm frames are exactly the global
+minimizers of the frame potential.} The proof is a single application
+of Cauchy--Schwarz to the eigenvalues of $S$ --- the same inequality
+from Chapter~1 that has appeared throughout this course, now doing work
+at the level of an optimization problem rather than a single pair of
+vectors. Symmetry (roots of unity) and projection (orthonormal-basis
+projection) are not competing definitions of tightness; they are simply
+two different constructions that happen to land exactly on this unique
+minimum value $m^2/n$, for different reasons in each case.
+\end{keyidea}
+
+\begin{examplebox}[title={Example 8.2: Verifying the minimum across constructions}]
+\label{ex:fp-verify-constructions}
+For $m=3$, $n=2$: the theorem predicts a minimum frame potential of
+$m^2/n=9/2$. The triangular frame achieves exactly $9/2$
+(Example~\ref{ex:fp-triangle}), confirming the symmetry-based
+construction of Chapter~4 lands on the true minimum, not merely a local
+one. For $m=4$, $n=2$ (square vertices, Example~3.6): predicted minimum
+$16/2=8$; direct computation gives $\tr(S^2)=\tr((2I)^2)=\tr(4I)=8$,
+again exact. Both constructions --- entirely different in derivation,
+one trigonometric and one projective --- hit the same theoretical floor.
+\end{examplebox}
+
+\section{Gradient Descent on the Frame Potential}
+\label{sec:gradient-descent}
+
+Theorem~\ref{thm:fp-minimization} tells us tight frames are exactly the
+unit-norm configurations minimizing $\FP$. This suggests a constructive
+algorithm: start from an arbitrary (typically random, non-tight)
+unit-norm configuration, and run gradient descent on $\FP$ to find a
+nearby minimum --- which, by the theorem, must be a tight frame. This
+is a genuinely different way of producing tight frames than anything in
+Chapter~4: no symmetry, no projection, just numerical optimization.
+
+\begin{proposition}[Gradient of the frame potential]
+\label{prop:fp-gradient}
+Regard $\FP$ as a function of the synthesis matrix $V\in\R^{n\times m}$
+(columns are the vectors $f_i$), via $\FP(V)=\tr\bigl((VV^T)^2\bigr)$.
+Then
+\[
+  \nabla_V\,\FP(V) = 4\,(VV^T)\,V = 4SV.
+\]
+\end{proposition}
+
+\begin{proof}
+We compute the directional derivative of $\FP$ at $V$ in an arbitrary
+direction $H\in\R^{n\times m}$, i.e.\ $\frac{d}{dt}\FP(V+tH)\big|_{t=0}$,
+and identify the gradient as the matrix $G$ satisfying
+$\frac{d}{dt}\FP(V+tH)\big|_{t=0}=\tr(G^TH)$ for every $H$ (the
+Frobenius inner product $\inner{A}{B}_F:=\tr(A^TB)$ is the relevant
+inner product on the space of matrices).
+
+Let $S(V)=VV^T$, so $\FP(V)=\tr(S(V)^2)$. First,
+\[
+  \frac{d}{dt}S(V+tH)\Big|_{t=0}
+  = \frac{d}{dt}(V+tH)(V+tH)^T\Big|_{t=0} = HV^T+VH^T =: dS.
+\]
+Since $\tr(\cdot^2)$ has derivative $A\mapsto2\tr(S\,dA)$ at a symmetric
+matrix $S$ in direction $dA$ (using $\tr(S\,dA)=\tr(dA\,S)$, the cyclic
+property of trace), we get
+\[
+  \frac{d}{dt}\FP(V+tH)\Big|_{t=0}
+  = 2\tr\bigl(S\,(HV^T+VH^T)\bigr)
+  = 2\tr(SHV^T) + 2\tr(SVH^T).
+\]
+Both terms reduce to the same expression: using the cyclic property of
+trace, $\tr(SHV^T)=\tr(V^TSH)=\tr\bigl((SV)^TH\bigr)$ (the last equality
+using $S^T=S$), and likewise $\tr(SVH^T)=\tr(H^TSV)=\tr\bigl((SV)^TH
+\bigr)$. So
+\[
+  \frac{d}{dt}\FP(V+tH)\Big|_{t=0} = 4\tr\bigl((SV)^TH\bigr).
+\]
+Comparing to $\tr(G^TH)$, we read off $G=SV$, i.e.
+$\nabla_V\FP(V)=4SV$.
+\end{proof}
+
+\begin{keyidea}
+The gradient descent update, with a small step size $\eta>0$, is
+\[
+  V \;\longleftarrow\; V - \eta\cdot4SV = V - 4\eta\,SV,
+\]
+followed by renormalizing each column back to unit length (a
+\emph{projection} step, since unconstrained gradient descent would not
+respect the unit-norm constraint). This combination --- gradient step,
+then renormalize --- is an instance of \emph{projected gradient descent}
+on the unit sphere, called a \emph{retraction} in the optimization
+literature; we use the simplest possible retraction (direct
+renormalization) and refer the curious reader to the Riemannian
+optimization literature on the sphere and Stiefel manifold for more
+sophisticated alternatives.
+\end{keyidea}
+
+\section{NumPy Implementation}
+\label{sec:numpy-fp}
+
+\begin{lstlisting}[caption={Constructing a tight frame from scratch via gradient descent on the frame potential}]
+import numpy as np
+
+def frame_potential(V):
+    """FP(V) = tr((V V^T)^2) for V of shape (n, m)."""
+    S = V @ V.T
+    return np.trace(S @ S)
+
+def fp_gradient(V):
+    """Gradient of FP with respect to V: 4 S V."""
+    S = V @ V.T
+    return 4 * S @ V
+
+def normalize_columns(V):
+    """Project each column back onto the unit sphere."""
+    norms = np.linalg.norm(V, axis=0)
+    return V / norms
+
+def fit_tight_frame(n, m, num_steps=500, lr=0.05, seed=0, verbose=False):
+    """
+    Construct an (approximately) tight, unit-norm frame of m vectors
+    in R^n via projected gradient descent on the frame potential.
+    """
+    rng = np.random.default_rng(seed)
+    V = rng.standard_normal((n, m))
+    V = normalize_columns(V)
+
+    history = [frame_potential(V)]
+    for step in range(num_steps):
+        grad = fp_gradient(V)
+        V = V - lr * grad
+        V = normalize_columns(V)
+        history.append(frame_potential(V))
+        if verbose and step % 100 == 0:
+            print(f"step {step}: FP = {history[-1]:.6f}")
+
+    return V, history
+
+# --- Construct a tight frame: m=3 vectors in R^2 ---
+V, history = fit_tight_frame(n=2, m=3, num_steps=500, lr=0.05, seed=1)
+predicted_minimum = 3**2 / 2
+print(f"Final frame potential: {history[-1]:.6f}  "
+      f"(predicted minimum m^2/n = {predicted_minimum})")
+
+S_final = V @ V.T
+eigenvalues = np.linalg.eigvalsh(S_final)
+print(f"Final frame operator eigenvalues: {eigenvalues.round(6)}")
+print(f"Tight (eigenvalues equal)? "
+      f"{np.isclose(eigenvalues[0], eigenvalues[-1])}")
+
+# --- Larger example: m=7 vectors in R=3, no symmetry assumed ---
+V7, history7 = fit_tight_frame(n=3, m=7, num_steps=1000, lr=0.02, seed=2)
+predicted7 = 7**2 / 3
+print(f"\nm=7, n=3: final FP = {history7[-1]:.6f} "
+      f"(predicted m^2/n = {predicted7:.4f})")
+eigs7 = np.linalg.eigvalsh(V7 @ V7.T)
+print(f"Eigenvalues: {eigs7.round(6)}")
+\end{lstlisting}
+
+\begin{remark*}
+This algorithm makes no reference to symmetry, roots of unity, or
+projection from a larger space --- it is a purely numerical search that
+happens to always find a tight frame, because Theorem~
+\ref{thm:fp-minimization} guarantees every global minimum of $\FP$
+\emph{is} one. Unlike the explicit, hand-verifiable constructions of
+Chapter~4, gradient descent gives no closed-form description of the
+resulting vectors --- but it works for \emph{any} $m\ge n$, including
+configurations (like $m=7$, $n=3$) with no convenient symmetric
+description at all.
+\end{remark*}
+
+\section{Local Minima and the Role of Initialization}
+\label{sec:local-minima}
+
+A natural question: does gradient descent on $\FP$ always converge to
+the global minimum $m^2/n$, or can it become stuck at a worse,
+\emph{local} minimum? The frame potential is a quartic (degree-4)
+polynomial function of the entries of $V$, restricted to a product of
+spheres (one sphere per column) --- there is no a priori guarantee of a
+single basin of attraction.
+
+\begin{examplebox}[title={Example 8.3: A bad initialization}]
+\label{ex:fp-bad-init}
+Consider $m=4$, $n=2$, initialized with all four vectors nearly equal:
+$f_i\approx(1,0)$ for $i=1,\ldots,4$, perturbed by tiny random noise.
+Gradient descent from this start tends to push the vectors apart
+\emph{slowly} at first (the gradient is small when vectors are nearly
+parallel, since $S\approx4e_1e_1^T$ already has one very large and one
+near-zero eigenvalue, and the dynamics initially preserve this near
+-degenerate structure), but in practice still converges to $\FP=8$
+(the true minimum) given enough iterations, for this particular
+($m,n$). This is verified numerically in Lab Exercise~8.3 below;
+empirically, for $m,n$ in the range relevant to this course, poor local
+minima are rare but not impossible, and slow convergence from
+near-degenerate starting configurations is the more common practical
+obstruction.
+\end{examplebox}
+
+\begin{keyidea}
+In practice: run gradient descent from \textbf{several random
+initializations} and keep the result with the lowest final $\FP$. This
+is standard practice for any non-convex optimization problem, and the
+frame potential, despite the elegant global theorem proved in Section~
+\ref{sec:fp-minimization}, is no exception --- the theorem guarantees
+\emph{what} the global minimum value is and \emph{which} configurations
+achieve it, but says nothing about how easy that minimum is to find by
+local search from an arbitrary start.
+\end{keyidea}
+
+\section{Chapter Summary}
+\label{sec:summary-ch8}
+
+\begin{itemize}
+  \item The \textbf{frame potential} $\FP(\{f_i\}) = \sum_{i,j}
+        |\inner{f_i}{f_j}|^2$ measures total pairwise correlation in a
+        vector configuration, and equals $\tr(S^2) = \sum_k\lambda_k^2$
+        (Proposition~\ref{prop:fp-is-trace-S2}) --- the sum of squared
+        eigenvalues of the frame operator.
+  \item \textbf{Theorem~\ref{thm:fp-minimization}}: among unit-norm
+        configurations of $m$ vectors in $\R^n$, $\FP\ge m^2/n$, with
+        equality if and only if the configuration is a tight frame
+        (bound $A=m/n$). The proof is a single Cauchy--Schwarz
+        application to the eigenvalues of $S$ against the all-ones
+        vector.
+  \item This makes precise the claim deferred from Chapter~4: tightness
+        \emph{is} energy-minimization, and symmetry-based or
+        projection-based constructions are simply two routes that
+        happen to reach the same global minimum.
+  \item \textbf{Gradient descent} on $\FP$, with gradient $4SV$
+        (Proposition~\ref{prop:fp-gradient}) and a unit-norm
+        renormalization (retraction) after each step, constructs tight
+        frames numerically with no symmetry assumed --- working for any
+        $m\ge n$, including cases with no convenient closed-form
+        description.
+  \item The frame potential is non-convex on the sphere, so gradient
+        descent can in principle find local minima; running several
+        random initializations and keeping the best result is standard
+        practice.
+\end{itemize}
+
+\section{Lab Exercises}
+\label{sec:lab-ch8}
+
+\begin{exercisebox}[title={Lab Exercise 8.1: Verifying the Gradient Formula}]
+Implement \texttt{frame\_potential(V)} and \texttt{fp\_gradient(V)} from
+Section~\ref{sec:numpy-fp}. For a random $V$ of shape $(3,5)$, verify
+the gradient formula $\nabla\FP=4SV$ against a finite-difference
+approximation (perturb each entry of $V$ by $\pm10^{-6}$ and estimate
+the corresponding partial derivative), confirming agreement to at least
+$4$ decimal places.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 8.2: Reproducing Known Tight Frames}]
+Run \texttt{fit\_tight\_frame} for $(n,m)=(2,3)$, $(2,4)$, $(2,5)$,
+$(2,6)$, and confirm in each case that the final frame potential matches
+the predicted minimum $m^2/n$ to at least $4$ decimal places, and that
+the final frame operator is (numerically) a multiple of the identity.
+Compare the final vectors you obtain for $(n,m)=(2,3)$ to the explicit
+triangular frame from Chapter~1 --- are they the same configuration (up
+to rotation), or a different tight frame entirely? (Hint: compute the
+pairwise angles between your gradient-descent vectors and compare to
+$120^\circ$.)
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 8.3: Initialization Sensitivity}]
+Reproduce Example~\ref{ex:fp-bad-init}: initialize $4$ vectors in $\R^2$
+clustered tightly around $(1,0)$ (e.g.\ add Gaussian noise of standard
+deviation $0.01$ to four copies of $(1,0)$, then normalize), and run
+gradient descent. Plot the frame potential versus iteration number on a
+semi-log $y$-axis. Compare the convergence speed to a run started from
+a uniformly random initialization (as in Lab Exercise~8.2). Does the
+clustered start eventually reach the same minimum? How many more
+iterations does it need?
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 8.4: A Frame with No Symmetry}]
+Run \texttt{fit\_tight\_frame} for $(n,m)=(3,7)$ (seven vectors in
+$\R^3$ -- a configuration with no convenient closed-form symmetric
+description, unlike every example in Chapter~4). Verify the resulting
+frame is tight with the predicted bound $A=7/3$. Then compute all
+$\binom{7}{2}=21$ pairwise angles between the resulting vectors (in
+degrees) and report their minimum, maximum, and mean. Are the vectors
+\emph{equiangular} (all pairwise angles equal), or merely tight? (This
+question previews the distinction between tight frames and the stronger
+notion of equiangular tight frames, to be studied in Chapter~9.)
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 8.5 (Optional, Challenge): Multiple Restarts}]
+Write a function \texttt{best\_of\_n\_restarts(n, m, num\_restarts=10,
+\ldots)} that runs \texttt{fit\_tight\_frame} from \texttt{num\_restarts}
+independent random initializations and returns the configuration with
+the lowest final frame potential. For $(n,m)=(2,4)$, compare the spread
+of final frame potentials across $20$ independent single runs (no
+restart logic, just $20$ separate calls to \texttt{fit\_tight\_frame}
+with different seeds) --- do all $20$ runs reach the true minimum $8$,
+or do some get stuck above it? Report the fraction of runs (if any) that
+fail to reach the global minimum within $500$ steps, and suggest (without
+necessarily implementing) one modification to the algorithm that might
+improve this fraction --- e.g.\ a larger learning rate, a
+momentum term, or more steps.
+\end{exercisebox}
+\newpage
+\section{Supplementary Exercises}
+\label{sec:extra-ch8}
+
+\subsection*{Theoretical Exercises}
+\begin{theoexercises}
+	\item Using the fact that $FF^*$ and $F^*F$ share nonzero eigenvalues
+	(Chapter~3 Supplementary Exercise T1), give an alternative
+	derivation of $\FP(\{f_i\})=\tr(S^2)$ by showing it also equals
+	$\norm{G}_F^2$, where $G=F^*F$ is the Gram matrix.
+	
+	\item Prove that frame potential is invariant under simultaneously
+	applying an orthogonal transformation to every vector:
+	$\FP(\{Uf_i\})=\FP(\{f_i\})$ for any orthogonal $U$.
+	
+	\item Prove that scaling every vector by a common factor $c$ scales the
+	frame potential by $c^4$: $\FP(\{cf_i\})=c^4\FP(\{f_i\})$.
+	
+	\item Show that the bound $\FP\ge m^2/n$ from Theorem~8.3.1 remains
+	valid even when $m<n$ (fewer unit vectors than the ambient
+	dimension), but prove that equality can \emph{never} be achieved
+	in that case. (Hint: equality forces all $n$ eigenvalues of $S$
+	to be equal; what happens if $\rank S<n$?)
+	
+	\item Let $\{f_i\}_{i=1}^m$ and $\{g_j\}_{j=1}^{m'}$ be two frames for
+	$\R^n$ with frame operators $S_1,S_2$. Prove that the frame
+	potential of the combined set $\{f_i\}\cup\{g_j\}$ is
+	$\FP(\{f_i\})+\FP(\{g_j\})+2\tr(S_1S_2)$, and conclude that frame
+	potential is \emph{not} additive under taking unions in general
+	(contrast with Chapter~4 Supplementary Exercise T2, where
+	\emph{tightness} of a union behaves additively on the bound).
+	
+	\item Among all positive semidefinite $n\times n$ matrices $S$ with
+	fixed trace $\tr(S)=m$, prove that $\tr(S^2)$ is maximized (for
+	fixed rank $1$) when $S=m\,uu^T$ for a unit vector $u$, achieving
+	$\tr(S^2)=m^2$. Relate this worst case to a frame configuration
+	in which all $m$ vectors coincide.
+\end{theoexercises}
+
+\subsection*{Computational Exercises}
+\begin{compexercises}
+	\item For a random $5\times2$ unit-norm configuration ($m=2<n=5$),
+	compute $\FP$ and confirm it exceeds $m^2/n$; then compare to the
+	orthogonal configuration (first two standard basis vectors),
+	confirming the orthogonal case achieves a strictly smaller (but
+	still $>m^2/n$) frame potential, illustrating T4.
+	
+	\item Verify T5's union formula numerically using the triangular frame
+	and the square frame: compute $\FP$ of each separately, compute
+	$\tr(S_1S_2)$, and confirm the union's frame potential matches
+	$\FP_1+\FP_2+2\tr(S_1S_2)$.
+	
+	\item Construct a degenerate configuration of $5$ identical unit
+	vectors in $\R^3$ and confirm $\FP=25=m^2$, matching T6's
+	worst-case prediction; compare to the frame-potential-minimizing
+	configuration found by \texttt{fit\_tight\_frame} for the same
+	$(n,m)=(3,5)$.
+	
+	\item Numerically confirm T2: rotate the triangular frame by several
+	random angles and verify the frame potential is unchanged in
+	every case.
+\end{compexercises}

@@ -1,0 +1,670 @@
+\chapter{Dual Frames}
+\label{ch:dual-frames}
+\fancyhead[R]{\small\textit{Chapter 5: Dual Frames}}
+\section{Overview: From One Reconstruction Formula to a Family}
+\label{sec:ch5-overview}
+
+Chapter~3 derived a reconstruction formula almost in passing, while
+studying the frame operator: for any frame $\{f_i\}_{i=1}^m$ with frame
+operator $S$,
+\[
+  x = \sum_{i=1}^m \inner{x}{f_i}\,(S^{-1}f_i) \qquad \text{for every } x \in V,
+\]
+and named the vectors $\tilde f_i := S^{-1}f_i$ the \emph{canonical dual
+frame}, promising a full treatment in this chapter. Chapter~3 also
+observed, in passing, that the synthesis operator $F$ has a nontrivial
+null space whenever the frame is redundant ($m>n$), and promised that
+this null space would turn out to parametrize \emph{every} valid dual,
+not just the canonical one.
+
+This chapter delivers on both promises. We will see that the canonical
+dual is only one member---admittedly a distinguished one---of an entire
+\emph{affine family} of dual frames, all of which reconstruct every
+vector in $V$ exactly. We characterize this family completely
+(Theorem~\ref{thm:dual-family}), show that the canonical dual is the
+unique \emph{minimal-norm} member of the family
+(Theorem~\ref{thm:canonical-minimal-norm}), and close with a numerical
+investigation of how the choice of dual affects robustness to noise---
+returning, with real machinery in hand, to the very motivation that
+opened Chapter~1.
+
+\section{Dual Frames: Definition}
+\label{sec:dual-definition}
+
+\begin{definition}[Dual frame]
+\label{def:dual-frame}
+Let $\{f_i\}_{i=1}^m$ be a frame for $V=\F^n$. A frame $\{g_i\}_{i=1}^m$
+for $V$ (indexed by the same index set) is called a \emph{dual frame} of
+$\{f_i\}_{i=1}^m$ if
+\begin{equation}
+\label{eq:dual-condition}
+  x = \sum_{i=1}^m \inner{x}{f_i}\, g_i \qquad \text{for every } x \in V.
+\end{equation}
+\end{definition}
+
+\begin{remark*}
+Definition~\ref{def:dual-frame} is not symmetric-looking at first
+glance, but it is in fact a symmetric relationship: if $\{g_i\}$ is dual
+to $\{f_i\}$ in the sense above, then $\{f_i\}$ is also dual to
+$\{g_i\}$, i.e.\ $x=\sum_i\inner{x}{g_i}f_i$ for all $x$ as well. We
+prove this symmetry as part of Proposition~\ref{prop:canonical-dual-properties}
+below, in the canonical case, and the general case is
+Lab Exercise 5.1 (it follows the same pattern).
+For now, simply note that ``dual'' is meant in this mutual sense, exactly
+as ``$\tilde f_i$ is dual to $f_i$'' is meant to be an if-and-only-if kind
+of partnership, not a one-way relationship.
+\end{remark*}
+
+In matrix language, if $G$ denotes the synthesis matrix of $\{g_i\}_{i=1}^m$
+(the $n\times m$ matrix with $i$-th column $g_i$), then
+\eqref{eq:dual-condition} reads $x = G(F^*x)$ for every $x\in V$, i.e.
+\begin{equation}
+\label{eq:dual-matrix-condition}
+  GF^* = I_n.
+\end{equation}
+This is the condition we will use throughout the chapter: \emph{a
+synthesis matrix $G$ defines a dual frame if and only if $GF^*=I_n$}.
+
+\section{The Canonical Dual Frame}
+\label{sec:canonical-dual}
+
+\begin{proposition}[The canonical dual is a valid dual frame]
+\label{prop:canonical-dual-properties}
+Let $\{f_i\}_{i=1}^m$ be a frame for $V$ with frame operator $S$, and
+define $\tilde f_i := S^{-1}f_i$ for $i=1,\ldots,m$. Then:
+\begin{enumerate}[label=(\roman*)]
+  \item $\{\tilde f_i\}_{i=1}^m$ is itself a frame for $V$ (the
+        \emph{canonical dual frame}).
+  \item Its frame operator is $\tilde S = S^{-1}$.
+  \item $\{\tilde f_i\}$ is dual to $\{f_i\}$ in the sense of
+        Definition~\ref{def:dual-frame}, and the relationship is
+        mutual: $\{f_i\}$ is also dual to $\{\tilde f_i\}$.
+  \item The optimal frame bounds of $\{\tilde f_i\}$ are
+        $\tilde A = 1/B$ and $\tilde B = 1/A$, where $A,B$ are the
+        optimal bounds of $\{f_i\}$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Write $\tilde F := S^{-1}F$ for the synthesis matrix of $\{\tilde
+f_i\}$ (this is consistent: the $i$-th column of $S^{-1}F$ is
+$S^{-1}f_i=\tilde f_i$, since $S^{-1}$ is applied to each column of $F$).
+
+\textbf{(ii)} The frame operator of $\{\tilde f_i\}$ is
+\[
+  \tilde S = \tilde F \tilde F^* = (S^{-1}F)(S^{-1}F)^*
+  = S^{-1}F F^*(S^{-1})^* = S^{-1}SS^{-1} = S^{-1},
+\]
+using that $S$ (hence $S^{-1}$) is self-adjoint, so $(S^{-1})^*=S^{-1}$.
+
+\textbf{(i)} Since $S$ is invertible and self-adjoint with $S>0$
+(Proposition~3.4.2(iii)), $S^{-1}$ is also self-adjoint and positive
+definite (its eigenvalues are the reciprocals $1/\lambda_k>0$ of the
+eigenvalues of $S$). By part (ii), the frame operator of
+$\{\tilde f_i\}$ is $\tilde S = S^{-1}$, which is positive definite;
+by Proposition~3.4.2(iii) applied in reverse (positive definite frame
+operator $\Leftrightarrow$ the vectors span $V$), $\{\tilde f_i\}$
+spans $V$, hence (Theorem~2.2.1) is a frame for $V$.
+
+\textbf{(iii)} We must check $\tilde F F^* = I_n$ (matching
+\eqref{eq:dual-matrix-condition} with $G=\tilde F$):
+\[
+  \tilde F F^* = (S^{-1}F)F^* = S^{-1}(FF^*) = S^{-1}S = I_n.
+\]
+So $\{\tilde f_i\}$ is dual to $\{f_i\}$. For the converse direction,
+we must check $F\tilde F^* = I_n$:
+\[
+  F\tilde F^* = F(S^{-1}F)^* = F F^*(S^{-1})^* = S S^{-1} = I_n,
+\]
+again using $(S^{-1})^*=S^{-1}$. So $\{f_i\}$ is also dual to
+$\{\tilde f_i\}$, confirming the mutual relationship.
+
+\textbf{(iv)} By Theorem~3.5.1, the optimal bounds of $\{\tilde f_i\}$
+are the extreme eigenvalues of $\tilde S = S^{-1}$. If $S$ has
+eigenvalues $\lambda_1\ge\cdots\ge\lambda_n$ (so $B=\lambda_1$,
+$A=\lambda_n$ for $\{f_i\}$), then $S^{-1}$ has eigenvalues
+$1/\lambda_1\le\cdots\le1/\lambda_n$ (matrix inversion preserves
+eigenvectors and inverts eigenvalues). The smallest eigenvalue of
+$S^{-1}$ is $1/\lambda_1=1/B$ and the largest is $1/\lambda_n=1/A$,
+giving $\tilde A=1/B$ and $\tilde B=1/A$.
+\end{proof}
+
+\begin{keyidea}
+The canonical dual frame $\tilde f_i = S^{-1}f_i$ has frame operator
+$\tilde S = S^{-1}$, and its frame bounds are the \emph{reciprocals,
+in reversed order}, of the original frame's bounds: $\tilde A=1/B$,
+$\tilde B=1/A$. In particular, \textbf{the canonical dual of a tight
+frame is again tight}: if $A=B$, then $\tilde A=\tilde B=1/A$. This matches the reconstruction formula from Chapter~3 (Equation 3.5),
+where the tight-frame dual was simply $\tilde f_i =
+\tfrac1A f_i$ --- a special case of $\tilde f_i = S^{-1}f_i = \tfrac1A f_i$
+when $S=AI$.
+\end{keyidea}
+
+\begin{examplebox}[title={Example 5.1: Canonical dual of the non-tight frame}]
+\label{ex:canonical-dual-h}
+Recall $\{h_1,h_2,h_3\}=\{(1,0)^T,(0,1)^T,(1,1)^T\}$ from Chapter~3, with
+frame operator $S=\begin{pmatrix}2&1\\1&2\end{pmatrix}$ and bounds
+$A=1$, $B=3$. We invert $S$:
+\[
+  S^{-1} = \frac{1}{\det S}\begin{pmatrix}2&-1\\-1&2\end{pmatrix}
+  = \frac{1}{3}\begin{pmatrix}2&-1\\-1&2\end{pmatrix},
+\]
+using $\det S = 2\cdot2-1\cdot1=3$. The canonical dual vectors are
+\[
+  \tilde h_1 = S^{-1}h_1 = \tfrac13(2,-1)^T, \quad
+  \tilde h_2 = S^{-1}h_2 = \tfrac13(-1,2)^T, \quad
+  \tilde h_3 = S^{-1}h_3 = \tfrac13(1,1)^T.
+\]
+By Proposition~\ref{prop:canonical-dual-properties}(iv), the dual frame
+has bounds $\tilde A = 1/3$, $\tilde B = 1/1 = 1$. Notice that
+$\{\tilde h_i\}$ is visibly \emph{not} a rescaling of $\{h_i\}$---unlike
+the tight-frame case, the canonical dual of a non-tight frame is
+genuinely a different set of vectors, not merely the original frame
+scaled by a constant.
+\end{examplebox}
+
+\section{The Family of All Dual Frames}
+\label{sec:dual-family}
+
+The canonical dual is a distinguished dual frame, but---exactly as
+Chapter~3 promised---it is not the only one whenever the original frame
+is redundant. We now characterize the complete family.
+
+\begin{theorem}[Characterization of all dual frames]
+\label{thm:dual-family}
+Let $\{f_i\}_{i=1}^m$ be a frame for $V=\F^n$ with synthesis matrix $F$,
+and let $\tilde F = S^{-1}F$ be the canonical dual synthesis matrix.
+Then $G$ is the synthesis matrix of a dual frame of $\{f_i\}$ if and
+only if
+\begin{equation}
+\label{eq:dual-family}
+  G = \tilde F + Z, \qquad \text{where } Z F^* = 0.
+\end{equation}
+That is, the set of all valid dual synthesis matrices is the affine
+subspace $\tilde F + \setdef{Z \in \F^{n\times m}}{ZF^*=0}$.
+\end{theorem}
+
+\begin{proof}
+($\Leftarrow$) Suppose $G=\tilde F+Z$ with $ZF^*=0$. Then
+\[
+  GF^* = \tilde F F^* + ZF^* = I_n + 0 = I_n,
+\]
+using Proposition~\ref{prop:canonical-dual-properties}(iii)
+($\tilde FF^*=I_n$). By \eqref{eq:dual-matrix-condition}, $G$ defines a
+dual frame.
+
+($\Rightarrow$) Suppose $G$ defines a dual frame, so $GF^*=I_n$. Set
+$Z := G - \tilde F$. Then
+\[
+  ZF^* = GF^* - \tilde FF^* = I_n - I_n = 0,
+\]
+so $Z$ has the required property, and $G=\tilde F+Z$ by construction.
+\end{proof}
+
+\begin{remark*}
+This theorem makes precise the promise from Chapter~3's remark on the
+synthesis operator: the freedom in choosing a dual frame is exactly
+captured by matrices $Z$ satisfying $ZF^*=0$, i.e.\ matrices whose rows
+each lie in $\ker F$ (since $(ZF^*)_{ji}=\text{row}_j(Z)\cdot
+\overline{f_i}$, and this vanishes for every $i$ exactly when
+row$_j(Z) \in (\spn\{f_i\})^\perp$ in the appropriate sense--- more
+directly, $ZF^*=0$ says each row of $Z$, viewed as a vector of
+coefficients in $\F^m$, lies in $\ker F$, since $F\,(\text{row}_j(Z))^*=
+0$ is what $ZF^*=0$ unpacks to row by row). When the frame is a basis
+($m=n$), $F$ is square and invertible, so $\ker F=\{0\}$, forcing $Z=0$:
+\emph{the dual of a basis is unique}, namely the canonical dual, exactly
+as expected from ordinary linear algebra (a basis has one and only one
+dual/biorthogonal basis). When $m>n$, $\ker F$ is nontrivial
+(dimension $m-n$, by the rank-nullity theorem, since $F$ has rank $n$),
+and there is a genuine $(m-n)\times n$-real-dimensional family of dual
+frames to choose from.
+\end{remark*}
+
+\begin{keyidea}
+\textbf{Bases have a unique dual. Redundant frames have infinitely
+many.} The freedom is exactly $\ker F$: the more redundant the frame
+(the larger $m-n$), the larger the space of valid dual frames. This is
+the algebraic shadow of the flexibility we advertised informally all the
+way back in Chapter~1, Section~1.1: redundancy buys you freedom of
+representation, and Theorem~\ref{thm:dual-family} is the precise
+statement of how much freedom, and exactly where it lives.
+\end{keyidea}
+
+\begin{examplebox}[title={Example 5.2: An alternate dual of the non-tight frame}]
+\label{ex:alternate-dual-h}
+Continue Example~\ref{ex:canonical-dual-h}. Since $m=3>n=2$, $\ker F$
+is $1$-dimensional. One checks $F(1,1,-1)^T = h_1+h_2-h_3 =
+(1,0)^T+(0,1)^T-(1,1)^T=(0,0)^T$, so $(1,1,-1)^T$ spans $\ker F$. A
+valid perturbation is $Z = w\,(1,1,-1)$ for any $w\in\R^2$ (a single
+column-vector $w$ outer-producted against the row $(1,1,-1)$), since
+then each row of $Z$ is a multiple of $(1,1,-1)\in\ker F$, and
+$ZF^*=0$ as required. Taking, say, $w=(0.1,-0.2)^T$:
+\[
+  Z = \begin{pmatrix}0.1\\-0.2\end{pmatrix}\begin{pmatrix}1&1&-1\end{pmatrix}
+  = \begin{pmatrix}0.1&0.1&-0.1\\-0.2&-0.2&0.2\end{pmatrix},
+\]
+and $G = \tilde F + Z$ gives a valid, non-canonical dual frame
+$\{g_1,g_2,g_3\}$. This is verified numerically in
+Lab Exercise 5.2, including a direct check
+that $\sum_i\inner{x}{h_i}g_i=x$ for several test vectors $x$, despite
+$\{g_i\}\ne\{\tilde h_i\}$.
+\end{examplebox}
+
+\section{The Canonical Dual Is the Minimal-Norm Dual}
+\label{sec:minimal-norm}
+
+Among the infinitely many dual frames available whenever $m>n$, why is
+the canonical dual the natural default? The next theorem gives a precise
+optimality reason.
+
+\begin{theorem}[Minimal-norm characterization of the canonical dual]
+\label{thm:canonical-minimal-norm}
+Among all dual synthesis matrices $G$ satisfying $GF^*=I_n$, the
+canonical dual $\tilde F = S^{-1}F$ is the unique minimizer of the total
+squared norm
+\[
+  \norm{G}_F^2 := \sum_{i=1}^m \norm{g_i}^2 = \tr(GG^*),
+\]
+(the squared Frobenius norm of $G$). That is, $\tilde F$ uses the
+``smallest'' dual vectors, in this total-energy sense, among all valid
+choices.
+\end{theorem}
+
+\begin{proof}
+Write $G = \tilde F + Z$ with $ZF^*=0$, as guaranteed by
+Theorem~\ref{thm:dual-family}. We expand the squared Frobenius norm:
+\[
+  \norm{G}_F^2 = \tr\bigl((\tilde F+Z)(\tilde F+Z)^*\bigr)
+  = \tr(\tilde F\tilde F^*) + \tr(\tilde FZ^*) + \tr(Z\tilde F^*) + \tr(ZZ^*).
+\]
+We claim the two cross terms vanish. Indeed,
+\[
+  \tilde F Z^* = (S^{-1}F)Z^* = S^{-1}(FZ^*) = S^{-1}(ZF^*)^* = S^{-1}\cdot0^* = 0,
+\]
+using $ZF^*=0$. Taking adjoints of both sides of $ZF^*=0$ gives
+$(ZF^*)^*=FZ^*=0$ as well (using $(AB)^*=B^*A^*$ and $(F^*)^*=F$), which
+is exactly the fact used above. Hence $\tr(\tilde FZ^*)=0$, and
+similarly $\tr(Z\tilde F^*)=\tr((\tilde FZ^*)^*)=\tr(0^*)=0$. This leaves
+\[
+  \norm{G}_F^2 = \norm{\tilde F}_F^2 + \norm{Z}_F^2 \;\ge\; \norm{\tilde F}_F^2,
+\]
+with equality if and only if $\norm{Z}_F^2=0$, i.e.\ $Z=0$, i.e.\
+$G=\tilde F$. So $\tilde F$ is the unique minimizer.
+\end{proof}
+
+\begin{keyidea}
+The identity $\norm{G}_F^2 = \norm{\tilde F}_F^2+\norm{Z}_F^2$ is a
+\textbf{Pythagorean decomposition}: the canonical dual's contribution
+and the ``extra'' perturbation $Z$ contribute independently
+(orthogonally) to the total energy, exactly as $a^2+b^2$ decomposes the
+squared length of a right-triangle hypotenuse. This is the same
+geometric idea as projecting onto a subspace and decomposing a vector
+into a component inside and a component outside: here, the
+``subspace'' is the affine family of duals, the canonical dual is the
+point of that family closest to the origin, and every other dual is
+strictly farther away by exactly $\norm{Z}_F^2$.
+\end{keyidea}
+
+\begin{remark*}
+This theorem explains, precisely, why the term ``canonical'' is earned
+and not arbitrary: among every possible way to reconstruct $x$ from its
+frame coefficients $\inner{x}{f_i}$, the canonical dual does so using
+the least total ``effort,'' in the sense of minimizing $\sum_i\norm{g_i}^2$.
+This will matter in Chapter~11 (frames and quantization/noise), where
+smaller dual-vector norms translate directly into better noise
+suppression in the reconstruction formula --- a connection we begin to
+explore numerically in the next section.
+\end{remark*}
+
+\section{Reconstruction Stability: Canonical vs.\ Alternate Duals}
+\label{sec:stability}
+
+Chapter~1 motivated frames by the promise of robustness to noise and
+erasures. We are now equipped to investigate this quantitatively for the
+first time. Suppose the frame coefficients $c_i = \inner{x}{f_i}$ are
+corrupted by some noise $\varepsilon_i$, so that the receiver has access
+only to $c_i + \varepsilon_i$, and reconstructs via a dual frame
+$\{g_i\}$ as $\hat x = \sum_i (c_i+\varepsilon_i) g_i = x +
+\sum_i\varepsilon_i g_i$. The reconstruction error is
+\[
+  \hat x - x = \sum_{i=1}^m \varepsilon_i g_i = G\varepsilon,
+\]
+where $\varepsilon = (\varepsilon_1,\ldots,\varepsilon_m)$. If the noise
+components $\varepsilon_i$ are independent with variance $\sigma^2$
+each, the expected squared reconstruction error is
+\[
+  \mathbb{E}\norm{\hat x-x}^2 = \mathbb{E}\norm{G\varepsilon}^2
+  = \sigma^2\,\tr(GG^*) = \sigma^2\norm{G}_F^2.
+\]
+
+\begin{keyidea}
+\textbf{The canonical dual minimizes expected reconstruction error under
+uncorrelated noise.} This follows immediately from
+Theorem~\ref{thm:canonical-minimal-norm}: since
+$\mathbb{E}\norm{\hat x-x}^2=\sigma^2\norm{G}_F^2$ and $\tilde F$
+minimizes $\norm{G}_F^2$ among all valid duals, the canonical dual also
+minimizes expected reconstruction error. The abstract optimality result
+of Section~\ref{sec:minimal-norm} therefore has an immediate and very
+concrete payoff: \emph{when in doubt, use the canonical dual}---it is
+not just the most natural choice algebraically, but the most
+noise-robust choice as well.
+\end{keyidea}
+
+\begin{examplebox}[title={Example 5.3: Numerically comparing canonical vs.\ alternate dual}]
+\label{ex:stability-comparison}
+Continue Examples~\ref{ex:canonical-dual-h} and~\ref{ex:alternate-dual-h}.
+The canonical dual has $\norm{\tilde F}_F^2 = \tr(S^{-1})$. Since
+$S^{-1}=\tfrac13\begin{pmatrix}2&-1\\-1&2\end{pmatrix}$, we get
+$\tr(S^{-1})=\tfrac13(2+2)=\tfrac43\approx1.333$. For the alternate dual
+$G=\tilde F+Z$ from Example~\ref{ex:alternate-dual-h} with
+$Z=(0.1,-0.2)^T(1,1,-1)$, each row of $Z$ has \emph{three} entries (one
+per frame vector), so direct computation (carried out numerically in
+Lab Exercise 5.3) gives
+$\norm{Z}_F^2=3(0.1^2+0.2^2)=0.15$, so
+$\norm{G}_F^2=\norm{\tilde F}_F^2+\norm{Z}_F^2\approx1.333+0.15=1.483$,
+strictly larger than the canonical dual's $1.333$, exactly as
+Theorem~\ref{thm:canonical-minimal-norm} guarantees. Under unit-variance
+noise, the canonical dual's expected squared error is $\approx1.333$,
+while the alternate dual's is $\approx1.483$: roughly $11.25\%$ worse,
+purely as a consequence of choosing a non-optimal dual.
+\end{examplebox}
+
+\section{NumPy Implementation}
+\label{sec:numpy-dual-frames}
+
+\begin{lstlisting}[caption={Canonical and alternate dual frames, and stability comparison}]
+import numpy as np
+from scipy.linalg import null_space
+
+def frame_operator(F):
+    return F @ F.T
+
+def canonical_dual(F):
+    """Synthesis matrix of the canonical dual frame: S^{-1} F."""
+    S = frame_operator(F)
+    return np.linalg.solve(S, F)   # S^{-1} @ F, more stable than explicit inverse
+
+def dual_family_direction(F):
+    """
+    Orthonormal basis of directions Z = w @ N.T (one column w at a time)
+    spanning the freedom in choosing a dual frame, where N spans ker(F).
+    Returns N, shape (m, m-n).
+    """
+    return null_space(F)
+
+def random_alternate_dual(F, scale=1.0, seed=0):
+    """Construct a random valid (non-canonical) dual frame's synthesis matrix."""
+    n, m = F.shape
+    N = dual_family_direction(F)        # shape (m, m-n)
+    rng = np.random.default_rng(seed)
+    W = rng.standard_normal((n, N.shape[1])) * scale
+    Z = W @ N.T                          # shape (n, m), and Z @ F.T == 0
+    G_tilde = canonical_dual(F)
+    return G_tilde + Z
+
+def expected_reconstruction_error(G, sigma=1.0):
+    """E[||x_hat - x||^2] / sigma^2 = ||G||_F^2 = tr(G G^T)."""
+    return np.trace(G @ G.T)
+
+# -----------------------------------------------------------------
+# Example 5.1 / 5.3: non-tight frame {h1, h2, h3}
+# -----------------------------------------------------------------
+H = np.array([[1., 0., 1.],
+              [0., 1., 1.]])
+
+H_tilde = canonical_dual(H)
+print("=== Canonical dual of {h1,h2,h3} ===")
+print("H_tilde =\n", H_tilde.round(4))
+print("Check H_tilde @ H.T == I:", np.allclose(H_tilde @ H.T, np.eye(2)))
+print(f"||H_tilde||_F^2 = {expected_reconstruction_error(H_tilde):.6f}")
+
+G_alt = random_alternate_dual(H, scale=0.2, seed=0)
+print("\n=== A random alternate dual ===")
+print("G_alt =\n", G_alt.round(4))
+print("Check G_alt @ H.T == I:", np.allclose(G_alt @ H.T, np.eye(2)))
+print(f"||G_alt||_F^2 = {expected_reconstruction_error(G_alt):.6f}")
+print(f"(Canonical is smaller: "
+      f"{expected_reconstruction_error(H_tilde) <= expected_reconstruction_error(G_alt)})")
+
+# -----------------------------------------------------------------
+# Verify reconstruction works exactly for BOTH duals
+# -----------------------------------------------------------------
+rng = np.random.default_rng(1)
+for trial in range(3):
+    x = rng.standard_normal(2)
+    c = H.T @ x   # frame coefficients <x, h_i>
+    x_hat_canonical = H_tilde @ c
+    x_hat_alt = G_alt @ c
+    print(f"\nx = {x.round(4)}")
+    print(f"  canonical reconstruction error: {np.linalg.norm(x_hat_canonical - x):.2e}")
+    print(f"  alternate reconstruction error: {np.linalg.norm(x_hat_alt - x):.2e}")
+
+# -----------------------------------------------------------------
+# Monte Carlo: verify canonical dual minimizes noisy reconstruction error
+# -----------------------------------------------------------------
+def noisy_reconstruction_trial(F, G, x, sigma, rng):
+    c = F.T @ x
+    noise = rng.standard_normal(c.shape) * sigma
+    x_hat = G @ (c + noise)
+    return np.linalg.norm(x_hat - x)**2
+
+rng = np.random.default_rng(2)
+x_test = np.array([1.0, -0.5])
+sigma = 0.3
+N_trials = 200_000
+
+errs_canonical = [noisy_reconstruction_trial(H, H_tilde, x_test, sigma, rng)
+                   for _ in range(N_trials)]
+errs_alt = [noisy_reconstruction_trial(H, G_alt, x_test, sigma, rng)
+            for _ in range(N_trials)]
+
+print(f"\n=== Monte Carlo noise comparison ({N_trials} trials, sigma={sigma}) ===")
+print(f"Mean squared error, canonical dual: {np.mean(errs_canonical):.6f}  "
+      f"(predicted: {sigma**2 * expected_reconstruction_error(H_tilde):.6f})")
+print(f"Mean squared error, alternate dual: {np.mean(errs_alt):.6f}  "
+      f"(predicted: {sigma**2 * expected_reconstruction_error(G_alt):.6f})")
+\end{lstlisting}
+
+\begin{remark*}
+We use \texttt{np.linalg.solve(S, F)} rather than explicitly forming
+\texttt{np.linalg.inv(S) @ F}. These are mathematically identical, but
+\texttt{solve} avoids explicitly constructing the inverse matrix, which
+is both faster and numerically more stable, especially as $S$ becomes
+ill-conditioned (nearly singular). This is a general good habit: prefer
+\texttt{np.linalg.solve(A, b)} over \texttt{np.linalg.inv(A) @ b}
+whenever you only need the product, not the inverse matrix itself.
+\end{remark*}
+
+\section{Chapter Summary}
+\label{sec:summary-ch5}
+
+\begin{itemize}
+  \item A \textbf{dual frame} $\{g_i\}$ of $\{f_i\}$ satisfies
+        $x=\sum_i\inner{x}{f_i}g_i$ for all $x$, equivalently
+        $GF^*=I_n$ for the synthesis matrices $G, F$. The relationship
+        is mutual: $\{f_i\}$ is also dual to $\{g_i\}$.
+  \item The \textbf{canonical dual} $\tilde f_i=S^{-1}f_i$ is always a
+        valid dual, with frame operator $\tilde S=S^{-1}$ and frame
+        bounds $\tilde A=1/B$, $\tilde B=1/A$ (reciprocal and reversed).
+        For tight frames, $\tilde f_i=\tfrac1Af_i$, a trivial rescaling.
+  \item \textbf{Theorem~\ref{thm:dual-family}}: every valid dual has
+        synthesis matrix $G=\tilde F+Z$ with $ZF^*=0$, i.e.\ each row
+        of $Z$ lies in $\ker F$. Bases ($m=n$) have a unique dual;
+        redundant frames ($m>n$) have an $(m-n)$-real-dimensional
+        affine family of duals.
+  \item \textbf{Theorem~\ref{thm:canonical-minimal-norm}}: the canonical
+        dual is the unique \textbf{minimal Frobenius-norm} dual, via the
+        Pythagorean decomposition $\norm{G}_F^2=\norm{\tilde F}_F^2+\norm{Z}_F^2$.
+  \item This optimality has a direct payoff: since expected squared
+        reconstruction error under uncorrelated coefficient noise equals
+        $\sigma^2\norm{G}_F^2$, the \textbf{canonical dual minimizes
+        expected reconstruction error} among all valid duals---the
+        precise, quantitative form of the robustness-to-noise promise
+        first made informally in Chapter~1.
+\end{itemize}
+
+\section{Lab Exercises}
+\label{sec:lab-ch5}
+
+\begin{exercisebox}[title={Lab Exercise 5.1: The Canonical Dual Pipeline}]
+\label{lab:dual-symmetry}
+Implement \texttt{canonical\_dual(F)} from
+Section~\ref{sec:numpy-dual-frames}. Run it on:
+\begin{enumerate}[label=(\alph*)]
+  \item The triangular frame (tight, Chapter~3 Example~3.2): verify
+        $\tilde f_i = \tfrac{1}{1.5}f_i$ for each $i$.
+  \item The non-tight frame $\{h_1,h_2,h_3\}$ (Example~5.1): reproduce
+        the hand computation exactly.
+  \item The square vertices (Chapter~3 Example~3.6): verify the
+        canonical dual is again a rescaling of the original (as
+        expected, since this frame is tight).
+\end{enumerate}
+For each case, also verify the mutual-duality claim from the remark
+after Definition~5.2.1: check numerically that
+\texttt{F @ H\_tilde.T} also equals the identity (not just
+\texttt{H\_tilde @ F.T}), confirming $\{f_i\}$ is dual to
+$\{\tilde f_i\}$ as well as vice versa.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 5.2: Verifying the Dual Family}]
+\label{lab:dual-family-numerics}
+Implement \texttt{dual\_family\_direction(F)} and
+\texttt{random\_alternate\_dual(F)} from
+Section~\ref{sec:numpy-dual-frames}. Using $\{h_1,h_2,h_3\}$:
+\begin{enumerate}[label=(\alph*)]
+  \item Reproduce Example~5.2's specific alternate dual exactly (using
+        $w=(0.1,-0.2)^T$), and verify $GF^*=I_2$ numerically.
+  \item Generate $10$ different random alternate duals (varying the
+        seed) and verify, for each, that $\sum_i\inner{x}{h_i}g_i=x$
+        holds exactly (to machine precision) for five random test
+        vectors $x$.
+  \item For each of the $10$ alternate duals, compute $\norm{G}_F^2$
+        and confirm it always exceeds $\norm{\tilde F}_F^2 \approx
+        1.333$ (the canonical value from Example~5.3), consistent with
+        Theorem~\ref{thm:canonical-minimal-norm}.
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 5.3: Monte Carlo Stability Comparison}]
+\label{lab:stability-numerics}
+Reproduce the Monte Carlo experiment from
+Section~\ref{sec:numpy-dual-frames} (the final code block). Then extend
+it:
+\begin{enumerate}[label=(\alph*)]
+  \item Vary the perturbation scale in
+        \texttt{random\_alternate\_dual} over
+        $\texttt{scale}=0.05, 0.2, 0.5, 1.0, 2.0$, and for each, compute
+        $\norm{G}_F^2$ and the predicted mean squared error
+        $\sigma^2\norm{G}_F^2$ (with $\sigma=0.3$ as before). Plot
+        predicted MSE versus \texttt{scale}.
+  \item Confirm, by running the Monte Carlo simulation (at least
+        $50{,}000$ trials) at each scale, that the empirically observed
+        mean squared error matches your prediction closely.
+  \item In a sentence or two: does this experiment suggest any practical
+        guidance for choosing a dual frame in a real signal-processing
+        system where the frame is fixed in advance but coefficient noise
+        is unavoidable?
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 5.4: Dual Frames of a Basis Are Unique}]
+Let $\{v_1, v_2\} = \{(2,1)^T, (1,3)^T\}$, a basis (not a redundant
+frame) for $\R^2$. Compute the canonical dual $\{\tilde v_1, \tilde
+v_2\}$, and verify, using \texttt{scipy.linalg.null\_space}, that
+$\ker F$ is trivial (zero-dimensional) for the synthesis matrix of this
+basis. Conclude, via Theorem~\ref{thm:dual-family}, that the canonical
+dual is the \emph{only} dual frame in this case. (For comparison with
+your linear algebra background: explain in a sentence why this matches
+the familiar fact that a basis has a unique dual/biorthogonal basis,
+characterized by $\inner{v_i}{\tilde v_j} = \delta_{ij}$.)
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 5.5 (Optional, Challenge): Sparsity-Promoting Duals}]
+Theorem~\ref{thm:canonical-minimal-norm} shows the canonical dual
+minimizes the \emph{total Frobenius energy} $\sum_i\norm{g_i}^2$ among
+all valid duals. A different, and increasingly important, optimality
+criterion in modern signal processing is \emph{sparsity}: finding a dual
+frame (or, more precisely, a coefficient sequence) with as many exactly
+zero entries as possible. This exercise previews that idea numerically.
+\begin{enumerate}[label=(\alph*)]
+  \item Using $\{h_1,h_2,h_3\}$ and a fixed $x=(1,-0.5)^T$, the
+        canonical dual gives one specific coefficient-free
+        reconstruction. But recall from
+        Example~3.7 that the coefficients $c_i=\inner{x}{f_i}$
+        \emph{themselves} are not unique either, once you allow
+        $c'=c+z$ for $z\in\ker F$ (a fact distinct from, but related
+        to, the dual-frame freedom of this chapter). Parametrize
+        $c'(t) = c + t\cdot n$ where $n$ spans $\ker H$ (one-dimensional,
+        as in Example~5.2), and plot $\norm{c'(t)}_1$ (the $\ell^1$ norm,
+        \texttt{np.sum(np.abs(...))}) as a function of $t\in[-2,2]$.
+  \item Find the value of $t$ that minimizes $\norm{c'(t)}_1$
+        numerically (e.g.\ via \texttt{scipy.optimize.minimize\_scalar}).
+        Is the minimizing coefficient vector sparse (does it have an
+        exact zero entry)? This phenomenon---$\ell^1$ minimization
+        promoting exact sparsity---is the starting point of compressed
+        sensing, which we will touch on again in Chapter~12.
+\end{enumerate}
+\end{exercisebox}
+\newpage
+\section{Supplementary Exercises}
+\label{sec:extra-ch5}
+
+\subsection*{Theoretical Exercises}
+\begin{theoexercises}
+	\item Prove that the set of all dual frames of a fixed frame
+	$\{f_i\}_{i=1}^m$ (the affine family of Theorem~5.4.1) is
+	\emph{convex}: if $G_1$ and $G_2$ are both valid dual synthesis
+	matrices, then so is $tG_1+(1-t)G_2$ for every $t\in[0,1]$.
+	
+	\item Prove the full biconditional: a frame $\{f_i\}_{i=1}^m$ equals its
+	own canonical dual ($\tilde f_i=f_i$ for all $i$) if and only if
+	$\{f_i\}$ is a Parseval frame. (One direction is immediate;
+	for the converse, show $F=\tilde F$ forces $S=I$.)
+	
+	\item Prove that $\norm{Z}_F^2$ is a strictly convex function of $Z$
+	(over the subspace of matrices with $ZF^*=0$), and use this
+	convexity --- rather than the Pythagorean/orthogonality argument
+	used in the text --- to give an alternative proof that the
+	canonical dual is the \emph{unique} minimizer of total energy in
+	Theorem~5.5.1.
+	
+	\item Let $\{f_i\}_{i=1}^m$ be a tight frame for $\R^n$ with bound $A$
+	(not necessarily unit-norm). Prove that the canonical dual has
+	total energy $\sum_i\norm{\tilde f_i}^2=n/A$ exactly. Specialize
+	to the unit-norm case ($A=m/n$) to recover the formula $n^2/m$
+	used in Chapter~11.
+	
+	\item Prove directly from the definition of the analysis operator
+	$F^*$ that $\ker F^*=(\spn\{f_i\})^\perp$.
+	
+	\item Using strict convexity (T3), prove or disprove: for any two
+	\emph{distinct} valid duals $G_1\ne G_2$ of a fixed frame, the
+	averaged dual $\tfrac12(G_1+G_2)$ has strictly smaller total
+	energy than the larger of $\norm{G_1}_F^2,\norm{G_2}_F^2$.
+\end{theoexercises}
+
+\subsection*{Computational Exercises}
+\begin{compexercises}
+	\item For $\{h_1,h_2,h_3\}$, construct two distinct alternate duals
+	$G_1,G_2$, form their average, and confirm numerically that the
+	average is itself a valid dual (T1).
+	
+	\item Confirm numerically that the triangular frame (tight, $A=1.5\ne1$)
+	does \emph{not} equal its own canonical dual, while the standard
+	ONB (Parseval) does, illustrating both directions of T2.
+	
+	\item Scale the triangular frame by a factor $c=2,3,4$ (multiply every
+	vector by $c$), and for each, compute the canonical dual's total
+	energy and compare to the predicted $n/A$ from T4.
+	
+	\item For $\{h_1,h_2,h_3\}$, construct $10$ random alternate duals with
+	varying perturbation scale, compute each one's total energy, and
+	verify numerically that the canonical dual ($w=0$) has strictly
+	smaller energy than every one of them, consistent with T3's
+	convexity argument.
+	
+	\item Construct three distinct alternate duals of $\{h_1,h_2,h_3\}$,
+	compute all pairwise averages, and verify each pairwise average
+	has energy strictly less than the larger of its two parents,
+	illustrating T6 across multiple pairs.
+\end{compexercises}

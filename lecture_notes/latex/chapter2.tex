@@ -1,0 +1,324 @@
+\chapter{The Definition of a Finite Frame}
+\label{ch:definition}
+\fancyhead[R]{\small\textit{Chapter 2: The Definition of a Finite Frame}}
+\section{From Parseval's Identity to the Frame Inequality}
+\label{sec:from-parseval}
+
+Chapter 1 ended with a question, posed in the remark following Theorem 1.2.9 (the orthonormal expansion theorem): what happens if we take the equality
+$$
+\norm{x}^2 = \sum_{k=1}^n |\inner{x}{e_k}|^2, \qquad \text{valid for every } x \in V \text{ when } \{e_k\}_{k=1}^n \text{ is an orthonormal basis,}
+$$
+and relax it in two ways simultaneously? First, we allow the set of vectors to be redundant: instead of exactly $n$ orthonormal vectors, we allow any finite collection $\{f_i\}_{i=1}^m$, with $m \ge n$ and no orthonormality assumed. Second, we relax the equality to a two-sided inequality, since redundant, non-orthonormal vectors will not generally make the left- and right-hand sides match exactly for every $x$ (we saw this concretely in Section 1.2.4 and in Lab Exercise 1.3, where the quantity $\sum_i |\inner{x}{f_i}|^2$ varied with the direction of $x$, even though $\norm{x}^2$ did not).
+
+This chapter makes that relaxation precise. The result is the formal definition of a \emph{frame}, the central object of the entire course.
+
+\begin{definition}[Finite frame]
+\label{def:frame}
+Let $V = \F^n$ (with $\F = \R$ or $\F = \C$), and let $\{f_i\}_{i=1}^m \subset V$ be a finite collection of vectors. We say $\{f_i\}_{i=1}^m$ is a \emph{frame} for $V$ if there exist constants $0 < A \leq B < \infty$ such that
+\begin{equation}
+\label{eq:frame-inequality}
+A \norm{x}^2 \;\leq\; \sum_{i=1}^m \left| \inner{x}{f_i} \right|^2 \;\leq\; B \norm{x}^2 \qquad \text{for every } x \in V.
+\end{equation}
+The constants $A$ and $B$ are called \emph{frame bounds}; specifically, $A$ is a \emph{lower frame bound} and $B$ is an \emph{upper frame bound}. We refer to inequality \eqref{eq:frame-inequality} itself as the \emph{frame inequality} or \emph{frame condition}.
+\end{definition}
+
+\begin{remark*}
+The frame bounds $A$ and $B$ in Definition \ref{def:frame} are not unique: if $A$ is a valid lower frame bound, so is any smaller positive number, and if $B$ is a valid upper frame bound, so is any larger number. When we speak of \emph{the} lower and upper frame bounds (with the definite article), we will always mean the \emph{optimal} ones: the largest possible $A$ and the smallest possible $B$ for which \eqref{eq:frame-inequality} holds. We will see next week (Chapter 3) that these optimal bounds have an exact description in terms of eigenvalues of the frame operator, but for this chapter, it is the \emph{existence} of some valid pair $(A,B)$ that defines a frame, not their optimal values.
+\end{remark*}
+
+\begin{remark*}
+A notational comment: we use $m$ for the number of frame vectors and $n$ for the dimension of the ambient space throughout this course, matching the convention in most of the finite-frame-theory literature. When $m = n$ and $\{f_i\}$ happens to be linearly independent (hence a basis), Definition \ref{def:frame} still applies and recovers an important special case, treated in Example \ref{ex:basis-is-frame} below. The interesting case for this course --- the one that motivated all of Chapter 1 --- is $m > n$, but the definition does not require this, and it is worth understanding the $m=n$ case first.
+\end{remark*}
+
+\subsection{First Examples}
+\label{subsec:first-examples}
+
+\begin{examplebox}[title={Example 2.1: An orthonormal basis is a (tight) frame}]
+\label{ex:onb-is-frame}
+Let $\{e_1, \dots, e_n\}$ be an orthonormal basis of $V$. By Theorem 1.2.9, $\sum_{k=1}^n |\inner{x}{e_k}|^2 = \norm{x}^2$ exactly, for every $x \in V$. Thus the frame inequality \eqref{eq:frame-inequality} holds with $A = B = 1$: every orthonormal basis is a frame, with both frame bounds equal to $1$. This is the simplest possible example, and it is the one that all the definitions in this chapter are built to generalize.
+\end{examplebox}
+
+\begin{examplebox}[title={Example 2.2: An arbitrary basis is a frame}]
+\label{ex:basis-is-frame}
+Let $\{v_1, \dots, v_n\}$ be \emph{any} basis of $V$ (not necessarily orthonormal). We claim $\{v_i\}_{i=1}^n$ is a frame for $V$. This requires a short argument, since we no longer have an identity like Parseval's to fall back on directly; we give the argument in full generality in Theorem \ref{thm:finite-spanning-is-frame} below, where it is shown that \emph{every} finite spanning set of $V$ --- whether or not it is a basis, and whether or not it is redundant --- is automatically a frame. For now, take this as a preview: the frame property is a remarkably mild requirement in finite dimensions, and the next section is devoted to making this precise.
+\end{examplebox}
+
+\begin{examplebox}[title={Example 2.3: The triangular frame from Chapter 1}]
+\label{ex:triangle-is-frame}
+Recall the three vectors from Section 1.1.1:
+$$
+f_1 = (1, 0), \qquad f_2 = \left(-\tfrac{1}{2}, \tfrac{\sqrt 3}{2}\right), \qquad f_3 = \left(-\tfrac{1}{2}, -\tfrac{\sqrt 3}{2}\right) \quad \in \R^2.
+$$
+We will verify rigorously in Example \ref{ex:triangle-tight-computation} (later in this chapter, once we have the right computational tool) that this set satisfies the frame inequality with $A = B = \tfrac{3}{2}$. For now, notice that this is already a non-obvious, pleasant fact: \emph{every} direction $x \in \R^2$ satisfies $\sum_{i=1}^3 |\inner{x}{f_i}|^2 = \tfrac{3}{2}\norm{x}^2$ \emph{exactly}, despite the three vectors $f_1, f_2, f_3$ not being orthogonal to one another (in fact $\inner{f_i}{f_j} = -\tfrac12$ for every $i \ne j$, as a short computation shows). The redundancy in this configuration is, in a sense we are about to make precise, perfectly distributed.
+\end{examplebox}
+
+\section{Why the Frame Condition Is (Almost) Automatic in Finite Dimensions}
+\label{sec:automatic-in-finite-dim}
+
+This section contains the single most important structural fact about \emph{finite}-dimensional frame theory, and it is the reason this course can focus almost entirely on geometry and computation rather than on existence questions. In infinite dimensions (frames for infinite-dimensional Hilbert spaces, which you may encounter in a future course), it is a delicate matter whether a given spanning set is a frame at all --- the upper bound $B < \infty$ in particular can fail for perfectly reasonable-looking spanning sets. In finite dimensions, this delicacy completely disappears.
+
+\begin{theorem}[Every finite spanning set is a frame]
+\label{thm:finite-spanning-is-frame}
+Let $V = \F^n$, and let $\{f_i\}_{i=1}^m \subset V$ be a finite set of vectors. Then $\{f_i\}_{i=1}^m$ is a frame for $V$ (in the sense of Definition \ref{def:frame}) if and only if $\{f_i\}_{i=1}^m$ spans $V$.
+\end{theorem}
+
+\begin{proof}
+($\Rightarrow$) Suppose $\{f_i\}_{i=1}^m$ is a frame, with frame bounds $0 < A \le B < \infty$, but suppose toward a contradiction that $\{f_i\}_{i=1}^m$ does \emph{not} span $V$. Then $\spn\{f_1, \dots, f_m\}$ is a proper subspace of $V$, so its orthogonal complement is nontrivial: there exists a nonzero vector $x_0 \in V$ with $\inner{x_0}{f_i} = 0$ for every $i = 1, \dots, m$ (take $x_0$ to be any nonzero vector orthogonal to the span; such a vector exists because the orthogonal complement of a proper subspace of a finite-dimensional inner product space is itself nontrivial). For this $x_0$,
+$$
+\sum_{i=1}^m |\inner{x_0}{f_i}|^2 = 0,
+$$
+while the lower frame bound requires $\sum_{i=1}^m |\inner{x_0}{f_i}|^2 \ge A \norm{x_0}^2 > 0$ (using $A > 0$ and $x_0 \ne 0$, so $\norm{x_0}^2 > 0$). This is a contradiction. Hence $\{f_i\}_{i=1}^m$ must span $V$.
+
+($\Leftarrow$) Suppose $\{f_i\}_{i=1}^m$ spans $V$. We must produce valid constants $A, B$.
+
+\textbf{Upper bound.} Define $B := \sum_{i=1}^m \norm{f_i}^2$. For any $x \in V$ with $\norm{x} = 1$, Cauchy--Schwarz (Theorem 1.2.3) gives $|\inner{x}{f_i}| \le \norm{x}\,\norm{f_i} = \norm{f_i}$ for each $i$, hence
+$$
+\sum_{i=1}^m |\inner{x}{f_i}|^2 \le \sum_{i=1}^m \norm{f_i}^2 = B.
+$$
+For general $x \ne 0$, apply this to the unit vector $x/\norm{x}$ and use homogeneity of the inner product to recover $\sum_i |\inner{x}{f_i}|^2 \le B\norm{x}^2$; the case $x = 0$ is trivial. This $B$ is finite because it is a finite sum of finite numbers, so the upper bound holds automatically and requires no use of the spanning hypothesis at all (this part of the argument works for \emph{any} finite collection of vectors, spanning or not).
+
+\textbf{Lower bound.} This is where the spanning hypothesis is essential, and where the argument is more interesting. Define the function $\varphi : V \to [0, \infty)$ by
+$$
+\varphi(x) := \sum_{i=1}^m |\inner{x}{f_i}|^2.
+$$
+Restrict $\varphi$ to the unit sphere $S := \setdef{x \in V}{\norm{x} = 1}$. The function $\varphi$ is continuous (it is a finite sum of squared moduli of inner products, each of which is continuous in $x$), and $S$ is compact (closed and bounded in the finite-dimensional space $V$, by the Heine--Borel theorem). A continuous function on a compact set attains its minimum, so there exists some $x_0 \in S$ with
+$$
+\varphi(x_0) = \min_{x \in S} \varphi(x) =: A.
+$$
+We claim $A > 0$. Indeed, if $A = 0$, then $\varphi(x_0) = \sum_{i=1}^m |\inner{x_0}{f_i}|^2 = 0$, which forces $\inner{x_0}{f_i} = 0$ for every $i = 1, \dots, m$ (a sum of nonnegative terms is zero only if every term is zero). But then $x_0$ is orthogonal to every $f_i$, hence orthogonal to $\spn\{f_1, \dots, f_m\} = V$ (using the spanning hypothesis here, for the only time in the proof). A vector orthogonal to the entire space $V$, including itself, must satisfy $\inner{x_0}{x_0} = 0$, i.e., $x_0 = 0$. This contradicts $x_0 \in S$, i.e., $\norm{x_0} = 1$. Hence $A > 0$.
+
+Finally, $\varphi(x_0) = A$ is the minimum value over the \emph{unit sphere}, so $\varphi(x) \ge A$ for every unit vector $x$, and by the same homogeneity argument as before, $\varphi(x) \ge A\norm{x}^2$ for every $x \in V$. This is exactly the lower frame bound.
+\end{proof}
+
+\begin{keyidea}
+In finite dimensions, \emph{spanning is the only requirement}. The frame bounds $A$ and $B$ always exist once a finite set of vectors spans $V$; their \emph{values} are not automatic (they depend delicately on the geometry of the configuration), but their \emph{existence} is. This is why finite frame theory can spend its energy on geometry and computation --- on understanding what $A$ and $B$ \emph{are}, and what makes them large, small, or equal --- rather than on existence questions, which is where a great deal of the technical difficulty lies in the infinite-dimensional theory.
+\end{keyidea}
+
+\begin{corollary}
+\label{cor:any-basis-frame}
+Every basis of $V$ is a frame for $V$, with both frame bounds finite and positive. (This makes Example \ref{ex:basis-is-frame} a special case of Theorem \ref{thm:finite-spanning-is-frame}, since a basis is in particular a spanning set.)
+\end{corollary}
+
+\begin{proof}
+Immediate from Theorem \ref{thm:finite-spanning-is-frame}, since a basis spans $V$ by definition.
+\end{proof}
+
+\begin{remark*}
+Theorem \ref{thm:finite-spanning-is-frame} also clarifies exactly what can go wrong, and exactly one thing can: if $\{f_i\}_{i=1}^m$ does \emph{not} span $V$, the upper bound $B$ in Definition \ref{def:frame} can still be found exactly as in the proof above (the argument for $B$ never used spanning), but no valid lower bound $A > 0$ can exist, because the orthogonal complement direction $x_0$ from the ($\Rightarrow$) half of the proof gives $\varphi(x_0) = 0$ while $\norm{x_0}^2 > 0$, which is incompatible with any $A > 0$. In the language we will develop next week, a non-spanning set has frame operator with a zero eigenvalue, which is exactly the obstruction to a positive lower bound. So the failure mode for non-frames in finite dimensions is completely specific: it is always a failure of the lower bound caused by a missing direction, never a failure of the upper bound.
+\end{remark*}
+
+\subsection{A Quick Non-Example}
+\label{subsec:non-example}
+
+\begin{examplebox}[title={Example 2.4: A spanning failure}]
+\label{ex:non-frame}
+Let $V = \R^3$ and consider $g_1 = (1,0,0)$, $g_2 = (0,1,0)$. These two vectors do \emph{not} span $\R^3$ (their span is only the $xy$-plane), so by Theorem \ref{thm:finite-spanning-is-frame}, $\{g_1, g_2\}$ is \emph{not} a frame for $\R^3$. Concretely: taking $x_0 = (0,0,1)$ (orthogonal to both $g_1$ and $g_2$), we get $\sum_{i=1}^2 |\inner{x_0}{g_i}|^2 = 0$ while $\norm{x_0}^2 = 1 > 0$, so no $A > 0$ can satisfy the lower frame bound for this $x_0$. Note, however, that $\{g_1, g_2\}$ \emph{is} a perfectly good frame for the two-dimensional subspace $\spn\{g_1, g_2\} = \R^2 \times \{0\}$, viewed as a space in its own right. Whether a set of vectors is a frame is always relative to which ambient space $V$ it is being asked to span; throughout this course, $V$ will be clear from context, almost always $\R^n$ or $\C^n$ for an explicitly stated $n$.
+\end{examplebox}
+
+\section{Tight Frames: A First Look}
+\label{sec:tight-frames-preview}
+
+Theorem \ref{thm:finite-spanning-is-frame} tells us \emph{that} frame bounds exist for any spanning set, but says nothing about their values, and in particular says nothing about when the two bounds coincide. This question --- when is $A = B$? --- turns out to be exactly the right question to ask in order to recover the geometric symmetry we saw informally in Chapter 1 (Figure 1.1). We introduce the relevant terminology now, even though the full geometric treatment is the subject of Chapter 4 (Week 4 in the syllabus); having the definition in hand will make this chapter's examples and lab exercises considerably more meaningful.
+
+\begin{definition}[Tight frame]
+\label{def:tight-frame}
+A frame $\{f_i\}_{i=1}^m$ for $V$ is called a \emph{tight frame} if its frame bounds satisfy $A = B$, i.e., if there is a single constant $A > 0$ such that
+$$
+\sum_{i=1}^m |\inner{x}{f_i}|^2 = A \norm{x}^2 \qquad \text{for every } x \in V.
+$$
+If, in addition, $A = 1$, the frame is called a \emph{Parseval frame}.
+\end{definition}
+
+\begin{remark*}
+Comparing Definition \ref{def:tight-frame} to Example \ref{ex:onb-is-frame}: every orthonormal basis is a Parseval frame. The converse is \emph{false} in general --- a Parseval frame need not be an orthonormal basis, nor even consist of unit vectors, nor even be linearly independent. We will see explicit examples of Parseval frames that are not bases later in this chapter and in Chapter 4. The point of the terminology is precisely to isolate the property (the exact Parseval-type identity) that we want to keep, while discarding the property (linear independence / exact count of $n$ vectors) that we are willing to give up.
+\end{remark*}
+
+\begin{remark*}
+Tightness is the precise version of the informal phrase ``every direction is treated equally,'' which we used throughout Chapter 1. If $A = B$, then $\sum_i |\inner{x}{f_i}|^2$ depends on $x$ \emph{only through $\norm{x}^2$} --- two vectors $x, x'$ of the same length, but pointing in different directions, produce exactly the same total $\sum_i |\inner{x}{f_i}|^2$. This is the rigorous content behind the visual symmetry of the triangular configuration in Figure 1.1, and we are now in a position to verify it by direct computation, which we do next.
+\end{remark*}
+
+\begin{examplebox}[title={Example 2.5: Verifying tightness of the triangular frame}]
+\label{ex:triangle-tight-computation}
+We return to Example \ref{ex:triangle-is-frame} and verify the claimed tightness directly. Let $x = (x_1, x_2) \in \R^2$ be arbitrary. Using $f_1 = (1,0)$, $f_2 = (-\tfrac12, \tfrac{\sqrt3}{2})$, $f_3 = (-\tfrac12, -\tfrac{\sqrt3}{2})$:
+\begin{align*}
+\inner{x}{f_1} &= x_1, \\
+\inner{x}{f_2} &= -\tfrac12 x_1 + \tfrac{\sqrt3}{2} x_2, \\
+\inner{x}{f_3} &= -\tfrac12 x_1 - \tfrac{\sqrt3}{2} x_2.
+\end{align*}
+Squaring and summing,
+\begin{align*}
+\sum_{i=1}^3 |\inner{x}{f_i}|^2
+&= x_1^2 + \left(-\tfrac12 x_1 + \tfrac{\sqrt3}{2} x_2\right)^2 + \left(-\tfrac12 x_1 - \tfrac{\sqrt3}{2}x_2\right)^2 \\
+&= x_1^2 + \left(\tfrac14 x_1^2 - \tfrac{\sqrt3}{2}x_1x_2 + \tfrac34 x_2^2\right) + \left(\tfrac14 x_1^2 + \tfrac{\sqrt3}{2}x_1x_2 + \tfrac34 x_2^2\right) \\
+&= x_1^2 + \tfrac12 x_1^2 + \tfrac32 x_2^2 \\
+&= \tfrac32 x_1^2 + \tfrac32 x_2^2 \\
+&= \tfrac32 \norm{x}^2.
+\end{align*}
+The cross terms $-\tfrac{\sqrt3}{2}x_1x_2$ and $+\tfrac{\sqrt3}{2}x_1x_2$ cancel exactly --- this cancellation is not a coincidence, but a direct consequence of the $120^\circ$-rotational symmetry of the configuration, and this kind of cancellation is the algebraic fingerprint of tightness that we will learn to recognize (and engineer) systematically in Chapter 4. We conclude that $\{f_1, f_2, f_3\}$ is a tight frame for $\R^2$ with $A = B = \tfrac32$, confirming the claim made in Example \ref{ex:triangle-is-frame}.
+\end{examplebox}
+
+\section{Estimating Frame Bounds Numerically}
+\label{sec:numerical-estimation}
+
+Example \ref{ex:triangle-tight-computation} found the exact frame bounds of a specific, highly symmetric configuration by direct algebraic computation. This is satisfying, but it does not scale: for a configuration of, say, $m = 20$ vectors in $\R^5$ with no special symmetry, an analogous by-hand computation is impractical. We need a numerical method, and fortunately Chapter 1 already built almost all of the necessary machinery.
+
+Recall the \texttt{illumination} function from Lab Exercise 1.3, which computed $\varphi(x) = \sum_i |\inner{x}{f_i}|^2$ for a given direction $x$. The proof of Theorem \ref{thm:finite-spanning-is-frame} shows that the optimal frame bounds are exactly
+$$
+A = \min_{\norm{x}=1} \varphi(x), \qquad B = \max_{\norm{x}=1} \varphi(x),
+$$
+the minimum and maximum of $\varphi$ \emph{over the unit sphere}. This immediately suggests a numerical strategy: sample many random unit vectors $x$, evaluate $\varphi(x)$ at each, and use the smallest and largest observed values as estimates of $A$ and $B$.
+
+\begin{lstlisting}[caption={Estimating frame bounds by random sampling on the unit sphere}]
+import numpy as np
+
+def illumination(x, vectors):
+    """Compute sum_i |<x, f_i>|^2 for a list/array of frame vectors."""
+    return sum(np.dot(x, f)**2 for f in vectors)
+
+def random_unit_vector(n, rng):
+    """Sample a uniformly random unit vector in R^n."""
+    v = rng.standard_normal(n)
+    return v / np.linalg.norm(v)
+
+def estimate_frame_bounds(vectors, n, num_samples=20000, seed=0):
+    """
+    Estimate frame bounds A, B for a finite set of vectors in R^n
+    by sampling random unit vectors on the sphere.
+    """
+    rng = np.random.default_rng(seed)
+    values = np.empty(num_samples)
+    for k in range(num_samples):
+        x = random_unit_vector(n, rng)
+        values[k] = illumination(x, vectors)
+    A_estimate = values.min()
+    B_estimate = values.max()
+    return A_estimate, B_estimate
+
+# Sanity check: the triangular frame from Example 2.3 / 2.5
+f1 = np.array([1.0, 0.0])
+f2 = np.array([-0.5, np.sqrt(3)/2])
+f3 = np.array([-0.5, -np.sqrt(3)/2])
+triangle = [f1, f2, f3]
+
+A_est, B_est = estimate_frame_bounds(triangle, n=2)
+print(f"Estimated A = {A_est:.4f}, B = {B_est:.4f}")
+print(f"Exact value from Example 2.5: A = B = 1.5")
+\end{lstlisting}
+
+Running this code should produce \texttt{A\_est} and \texttt{B\_est} both very close to $1.5$ (small deviations from $1.5$, typically in the third decimal place with $20{,}000$ samples, are expected and are exactly the kind of sampling error this method is subject to --- we are not checking every direction, only $20{,}000$ random ones).
+
+\begin{remark*}
+This sampling method has an important limitation, worth stating plainly rather than discovering by surprise: it can only ever \emph{underestimate} $B$ and \emph{overestimate} $A$ in expectation, since random sampling is unlikely to land exactly on the true minimizing or maximizing direction $x_0$. The estimates improve (the gap between estimated and true $A, B$ shrinks) as \texttt{num\_samples} increases, but convergence can be slow, especially in higher dimensions $n$, where the unit sphere has much more ``room'' for the optimal direction to hide. Next week (Chapter 3), we will derive an exact, non-random formula for $A$ and $B$ in terms of the eigenvalues of a certain matrix --- the \emph{frame operator} --- which will make random sampling unnecessary for exact answers. The sampling method nonetheless remains useful throughout the course as a fast sanity check: if your exact, formula-based computation of $A$ and $B$ disagrees substantially with a quick random-sampling estimate, one of the two computations very likely contains a bug.
+\end{remark*}
+
+\begin{examplebox}[title={Example 2.6: A non-tight frame, numerically}]
+\label{ex:non-tight-numerical}
+Consider $h_1 = (1, 0)$, $h_2 = (0, 1)$, $h_3 = (1, 1)$ in $\R^2$. This set spans $\R^2$ (already $h_1, h_2$ alone do), so by Theorem \ref{thm:finite-spanning-is-frame} it is a frame. Is it tight? Running the \texttt{estimate\_frame\_bounds} function above on $\{h_1, h_2, h_3\}$ gives estimates of approximately $A \approx 1.00$ and $B \approx 3.00$ (we encourage you to verify this yourself in the lab below, rather than taking these numbers on faith). Since the estimates are clearly different ($A \ne B$), this is \emph{not} a tight frame, in sharp contrast to the triangular configuration of Example \ref{ex:triangle-tight-computation}. Geometrically, the direction $x = (1,1)/\sqrt2$ (along which $h_3$ also happens to point) is more ``illuminated'' than the direction $x = (1,-1)/\sqrt2$ (orthogonal to $h_3$), and this asymmetry is exactly what the unequal bounds $A \ne B$ are detecting.
+\end{examplebox}
+
+\section{Chapter Summary}
+\label{sec:summary-ch2}
+
+\begin{itemize}
+  \item Definition \ref{def:frame} formalizes the idea previewed throughout Chapter 1: a finite frame is a set of vectors $\{f_i\}_{i=1}^m$ satisfying the two-sided inequality $A\norm{x}^2 \le \sum_i |\inner{x}{f_i}|^2 \le B\norm{x}^2$ for all $x$, generalizing Parseval's identity for orthonormal bases (recovered exactly when $A=B=1$).
+  \item Theorem \ref{thm:finite-spanning-is-frame} is the key finite-dimensional simplification of the whole theory: a finite set of vectors in $\F^n$ is a frame if and only if it spans $\F^n$. Existence of frame bounds is automatic once spanning holds; only their \emph{values} require further work.
+  \item The upper bound $B$ can always be taken to be $\sum_i \norm{f_i}^2$, using nothing but Cauchy--Schwarz; the lower bound $A>0$ requires the spanning hypothesis and a compactness argument (a continuous function attains its minimum on the unit sphere, and that minimum is forced to be positive exactly because no nonzero vector can be orthogonal to everything in a spanning set).
+  \item A frame is \emph{tight} ($A=B$) when this minimum and maximum coincide; geometrically, tightness means every direction $x$ is ``illuminated'' equally by the configuration, regardless of which way it points. Example \ref{ex:triangle-tight-computation} verified this by hand for the triangular configuration from Chapter 1; Example \ref{ex:non-tight-numerical} exhibited a frame that is manifestly \emph{not} tight.
+  \item The optimal frame bounds are $A = \min_{\norm{x}=1}\varphi(x)$ and $B = \max_{\norm{x}=1}\varphi(x)$, where $\varphi(x) = \sum_i |\inner{x}{f_i}|^2$; this can be estimated numerically by sampling random unit vectors, extending the \texttt{illumination} function built in Chapter 1's lab. An exact, sampling-free formula is coming in Chapter 3.
+\end{itemize}
+
+\section{Lab Exercises}
+\label{sec:lab-ch2}
+
+These exercises build directly on the \texttt{illumination} function from Lab Exercise 1.3 and the \texttt{estimate\_frame\_bounds} function of Section \ref{sec:numerical-estimation}. Submit your code together with printed output and, where requested, plots and short written answers.
+
+\begin{exercisebox}[title={Lab Exercise 2.1: Confirming Example 2.6}]
+Implement the \texttt{estimate\_frame\_bounds} function from Section \ref{sec:numerical-estimation} (or use the version provided) and run it on $\{h_1, h_2, h_3\}$ from Example \ref{ex:non-tight-numerical}, with at least $50{,}000$ samples. Report your estimated $A$ and $B$. Then, find the \emph{exact} values of $A$ and $B$ by hand (hint: parametrize $x = (\cos\theta, \sin\theta)$ as in Lab Exercise 1.3, write $\varphi(\theta)$ explicitly using a double-angle trigonometric identity, and find its minimum and maximum over $\theta \in [0, 2\pi]$ using single-variable calculus). Compare your exact answer to your numerical estimate.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 2.2: Spanning vs.\ Not Spanning, Numerically}]
+Consider the two sets $\{g_1, g_2\}$ from Example \ref{ex:non-frame} (which does not span $\R^3$) and $\{g_1, g_2, g_3\}$ where $g_3 = (0,0,1)$ (which does). Run \texttt{estimate\_frame\_bounds} (modified to sample random unit vectors in $\R^3$ instead of $\R^2$) on both sets. Describe precisely what you observe for the non-spanning set, and explain the result using Theorem \ref{thm:finite-spanning-is-frame} and the discussion immediately following its proof.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 2.3: The Square Revisited}]
+In Lab Exercise 1.4, you investigated numerically (using only the \texttt{illumination} function, without a formal frame-bounds estimator) whether the four vertices of a square, $f_k = (\cos(k\pi/2), \sin(k\pi/2))$ for $k=0,1,2,3$, form a tight frame for $\R^2$. Revisit this question now using the full \texttt{estimate\_frame\_bounds} machinery of this chapter, and state your conclusion in the language of Definition \ref{def:tight-frame} (i.e., explicitly identify the common value of $A=B$ if the configuration is tight). Then verify your numerical finding with an exact by-hand computation in the style of Example \ref{ex:triangle-tight-computation}.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 2.4: Building a Frame-Checker}]
+Write a Python function \texttt{is\_frame(vectors, n, tol=1e-8)} that takes a list of vectors in $\R^n$ and returns \texttt{True} if the set spans $\R^n$ (and is therefore a frame, by Theorem \ref{thm:finite-spanning-is-frame}) and \texttt{False} otherwise. (Hint: this is a question about the \emph{rank} of the matrix whose columns are the given vectors; \texttt{np.linalg.matrix\_rank} is relevant, and the \texttt{tol} parameter should be passed to it to handle floating-point rounding.) Test your function on all of the example sets appearing in this chapter ($\{e_1,e_2\}$, $\{f_1,f_2,f_3\}$, $\{g_1,g_2\}$, $\{g_1,g_2,g_3\}$, $\{h_1,h_2,h_3\}$), and confirm that it correctly identifies which are frames for the relevant ambient space in each case.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 2.5 (Optional, Challenge): How Many Samples Are Enough?}]
+Using the triangular frame from Example \ref{ex:triangle-tight-computation} (exact value $A=B=1.5$), run \texttt{estimate\_frame\_bounds} with \texttt{num\_samples} taking the values $10, 100, 1000, 10000, 100000$ (you may wish to fix the random seed and average over several repetitions at each sample size for a cleaner trend). For each sample size, record the \emph{error} $|A_{\text{est}} - 1.5|$ and $|B_{\text{est}} - 1.5|$. Plot error versus \texttt{num\_samples} on a log-log scale (\texttt{plt.loglog}). Does the error appear to decrease at a steady rate as the sample size grows? This exercise is a gentle first encounter with a question --- how quickly does random sampling converge? --- that recurs throughout computational mathematics, including (as you may encounter in your own research) numerical optimization on manifolds and Monte Carlo methods more broadly.
+\end{exercisebox}
+\newpage
+\section{supplementary Exercises}
+\label{sec:extra-ch2}
+
+\subsection*{Theoretical Exercises}
+\begin{theoexercises}
+	\item Let $\{f_i\}_{i=1}^m$ be a frame for $\F^n$ with synthesis matrix
+	$F$. Using the rank--nullity theorem, prove
+	$\dim\ker F = m-n$.
+	
+	\item Prove that if $\{f_i\}_{i=1}^m$ is a tight frame for $\R^n$ with
+	bound $A$, then $\{Uf_i\}_{i=1}^m$ is also a tight frame with the
+	\emph{same} bound $A$, for any orthogonal matrix $U$. (Tightness
+	is a rotation-invariant property.)
+	
+	\item Construct two frames $\{f_i\}_{i=1}^3$ and $\{g_i\}_{i=1}^3$ for
+	$\R^2$ (same index set) such that $\{f_i+g_i\}_{i=1}^3$ is
+	\emph{not} a frame for $\R^2$. Conclude that frames are not closed
+	under index-matched addition.
+	
+	\item Suppose $\{f_i\}_{i=1}^{n+1}$ is a frame for $\R^n$ with exactly
+	one redundant vector, and suppose that removing \emph{any} single
+	vector still leaves a frame. Prove that no two of the $f_i$ are
+	parallel (scalar multiples of one another). (Hint: argue the
+	contrapositive --- if $f_j$ and $f_k$ are parallel, show that
+	removing some \emph{other} vector causes the remaining set to fail
+	to span.)
+	
+	\item State and prove the complex analogue of Corollary~2.2.2 (every
+	basis of $\C^n$ is a frame), taking care to use the
+	conjugate-linear convention for the inner product on $\C^n$
+	established in Section~1.2.1.
+	
+	\item Prove: if $\{f_i\}_{i=1}^m$ is a frame for $\R^n$ and
+	$V\subset\R^n$ is any subspace with orthogonal projection $P_V$,
+	then $\{P_Vf_i\}_{i=1}^m$ is a frame for $V$. (This is a
+	spanning-only counterpart to Theorem~4.4.1, which achieves the
+	stronger conclusion of \emph{tightness} in the special case where
+	$\{f_i\}$ is an orthonormal basis of a larger ambient space.)
+\end{theoexercises}
+
+\subsection*{Computational Exercises}
+\begin{compexercises}
+	\item Using \texttt{scipy.linalg.null\_space}, compute $\dim\ker F$ for
+	each of the five example frames from Lab Exercise~2.4, and confirm
+	it equals $m-n$ in every case, verifying T1.
+	
+	\item Rotate the triangular frame by $10$ random angles in $[0,2\pi)$
+	and confirm, via \texttt{exact\_frame\_bounds} (built in
+	Chapter~3's notebook, or by direct eigenvalue computation), that
+	$A=B=1.5$ is unchanged in every case, verifying T2.
+	
+	\item For $m=n+1=3$ in $\R^2$, construct a frame with a parallel pair
+	(e.g.\ $f_1=(1,0)$, $f_2=(2,0)$, $f_3=(0,1)$), and confirm
+	numerically that removing $f_3$ causes the remaining set to fail
+	to span $\R^2$, verifying T4's underlying mechanism. Then generate
+	$20$ random $3$-vector frames in $\R^2$ and report what fraction
+	have no parallel pair.
+	
+	\item Fix $h_1=(1,0)$, $h_2=(0,1)$, and let $h_3(\theta)=
+	(\cos\theta,\sin\theta)$. Using \texttt{estimate\_frame\_bounds},
+	plot $A(\theta)$ and $B(\theta)$ as $\theta$ ranges over
+	$[0,2\pi)$, and identify the angles at which the frame degenerates
+	(fails to span $\R^2$).
+	
+	\item Verify T6 numerically: construct a $4$-vector frame for $\R^3$
+	(redundant, $m>n$), project it orthogonally onto $5$ random
+	$2$-dimensional subspaces (via random unit normal vectors), and
+	confirm the projected $4$ vectors span each subspace in every
+	case.
+\end{compexercises}

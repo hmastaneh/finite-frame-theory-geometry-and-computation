@@ -1,0 +1,649 @@
+\chapter{Frames, Noise, and Quantization}
+\label{ch:noise-quantization}
+\fancyhead[R]{\small\textit{Chapter 11: Frames and Noise}}
+
+\section{Overview: Closing the Loop on Robustness}
+\label{sec:ch11-overview}
+
+Chapter~1 opened this course with a promise: redundant frames are robust
+not only to erasures (fulfilled in Chapter~10) but also to
+\emph{noise} and \emph{quantization}. Chapter~5 began to deliver on
+this promise algebraically, establishing that the expected squared
+reconstruction error under additive coefficient noise is
+$\sigma^2\norm{G}_F^2$ for a dual frame $G$, and that the canonical
+dual minimizes this quantity. But Chapter~5 did not answer the most
+practically important question: by \emph{how much} does a redundant
+frame improve on a basis?
+
+This chapter answers that question precisely and in two distinct
+settings. In the \textbf{additive noise} model, each coefficient
+$c_i=\inner{x}{f_i}$ is corrupted by independent noise of variance
+$\sigma^2$, and the question is how the expected squared
+reconstruction error scales with the oversampling ratio $r=m/n$. In
+the \textbf{scalar quantization} model, each coefficient is rounded to
+the nearest multiple of a step size $\delta$, and the question is how
+the deterministic worst-case reconstruction error scales with $r$.
+
+Both answers turn out to be the same: a factor of $m/n$ improvement
+over a basis, achieved by the canonical dual of any tight unit-norm
+frame. The two models agree because both are controlled by the same
+quantity --- the Frobenius norm $\norm{\tilde F}_F^2$ of the canonical
+dual's synthesis matrix --- and we close the loop Chapter~5 opened by
+making this connection explicit.
+
+\section{Additive Noise: Precise Error Accounting}
+\label{sec:additive-noise}
+
+We work with the additive noise model introduced in Chapter~5,
+Section~5.6, but now carry the calculation to its conclusion.
+
+\begin{definition}[Additive coefficient noise model]
+\label{def:noise-model}
+Given a frame $\{f_i\}_{i=1}^m$ for $\F^n$ and a signal $x\in\F^n$,
+the receiver observes
+\[
+  \tilde c_i = \inner{x}{f_i} + \varepsilon_i, \qquad i=1,\ldots,m,
+\]
+where $\varepsilon_1,\ldots,\varepsilon_m$ are independent, mean-zero
+random variables each with variance $\sigma^2$. Given a dual frame
+$\{g_i\}_{i=1}^m$ with synthesis matrix $G$, the receiver reconstructs
+\[
+  \hat x = \sum_{i=1}^m \tilde c_i\, g_i = G\tilde c.
+\]
+\end{definition}
+
+\begin{proposition}[Expected reconstruction error]
+\label{prop:expected-error}
+In the additive noise model, the reconstruction error satisfies
+$\hat x - x = G\varepsilon$ (where $\varepsilon=(\varepsilon_i)$),
+and its expected squared norm is
+\begin{equation}
+\label{eq:expected-error}
+  \E\norm{\hat x - x}^2 = \sigma^2 \norm{G}_F^2
+  = \sigma^2 \sum_{i=1}^m \norm{g_i}^2.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Since $G$ reconstructs exactly from noiseless coefficients ($GF^*=I$,
+Definition~5.2.1), $\hat x - x = G(F^*x+\varepsilon) - x = x + G\varepsilon
+- x = G\varepsilon$. Then
+\[
+  \E\norm{G\varepsilon}^2 = \E\tr((G\varepsilon)(G\varepsilon)^T)
+  = \tr(G\,\E[\varepsilon\varepsilon^T]\,G^T)
+  = \sigma^2\tr(GG^T)
+  = \sigma^2\norm{G}_F^2,
+\]
+using $\E[\varepsilon\varepsilon^T]=\sigma^2 I_m$ (independent, equal
+variance) and $\norm{G}_F^2=\tr(GG^T)$.
+\end{proof}
+
+\begin{remark*}
+This is exactly the formula derived in Chapter~5 (Section~5.6).
+Proposition~\ref{prop:expected-error} is recalled here because Chapter
+11's goal is to go further: to compute $\norm{G}_F^2$ explicitly for
+the canonical dual of a tight unit-norm frame, and to quantify the
+resulting improvement over a basis.
+\end{remark*}
+
+\subsection{The Canonical Dual Norm for Tight Unit-Norm Frames}
+\label{subsec:canonical-dual-norm}
+
+When $\{f_i\}_{i=1}^m$ is tight with bound $A$, we know from
+Chapter~5 that the canonical dual is $\tilde f_i = S^{-1}f_i =
+\tfrac{1}{A}f_i$ (since $S=AI$), so
+$\norm{\tilde f_i} = \tfrac{1}{A}\norm{f_i}$.
+For unit-norm vectors, $\norm{\tilde f_i}=\tfrac{1}{A}=\tfrac{n}{m}$.
+This gives
+
+\begin{proposition}[Canonical dual norm for tight unit-norm frames]
+\label{prop:canonical-dual-norm}
+Let $\{f_i\}_{i=1}^m$ be a tight, unit-norm frame for $\F^n$. Then
+$A = m/n$ (trace formula, Proposition~3.4.2(iv)), and the canonical
+dual's Frobenius norm satisfies
+\begin{equation}
+\label{eq:canonical-dual-norm}
+  \norm{\tilde F}_F^2 = \sum_{i=1}^m\norm{\tilde f_i}^2
+  = m\cdot\frac{1}{A^2} = m\cdot\frac{n^2}{m^2} = \frac{n^2}{m}.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Each $\tilde f_i = \tfrac{1}{A}f_i$ has norm $\tfrac{1}{A}$, so
+$\sum_i\norm{\tilde f_i}^2 = m/A^2 = m\cdot(n/m)^2 = n^2/m$.
+\end{proof}
+
+Substituting into Proposition~\ref{prop:expected-error}:
+
+\begin{theorem}[Additive noise: the redundancy gain]
+\label{thm:additive-noise-gain}
+For a tight, unit-norm frame with $m$ vectors in $\F^n$, the canonical
+dual achieves expected squared reconstruction error
+\begin{equation}
+\label{eq:noise-floor}
+  \E\norm{\hat x - x}^2 = \sigma^2 \cdot \frac{n^2}{m} = \sigma^2\cdot
+  \frac{n}{r},
+  \qquad r := \frac{m}{n} \text{ (oversampling ratio)}.
+\end{equation}
+For comparison, a basis ($m=n$, so $r=1$) achieves expected squared
+error $\sigma^2 n$.  The tight frame therefore gives a factor-of-$r$
+improvement:
+\[
+  \frac{\E_{\text{ONB}}\norm{\hat x-x}^2}
+       {\E_{\text{frame}}\norm{\hat x-x}^2} = r = \frac{m}{n}.
+\]
+\end{theorem}
+
+\begin{proof}
+Combine Propositions~\ref{prop:expected-error}
+and~\ref{prop:canonical-dual-norm}. For the ONB baseline: $F_{\text{ONB}}
+=I_n$, canonical dual $=I_n$, $\norm{I_n}_F^2 = n$, so expected error
+$= \sigma^2 n = \sigma^2 n/1$ (i.e.\ $r=1$).
+\end{proof}
+
+\begin{keyidea}
+\textbf{Doubling the number of frame vectors halves the noise floor.}
+For a tight unit-norm frame, the expected squared reconstruction error
+under additive coefficient noise is exactly $\sigma^2 n/r$, where
+$r=m/n$ is the oversampling ratio. Every doubling of $r$ gives a
+$3$~dB improvement in signal-to-noise ratio --- the same gain as
+averaging $r$ independent measurements, which is exactly what the
+canonical dual is doing: averaging over the $m$ ``views'' of $x$
+provided by the frame.
+\end{keyidea}
+
+\begin{examplebox}[title={Example 11.1: Hexagonal frame in $\R^2$ ($m=6$, $r=3$)}]
+\label{ex:hexagonal-noise}
+The regular hexagon ($m=6$, $n=2$) is a tight unit-norm frame with
+$A=3$ and canonical dual norms $\norm{\tilde f_i}=1/3$. By
+Theorem~\ref{thm:additive-noise-gain}, the expected squared error is
+$\sigma^2\cdot 2^2/6 = 2\sigma^2/3$, compared to $\sigma^2\cdot 2 =
+2\sigma^2$ for the standard ONB. The improvement factor is exactly
+$r=3$. Equivalently: to achieve the same noise floor as the ONB at
+$\sigma^2$, the hexagonal frame only needs noise standard deviation
+$\sigma\sqrt{r}=\sigma\sqrt{3}$ --- a $73\%$ looser noise tolerance.
+\end{examplebox}
+
+\section{The Dual-Norm Connection}
+\label{sec:dual-norm-connection}
+
+Chapter~5 (the remark following Theorem~5.5.1) promised that ``smaller
+dual-vector norms translate directly into better noise suppression.''
+Propositions~\ref{prop:expected-error} and~\ref{prop:canonical-dual-norm}
+now make this precise: the expected squared reconstruction error is
+$\sigma^2\sum_i\norm{g_i}^2$, and the canonical dual achieves the
+minimum possible value of this sum, $n^2/m$, among all valid duals
+(Theorem~5.5.1 of Chapter~5).
+
+\begin{corollary}[Canonical dual is optimal for additive noise]
+\label{cor:canonical-optimal}
+Among all dual frames of a given frame $\{f_i\}_{i=1}^m$, the canonical
+dual $\{\tilde f_i = S^{-1}f_i\}$ uniquely minimizes expected squared
+reconstruction error under independent, equal-variance additive noise.
+\end{corollary}
+
+\begin{proof}
+Immediate from Proposition~\ref{prop:expected-error} (error $=
+\sigma^2\norm{G}_F^2$) and Theorem~5.5.1 ($\norm{\tilde F}_F^2 \le
+\norm{G}_F^2$ for every dual $G$, with equality only when $G=\tilde F$).
+\end{proof}
+
+This corollary completes the loop opened in Chapter~5: the canonical
+dual is optimal not merely in the abstract Frobenius-norm sense, but
+concretely in the sense of minimizing the expected squared error a
+receiver will observe when reconstructing from noisy measurements.
+
+\section{Scalar Quantization}
+\label{sec:scalar-quantization}
+
+Additive noise models corruption by continuous random variables. A
+different and equally important model is \emph{scalar quantization}:
+each measured coefficient $\inner{x}{f_i}$ is rounded to the nearest
+multiple of a step size $\delta$:
+\[
+  \tilde c_i = \mathcal{Q}_\delta(\inner{x}{f_i})
+  := \delta\,\left\lfloor \frac{\inner{x}{f_i}}{\delta} + \frac12\right\rfloor.
+\]
+The quantization error $\varepsilon_i := \tilde c_i - \inner{x}{f_i}$
+satisfies $|\varepsilon_i|\le\delta/2$ deterministically, but the
+errors are neither independent nor Gaussian.
+
+\begin{proposition}[Quantization error bound]
+\label{prop:quantization-error}
+For any dual frame $\{g_i\}$ and any scalar quantizer with step $\delta$,
+the reconstruction error satisfies
+\begin{equation}
+\label{eq:quant-bound}
+  \norm{\hat x - x}
+  = \norm{G\varepsilon}
+  \le \frac{\delta}{2}\sum_{i=1}^m \norm{g_i}
+  \le \frac{\delta}{2}\sqrt{m}\,\norm{G}_F,
+\end{equation}
+where the first inequality uses $|\varepsilon_i|\le\delta/2$ and the
+triangle inequality, and the second uses Cauchy--Schwarz on the sum
+$\sum_i|\varepsilon_i|\norm{g_i}$.
+\end{proposition}
+
+\begin{proof}
+$\norm{G\varepsilon}\le\sum_i|\varepsilon_i|\norm{g_i}\le\tfrac{\delta}{2}
+\sum_i\norm{g_i}\le\tfrac{\delta}{2}\sqrt{m}\bigl(\sum_i\norm{g_i}^2\bigr)^{1/2}
+=\tfrac{\delta}{2}\sqrt{m}\norm{G}_F$, by Cauchy--Schwarz.
+\end{proof}
+
+\subsection{Tight Unit-Norm Frames: The Error Bound}
+\label{subsec:tight-quant-bound}
+
+\begin{proposition}[Quantization error bound for tight unit-norm frames]
+\label{prop:tight-quant-squared}
+For the canonical dual of a tight unit-norm frame with $m$ vectors in
+$\F^n$ and step size $\delta$, the worst-case squared reconstruction
+error satisfies
+\begin{equation}
+\label{eq:tight-quant-bound}
+  \norm{\hat x - x}^2
+  = \norm{G\varepsilon}^2
+  \le \norm{\varepsilon}^2\,\norm{\tilde F}_F^2
+  \le m\!\left(\frac{\delta}{2}\right)^{\!2}\!\frac{n^2}{m}
+  = \frac{n^2\delta^2}{4}.
+\end{equation}
+For a basis ($m=n$, $G=I_n$, $\norm{\varepsilon}^2 \le n(\delta/2)^2$),
+the corresponding bound is also $n(\delta/2)^2 \cdot n = n^2\delta^2/4$.
+Both bounds are equal: no factor-of-$m/n$ improvement is guaranteed
+by the worst-case bound alone.
+\end{proposition}
+
+\begin{proof}
+By the Cauchy--Schwarz inequality for vectors,
+\[
+  \norm{G\varepsilon}^2
+  = \norm{\sum_{i=1}^m\varepsilon_i\tilde f_i}^2
+  \le \norm{\varepsilon}^2\sum_{i=1}^m\norm{\tilde f_i}^2
+  = \norm{\varepsilon}^2\,\norm{\tilde F}_F^2,
+\]
+using $\langle\sum_i a_i u_i, \sum_j a_j u_j\rangle
+\le \bigl(\sum_i|a_i|^2\bigr)\bigl(\sum_i\norm{u_i}^2\bigr)$,
+which follows from Cauchy--Schwarz on $\R^m$.
+Since $|\varepsilon_i|\le\delta/2$ for all $i$, we have
+$\norm{\varepsilon}^2\le m(\delta/2)^2$. Substituting
+$\norm{\tilde F}_F^2=n^2/m$
+(Proposition~\ref{prop:canonical-dual-norm}) gives the bound $n^2\delta^2/4$.
+The ONB bound follows identically: $m=n$, $G=I_n$,
+$\norm{I_n}_F^2=n$, $\norm\varepsilon^2\le n(\delta/2)^2$, product $n^2\delta^2/4$.
+\end{proof}
+
+\begin{remark*}
+\label{rmk:quant-vs-noise}
+The worst-case bound $n^2\delta^2/4$ does \emph{not} improve with $m$.
+This contrast with the additive-noise result requires explanation.
+In the additive noise model, each $\varepsilon_i$ is an independent
+random variable with $\E[\varepsilon_i^2]=\sigma^2$; the $m$ error
+contributions $\varepsilon_i\tilde f_i$ partially cancel in expectation,
+giving the average squared error $\sigma^2\sum_i\norm{\tilde f_i}^2=\sigma^2 n^2/m$
+--- a clear $1/m$ gain. In the quantization model with a \emph{fixed}
+signal $x$, the errors $\varepsilon_i = \mathcal{Q}_\delta(\inner{x}{f_i})
+- \inner{x}{f_i}$ are deterministic and can --- in the worst case --- be
+systematically aligned to constructively reinforce rather than cancel,
+eliminating the averaging effect. In practice, for generic signals $x$,
+quantization errors do tend to behave more like independent noise and the
+observed error is often close to $n^2\delta^2/(4m)$ (a factor-of-$m$
+smaller); but this is an empirical observation about typical behavior,
+not a guaranteed bound. The fundamental difference between average and
+worst-case guarantees is a recurring theme in information theory and
+signal processing.
+\end{remark*}
+
+\begin{keyidea}
+The additive-noise floor $\sigma^2 n^2/m$ has clear $1/m$ scaling:
+every extra frame vector reduces expected squared error by $1/m$.
+The quantization bound $n^2\delta^2/4$ does \emph{not} improve with
+$m$ in the worst case --- but in practice, quantization errors
+behave more like noise, and empirical errors are often close to
+$n^2\delta^2/(4m)$. \textbf{Both models are controlled by the same
+quantity, $\norm{\tilde F}_F^2 = n^2/m$,} but the additive-noise
+gain is a guaranteed bound while the quantization gain is an
+empirical pattern. This distinction between average and worst-case
+guarantees is fundamental in information theory.
+\end{keyidea}
+
+\section{Comparing Additive Noise and Quantization}
+\label{sec:comparison}
+
+Table~\ref{tab:comparison} summarizes the two models for a tight
+unit-norm frame with $m$ vectors in $\F^n$ and its canonical dual.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+ & \textbf{Additive noise} & \textbf{Scalar quantization} \\
+\midrule
+Error measure & $\E\norm{\hat x-x}^2$ & $\norm{\hat x-x}^2$ (worst-case bound) \\
+Controlling quantity & $\sigma^2\norm{\tilde F}_F^2$ & $m(\delta/2)^2\norm{\tilde F}_F^2$ \\
+For tight unit-norm frame & $\sigma^2 n^2/m$ & $n^2\delta^2/4$ (w.c.); $\approx n^2\delta^2/(4m)$ (typ.) \\
+For ONB ($m=n$) & $\sigma^2 n$ & $n^2\delta^2/4$ \\
+Improvement over ONB & $m/n$ (guaranteed) & $1\times$ (w.c. bound); $m/n\times$ (empirical) \\
+Minimized by & Canonical dual & Canonical dual \\
+\bottomrule
+\end{tabular}
+\caption{Additive noise vs.\ scalar quantization for tight unit-norm frames.
+The additive-noise gain is a proven average-case result; the quantization
+improvement of $\approx m/n$ is empirical (worst-case bound does not depend on $m$).}
+\label{tab:comparison}
+\end{table}
+
+\begin{remark*}
+The additive-noise gain is $m/n$ in the expected squared error because
+the $m$ noise contributions $\varepsilon_i\tilde f_i$ add incoherently
+(zero-mean, independent), giving expected squared error
+$\sigma^2\sum_i\norm{\tilde f_i}^2=\sigma^2 n^2/m$ --- a clear $1/m$
+gain. In the quantization model, the $m$ error terms are
+\emph{deterministic} and can in principle add constructively in the
+worst case, eliminating the averaging effect. The proved worst-case
+bound $n^2\delta^2/4$ is the same for a frame as for a basis; only
+empirically (for generic signals) does the frame provide the same
+$\approx m/n$ improvement as in the noise model.
+\end{remark*}
+
+\section{NumPy Implementation}
+\label{sec:numpy-ch11}
+
+\begin{lstlisting}[caption={Noise and quantization simulations for tight frames}]
+import numpy as np
+
+def tight_unit_norm_frame(n, m, seed=0):
+    """
+    Build a tight unit-norm frame of m vectors in R^n via gradient
+    descent on the frame potential (Chapter 8).
+    """
+    rng = np.random.default_rng(seed)
+    V = rng.standard_normal((n, m))
+    V = V / np.linalg.norm(V, axis=0)
+    for _ in range(2000):
+        S = V @ V.T
+        V = V - 0.03 * (4 * S @ V)
+        V = V / np.linalg.norm(V, axis=0)
+    return V
+
+def regular_polygon(m):
+    """Tight unit-norm frame in R^2: regular m-gon (m >= 3)."""
+    angles = 2 * np.pi * np.arange(m) / m
+    return np.vstack([np.cos(angles), np.sin(angles)])
+
+def canonical_dual(F):
+    """Canonical dual synthesis matrix: S^{-1} F."""
+    return np.linalg.solve(F @ F.T, F)
+
+def scalar_quantize(c, delta):
+    """Round each entry of c to the nearest multiple of delta."""
+    return delta * np.round(c / delta)
+
+# -------------------------------------------------------------------
+# Section 11.2: Additive noise -- verifying the m/n gain factor
+# -------------------------------------------------------------------
+sigma = 0.3
+n = 2
+
+print("=== Additive noise: expected squared error vs m/n ===")
+print(f"{'m':>4}  {'r=m/n':>6}  {'predicted':>12}  {'MC mean':>10}  {'gain':>8}")
+for m in [2, 3, 4, 6, 8, 12]:
+    if m == 2:
+        F = np.eye(2)          # ONB: the m=2 "regular polygon" is degenerate
+    else:
+        F = regular_polygon(m)
+    G = canonical_dual(F)
+    predicted = sigma**2 * np.trace(G @ G.T)
+
+    # Monte Carlo
+    rng = np.random.default_rng(42)
+    x_test = np.array([1.0, -0.5])
+    errs = []
+    for _ in range(100_000):
+        eps = rng.normal(0, sigma, m)
+        x_hat = G @ (F.T @ x_test + eps)
+        errs.append(np.sum((x_hat - x_test)**2))
+
+    mc_mean = np.mean(errs)
+    gain = (sigma**2 * n) / mc_mean if m > 2 else 1.0
+    print(f"{m:>4}  {m/n:>6.1f}  {predicted:>12.5f}  {mc_mean:>10.5f}  {gain:>8.3f}x")
+
+# -------------------------------------------------------------------
+# Section 11.4: Scalar quantization -- verifying the proved bound n^2*delta^2/4
+# and comparing to the empirically observed (approx) n^2*delta^2/(4m) behavior
+# -------------------------------------------------------------------
+delta = 0.2
+
+print("\n=== Scalar quantization: proved bound vs. empirical ===")
+print(f"{'m':>4}  {'proved n^2d^2/4':>16}  {'MC max':>10}  {'holds':>6}  {'n^2d^2/4m (typical)':>20}")
+rng = np.random.default_rng(1)
+n = 2
+for m in [3, 4, 6, 8, 12]:
+    F = regular_polygon(m)
+    G = canonical_dual(F)
+    bound = (n**2 * delta**2) / 4        # CORRECT proved bound (Prop. 11.4.1)
+    typical = (n**2 * delta**2) / (4*m)  # empirical approximation only
+
+    # Sample many x and quantize
+    X = rng.standard_normal((n, 50_000))
+    X = X / np.linalg.norm(X, axis=0)   # unit-norm test signals
+    C_exact  = F.T @ X
+    C_quant  = scalar_quantize(C_exact, delta)
+    errors   = np.sum((G @ C_quant - X)**2, axis=0)
+    mc_max   = errors.max()
+
+    print(f"{m:>4}  {bound:>16.6f}  {mc_max:>10.6f}  {str(mc_max <= bound + 1e-9):>6}  {typical:>20.6f}")
+
+# -------------------------------------------------------------------
+# Example 11.1: Hexagonal frame (m=6, n=2)
+# -------------------------------------------------------------------
+print("\n=== Example 11.1: Hexagonal frame ===")
+m, n = 6, 2
+F_hex = regular_polygon(m)
+G_hex = canonical_dual(F_hex)
+S_hex = F_hex @ F_hex.T
+A_hex = np.linalg.eigvalsh(S_hex).mean()
+dual_norms = np.linalg.norm(G_hex, axis=0)
+print(f"  Frame bound A = {A_hex:.4f}  (expected m/n = {m/n:.4f})")
+print(f"  Dual-vector norms: {dual_norms.round(4)}  (expected n/m = {n/m:.4f})")
+print(f"  ||tilde_F||_F^2 = {np.trace(G_hex @ G_hex.T):.4f}"
+      f"  (expected n^2/m = {n**2/m:.4f})")
+sigma_test = 0.3
+print(f"  Predicted noise floor: sigma^2 * n^2/m ="
+      f" {sigma_test**2 * n**2/m:.4f}")
+print(f"  ONB comparison:        sigma^2 * n   ="
+      f" {sigma_test**2 * n:.4f}")
+print(f"  Improvement factor: {(sigma_test**2 * n) / (sigma_test**2 * n**2/m):.1f}x"
+      f"  (= m/n = {m/n:.1f})")
+\end{lstlisting}
+
+\section{Chapter Summary}
+\label{sec:summary-ch11}
+
+\begin{itemize}
+  \item \textbf{Additive noise model.} The expected squared reconstruction
+        error using dual frame $G$ is $\sigma^2\norm{G}_F^2$
+        (Proposition~\ref{prop:expected-error}). The canonical dual
+        uniquely minimizes this (Corollary~\ref{cor:canonical-optimal},
+        closing the loop from Chapter~5).
+
+  \item \textbf{Tight unit-norm frames.} The canonical dual has
+        $\norm{\tilde F}_F^2 = n^2/m$
+        (Proposition~\ref{prop:canonical-dual-norm}), giving expected
+        squared error $\sigma^2 n^2/m = \sigma^2 n/r$ where $r=m/n$
+        (Theorem~\ref{thm:additive-noise-gain}). This is a factor-of-$r$
+        improvement over an ONB.
+
+  \item \textbf{Scalar quantization.} With step $\delta$ and the
+        canonical dual, the proved worst-case squared reconstruction
+        error is bounded by $n^2\delta^2/4$
+        (Proposition~\ref{prop:tight-quant-squared}) --- the same as for
+        a basis. The factor-of-$m/n$ improvement is observed empirically
+        (typical errors $\approx n^2\delta^2/(4m)$) but is not guaranteed
+        in the worst case; see the remark in Section~\ref{subsec:tight-quant-bound}.
+
+  \item \textbf{Both models, same mechanism.} The factor-of-$m/n$
+        improvement comes from the same source in both models: dual
+        vectors of norm $n/m$ (rather than norm $1$ for a basis), so each
+        error contribution $\varepsilon_i\tilde f_i$ is smaller by $n/m$,
+        and there are $m$ of them. The controlling quantity is
+        $\norm{\tilde F}_F^2 = n^2/m$ in both cases (Table~\ref{tab:comparison}).
+\end{itemize}
+
+\section{Lab Exercises}
+\label{sec:lab-ch11}
+
+\begin{exercisebox}[title={Lab Exercise 11.1: Reproducing the Noise Floor Table}]
+Implement \texttt{regular\_polygon}, \texttt{canonical\_dual}, and the
+Monte Carlo loop from Section~\ref{sec:numpy-ch11}. For $n=2$ and
+$m=2,3,4,6,8,12,20$, compute and tabulate: (a)~the predicted noise
+floor $\sigma^2 n^2/m$, (b)~the Monte Carlo mean squared error (use
+$\sigma=0.3$, $10^5$ trials), and (c)~the gain factor over the ONB.
+Verify that the gain equals $m/n$ to at least two decimal places for
+all $m\ge3$.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 11.2: Non-Tight Frame Penalty}]
+Consider the non-tight frame $\{h_1,h_2,h_3\}$ with $h_1=e_1$,
+$h_2=e_2$, $h_3=(e_1+e_2)/\sqrt{2}$ in $\R^2$ (frame bounds $A=1$,
+$B=2$; note this differs from Chapter~5's frame by normalizing $h_3$):
+\begin{enumerate}[label=(\alph*)]
+  \item Compute the canonical dual $\tilde H$ and its Frobenius norm
+        $\norm{\tilde H}_F^2$.
+  \item Compare $\norm{\tilde H}_F^2$ to the tight unit-norm prediction
+        $n^2/m = 4/3$ for $n=2$, $m=3$. Which is larger? Does the
+        non-tight frame get a better or worse noise floor than the
+        tight triangular frame with the same $m$?
+  \item Run $10^5$ Monte Carlo noise trials (with $\sigma=0.3$) and
+        verify your prediction from~(a).
+  \item Explain why the non-tight frame performs worse: what is it
+        about the frame geometry (not just the formula) that leads to
+        a larger dual Frobenius norm?
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 11.3: Quantization Simulation}]
+For $n=2$ and $m \in \{3,4,6,8,12\}$, use the code in
+Section~\ref{sec:numpy-ch11} to:
+\begin{enumerate}[label=(\alph*)]
+  \item Verify that the \emph{proved} worst-case quantization bound
+        $n^2\delta^2/4$ (Proposition~\ref{prop:tight-quant-squared}) is
+        never violated across $10^5$ random unit-norm test signals
+        (use $\delta=0.2$). Confirm this holds for all $m$.
+  \item Plot the empirical maximum error (over all test signals) as a
+        function of $m$ on the same axes as the proved bound
+        $n^2\delta^2/4$ (constant in $m$) and the empirical approximation
+        $n^2\delta^2/(4m)$ (decays as $1/m$). Which does the empirical
+        maximum track more closely?
+  \item The proved bound is a \emph{constant} (independent of $m$), but
+        the empirical maximum decays with $m$. Explain why in terms of the
+        remark in Section~\ref{subsec:tight-quant-bound}: when does the
+        worst-case alignment of quantization errors actually arise?
+        Then try to construct, for a fixed frame ($m=3$, $n=2$), a signal
+        $x$ and step size $\delta$ such that the quantization errors
+        $\varepsilon_i$ all have the same sign and the reconstruction error
+        is noticeably larger than $n^2\delta^2/(4m)$. Report the ratio
+        of actual to ``typical'' error for your constructed $x$.
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 11.4: Higher Dimensions}]
+Extend the analysis to $n=3$ and $m=6,9,12,18$. Use
+\texttt{tight\_unit\_norm\_frame} (gradient-descent construction from
+Section~\ref{sec:numpy-ch11}) to build tight frames for $m>5$ where
+regular-polygon constructions no longer apply. For each $(n,m)$ pair:
+\begin{enumerate}[label=(\alph*)]
+  \item Verify $\norm{\tilde F}_F^2 \approx n^2/m$ for the gradient-descent
+        tight frame.
+  \item Run Monte Carlo noise trials and compare to the predicted noise
+        floor.
+  \item Plot the noise floor as a function of $m$ for fixed $n=3$, and
+        compare the slope to the theoretical $\sim 1/m$ decay.
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 11.5 (Challenge): Alternate Duals and Noise}]
+Theorem~5.5.1 of Chapter~5 guarantees the canonical dual minimizes
+$\norm{G}_F^2$ and hence the noise floor. How much worse can alternate
+duals be?
+\begin{enumerate}[label=(\alph*)]
+  \item For the triangular frame, parametrize the full dual family
+        $G(w) = \tilde F + wk^T$ (Chapter~6, Proposition~6.2.1) and
+        compute $\norm{G(w)}_F^2 = 4/3 + \norm{w}^2$ as a function of
+        $w\in\R^2$.
+  \item For $\norm{w}=1$ (one unit away from the canonical dual in the
+        parameter space), compute the predicted noise floor
+        $\sigma^2(4/3+1)$ and compare to the canonical minimum
+        $\sigma^2\cdot 4/3$. What is the percentage penalty for using
+        this sub-optimal dual?
+  \item The Chapter~6 analysis showed there is a special point
+        $w^*=(1,1)/\sqrt3$ where the error ellipse for the $\{h_1,h_2,h_3\}$
+        frame becomes circular (isotropic). Compute $\norm{G(w^*)}_F^2$
+        for this point and compare to the canonical dual's noise floor.
+        This illustrates that minimizing total noise and minimizing noise
+        anisotropy are two different objectives that generally require
+        two different dual choices.
+\end{enumerate}
+\end{exercisebox}
+\newpage
+\section{Supplementary Exercises}
+\label{sec:extra-ch11}
+
+\subsection*{Theoretical Exercises}
+\begin{theoexercises}
+	\item Suppose noise is added directly to the \emph{signal} $x$ (i.e.\
+	the receiver observes $x+\varepsilon$ for $\varepsilon\in\R^n$,
+	\emph{before} any frame analysis takes place), rather than to the
+	frame coefficients. Prove that in this model, redundancy provides
+	\emph{no} benefit whatsoever: the reconstruction error is
+	$\norm{\varepsilon}$ regardless of which frame or dual is used.
+	Contrast with Theorem~11.2.4, and identify precisely where in the
+	chain $x\to(\inner{x}{f_i})_i\to\hat x$ redundancy's benefit
+	actually enters.
+	
+	\item Prove that the \emph{worst-case} quantization error is controlled
+	by the operator norm $\norm{G}_{\mathrm{op}}$ (largest singular
+	value) of the dual synthesis matrix, not the Frobenius norm
+	$\norm{G}_F$ used for \emph{expected} additive-noise error: show
+	$\norm{G\varepsilon}_2\le\norm{G}_{\mathrm{op}}\norm{\varepsilon}_2$
+	for any bounded quantization error vector $\varepsilon$.
+	
+	\item Prove that for a tight, unit-norm frame with $m$ vectors in
+	$\R^n$, the canonical dual's operator norm is exactly
+	$\norm{\tilde F}_{\mathrm{op}}=\sqrt{n/m}$. Compare the rate at
+	which this quantity decays in $m$ (like $1/\sqrt m$) to the rate
+	at which the expected-error-controlling quantity
+	$\norm{\tilde F}_F^2=n^2/m$ decays (like $1/m$), and explain the
+	practical implication for worst-case versus average-case
+	robustness.
+	
+	\item Prove the general (not necessarily tight) two-sided bound
+	$1/\sqrt B\le\norm{\tilde F}_{\mathrm{op}}\le1/\sqrt A$ for the
+	canonical dual's operator norm, in terms of the original frame's
+	bounds $A,B$.
+	
+	\item For the $m=n+1$ dual family $G(w)=\tilde F+wk^T$ of Chapter~6,
+	prove or disprove: the operator norm $\norm{G(w)}_{\mathrm{op}}$,
+	like the Frobenius norm, is uniquely minimized at $w=0$.
+\end{theoexercises}
+
+\subsection*{Computational Exercises}
+\begin{compexercises}
+	\item For $n=2$, $m=3,6,12,24$, compute $\norm{\tilde F}_{\mathrm{op}}$
+	for the regular $m$-gon and confirm it matches $\sqrt{n/m}$
+	(T3), plotting both $\norm{\tilde F}_{\mathrm{op}}$ and
+	$\norm{\tilde F}_F^2$ against $m$ on a log-log scale to compare
+	decay rates.
+	
+	\item For $\{h_1,h_2,h_3\}$, compute $\norm{\tilde F}_{\mathrm{op}}$
+	directly and confirm it lies within the bounds $1/\sqrt B$ and
+	$1/\sqrt A$ from T4.
+	
+	\item For the triangular frame's dual family $G(w)$, compute
+	$\norm{G(w)}_{\mathrm{op}}$ over a grid of $w$ values and confirm
+	numerically whether it is minimized at $w=0$, resolving T5.
+	
+	\item Simulate the signal-level noise model from T1 directly: add
+	Gaussian noise to $x$ itself, ``reconstruct'' by simply returning
+	the noisy observation, and confirm the error equals
+	$\norm{\varepsilon}$ regardless of which frame's coefficients (if
+	any) are computed downstream.
+\end{compexercises}

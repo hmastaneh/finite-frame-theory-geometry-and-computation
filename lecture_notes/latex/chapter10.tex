@@ -1,0 +1,602 @@
+\chapter{Frames and Erasures}
+\label{ch:erasures}
+\fancyhead[R]{\small\textit{Chapter 10: Frames and Erasures}}
+
+\section{Overview: Closing the Loop on Redundancy}
+\label{sec:ch10-overview}
+
+Chapter~1 offered two promises: redundant frames are robust to noise, and
+robust to erasures. Chapter~5 fulfilled the first promise --- the noise
+stability analysis showed the canonical dual minimizes expected squared
+reconstruction error under additive coefficient noise. This chapter
+fulfills the second.
+
+An \emph{erasure} is a coefficient that never arrives at all, not merely
+one that is corrupted by noise. In communication, some transmitted symbols
+are simply lost in transit; in sensor networks, some sensors fail
+entirely; in data storage, some blocks become unreadable. In all of these
+settings, the question is not ``how noisy was the measurement?'' but
+``can I still reconstruct at all, and how accurately?''
+
+We will see that frames answer this question cleanly, and that the
+geometry developed in Chapters~8--9 (frame potential, equiangularity)
+provides the right tools for understanding which frames are most
+erasure-robust. The chapter closes with a precise connection back to
+Chapter~9: equiangular tight frames are not only optimal for coherence
+minimization (the Grassmannian packing problem), they are also optimal
+for worst-case erasure robustness.
+
+\section{The Erasure Model}
+\label{sec:erasure-model}
+
+\begin{definition}[Erasure pattern and sub-frame]
+\label{def:erasure-pattern}
+Given a frame $\{f_i\}_{i=1}^m$ for $V=\F^n$, an \emph{erasure pattern}
+of size $k$ is a subset $E\subset\{1,\ldots,m\}$ with $|E|=k$. The
+\emph{surviving index set} is $J=\{1,\ldots,m\}\setminus E$, and the
+corresponding \emph{sub-frame} is $\{f_i\}_{i\in J}$.
+
+In the erasure model, the receiver obtains only the frame coefficients
+$\{c_i=\inner{x}{f_i}\}_{i\in J}$ (the $k$ coefficients indexed by $E$
+are lost), and must reconstruct $x$ from these $m-k$ surviving
+measurements.
+\end{definition}
+
+\begin{definition}[$k$-erasure robustness]
+\label{def:k-erasure-robustness}
+A frame $\{f_i\}_{i=1}^m$ for $\F^n$ is \emph{$k$-erasure robust} if,
+for every erasure pattern $E$ with $|E|=k$, the sub-frame
+$\{f_i\}_{i\in J}$ (where $J=\{1,\ldots,m\}\setminus E$) still spans
+$\F^n$. The \emph{erasure number} of the frame is
+\[
+  \epsilon(F) := \max\setdef{k}{\text{the frame is }k\text{-erasure robust}},
+\]
+the maximum number of simultaneous erasures the frame can \emph{guarantee}
+to survive --- i.e., every pattern of that many erasures leaves a spanning
+sub-frame.
+\end{definition}
+
+\begin{remark*}
+Spanning is the correct condition because, by Theorem~2.2.1, a finite
+collection spans $\F^n$ if and only if it is a frame --- and we need the
+sub-frame to be a frame so that the canonical reconstruction formula
+$x = \tilde F_J (F_J^* x)$ (via the sub-frame's canonical dual) is valid.
+A non-spanning sub-frame has a direction $x_0$ with
+$\inner{x_0}{f_i}=0$ for all $i\in J$; no number of surviving
+measurements can recover $x_0$'s component, and reconstruction is
+impossible.
+\end{remark*}
+
+\begin{proposition}[Erasure number and redundancy]
+\label{prop:erasure-redundancy}
+For a frame $\{f_i\}_{i=1}^m$ for $\F^n$:
+\begin{enumerate}[label=(\roman*)]
+  \item $\epsilon(F)\le m-n$ (can tolerate at most $m-n$ erasures).
+  \item $\epsilon(F)=0$ if $m=n$ (no erasure tolerance, since any single
+        erasure leaves $n-1$ vectors, which cannot span $\F^n$).
+  \item The erasure number depends on the \emph{geometry} of the frame,
+        not merely the redundancy $m-n$: two frames with the same $m$
+        and $n$ can have different erasure numbers.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(i) After $m-n+1$ erasures only $n-1$ vectors remain, which cannot span
+an $n$-dimensional space.
+(ii) With $m=n$, erasing any single vector leaves $n-1$ vectors in $\F^n$,
+insufficient to span.
+(iii) Demonstrated in Examples~\ref{ex:square-triangle-comparison} and
+\ref{ex:pentagon-erasure} below: the square and pentagon frames in $\R^2$
+have the same $n=2$ but very different erasure numbers despite both being
+tight.
+\end{proof}
+
+\section{Reconstruction After Erasure}
+\label{sec:reconstruction-after-erasure}
+
+If the sub-frame $\{f_i\}_{i\in J}$ spans $\F^n$, reconstruction is
+always possible in principle: use the canonical dual of the sub-frame.
+But the sub-frame's dual depends on $J$, so the receiver must either
+recompute it for each erasure pattern --- a computation that scales with
+the number of possible patterns --- or use the original dual and accept
+some approximation error. For tight frames, the second option is much
+more transparent than it sounds.
+
+\begin{proposition}[Exact reconstruction after erasure]
+\label{prop:exact-recon-after-erasure}
+If $\{f_i\}_{i\in J}$ is a (sub-)frame for $\F^n$ with frame operator
+$S_J = \sum_{i\in J} f_if_i^*$, then
+\[
+  x = S_J^{-1}\!\left(\sum_{i\in J}\inner{x}{f_i}f_i\right)
+  = \sum_{i\in J}\inner{x}{f_i}(S_J^{-1}f_i),
+\]
+a reconstruction using only the surviving coefficients.
+\end{proposition}
+
+\begin{proof}
+Immediate from the canonical dual formula (Proposition~3.8.1 of
+Chapter~3, restated for the sub-frame $\{f_i\}_{i\in J}$). Since the
+sub-frame spans $\F^n$ by the $k$-erasure robustness assumption, $S_J$
+is invertible (Proposition~3.4.2(iii)).
+\end{proof}
+
+\subsection{Sub-Frame Operator Decomposition}
+\label{subsec:subframe-decomposition}
+
+The sub-frame operator $S_J$ has a clean relationship to the full frame
+operator $S$ that is worth making explicit.
+
+\begin{proposition}[Sub-frame operator]
+\label{prop:subframe-operator}
+Let $E=\{1,\ldots,m\}\setminus J$ be the erased indices. Then
+\[
+  S_J = S - S_E, \qquad\text{where } S_E = \sum_{i\in E}f_if_i^*
+\]
+is the ``erased contribution'' to the frame operator. In particular, if
+$\{f_i\}_{i=1}^m$ is tight with bound $A$, then
+\begin{equation}
+\label{eq:subframe-tight}
+  S_J = AI - S_E.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Direct from $S = \sum_{i=1}^m f_if_i^* = \sum_{i\in J}f_if_i^* +
+\sum_{i\in E}f_if_i^* = S_J + S_E$.
+\end{proof}
+
+\subsection{Error Formula for Tight Frames}
+\label{subsec:tight-erasure-error}
+
+For tight frames, a particularly clean scenario arises when the receiver
+uses the \emph{original} tight reconstruction formula
+$\hat x = \tfrac{1}{A}\sum_i c_i f_i$ but simply treats erased
+coefficients as zero, rather than recomputing the sub-frame dual.
+
+\begin{proposition}[Tight-frame erasure error]
+\label{prop:tight-erasure-error}
+Let $\{f_i\}_{i=1}^m$ be a tight frame with bound $A$ and unit-norm
+vectors, and suppose the coefficients indexed by $E$ are erased. If the
+receiver applies the original tight reconstruction formula with missing
+coefficients set to zero,
+\[
+  \hat x = \frac{1}{A}\sum_{i\in J}\inner{x}{f_i}\,f_i,
+\]
+then the reconstruction error is
+\begin{equation}
+\label{eq:tight-erasure-error}
+  \hat x - x = -\frac{1}{A}\sum_{i\in E}\inner{x}{f_i}\,f_i.
+\end{equation}
+In particular, for a single erasure $E=\{j\}$,
+\[
+  \hat x - x = -\frac{\inner{x}{f_j}}{A}\,f_j,
+  \qquad
+  \norm{\hat x - x} = \frac{|\inner{x}{f_j}|}{A}.
+\]
+\end{proposition}
+
+\begin{proof}
+Since $\{f_i\}$ is tight with bound $A$, the exact reconstruction is
+$x = \tfrac{1}{A}\sum_{i=1}^m \inner{x}{f_i}f_i$ (Chapter~3,
+equation~(3.5)). Subtracting:
+\[
+  \hat x - x = \frac{1}{A}\!\sum_{i\in J}\!\inner{x}{f_i}f_i
+  - \frac{1}{A}\!\sum_{i=1}^m\!\inner{x}{f_i}f_i
+  = -\frac{1}{A}\!\sum_{i\in E}\!\inner{x}{f_i}f_i.
+\]
+For a single erasure $E=\{j\}$, the norm is
+$\|\hat x-x\|=\tfrac{|\inner{x}{f_j}|}{A}\,\|f_j\|=\tfrac{|\inner{x}{f_j}|}{A}$
+using $\|f_j\|=1$.
+\end{proof}
+
+\begin{keyidea}
+Proposition~\ref{prop:tight-erasure-error} has two immediate
+consequences.
+\begin{itemize}
+  \item \textbf{Error is readable without knowing $x$}: The error
+        $\|\hat x-x\|=|\inner{x}{f_j}|/A$ depends on the erased
+        coefficient $c_j=\inner{x}{f_j}$, which the receiver already
+        knows was supposed to arrive but did not. This gives a
+        computable \emph{error certificate}: the receiver can compute
+        an upper bound on the error without the original signal $x$.
+  \item \textbf{Tight frames localize the error}: The error
+        $-\tfrac{1}{A}c_j f_j$ points \emph{in the direction} of the
+        erased frame vector $f_j$ --- the damage is confined to one
+        direction, not spread throughout the space. Contrast this with
+        a non-tight frame, where erasing one coefficient perturbs the
+        reconstruction in an entangled, direction-dependent way.
+\end{itemize}
+\end{keyidea}
+
+\section{Comparing Frames: The Square, Triangle, and Pentagon}
+\label{sec:frame-comparison}
+
+We now work through the three main running examples, establishing that
+the erasure number depends critically on the frame geometry, not only on
+the redundancy.
+
+\begin{examplebox}[title={Example 10.1: Triangle vs.\ square vs.\ pentagon in $\R^2$}]
+\label{ex:square-triangle-comparison}
+\textbf{Triangle ($m=3$, $n=2$, redundancy $1$):} Any two of the three
+vectors $f_1,f_2,f_3$ at $120^\circ$ are linearly independent (no pair
+is parallel or antipodal), so any single erasure leaves two
+spanning vectors. Thus $\epsilon(F)=1$. This matches the redundancy
+$m-n=1$, the theoretical maximum.
+
+\textbf{Square ($m=4$, $n=2$, redundancy $2$):} The four vectors
+$(\pm1,0)$ and $(0,\pm1)$ have two antipodal pairs: $(f_0,f_2)$ and
+$(f_1,f_3)$. Erasing one vector from each antipodal pair (e.g.\ $E=
+\{0,2\}$) leaves $\{f_1,f_3\}=\{(0,1),(0,-1)\}$, which does
+\emph{not} span $\R^2$ (both vectors lie on the $y$-axis). So
+$\epsilon(F)=1$, even though redundancy $m-n=2$. \textbf{The square
+frame wastes its extra redundancy}: it can handle any one erasure but
+not any two, despite having twice the surplus over the triangle.
+\end{examplebox}
+
+\begin{examplebox}[title={Example 10.2: Pentagon and the role of equiangularity}]
+\label{ex:pentagon-erasure}
+The regular pentagon ($m=5$, $n=2$, vertices at $2\pi k/5$) has
+redundancy $m-n=3$, and remarkably achieves $\epsilon(F)=3$: any
+$3$-element erasure leaves only $2$ vectors, but since no two pentagon
+vertices are parallel (the minimum angle between adjacent vertices is
+$72^\circ$, and no two vertices are antipodal), any $2$-element subset
+spans $\R^2$. Since $m-n=3$ is the maximum possible, the pentagon
+\emph{achieves its theoretical maximum erasure number.}
+
+The square, by contrast, achieves only $\epsilon(F)=1$ against its
+theoretical maximum of $2$. The structural deficiency is its antipodal
+pairs: two of its $\binom{4}{2}=6$ size-$2$ subsets fail to span.
+The pentagon has no such pairs: all $\binom{5}{2}=10$ size-$2$
+subsets are spanning.
+\end{examplebox}
+
+\begin{remark*}
+The phenomenon illustrated here is general: a frame achieves
+$\epsilon(F)=m-n$ (the theoretical maximum) if and only if every
+$(m-k)$-subset spans $\F^n$ for all $k\le m-n$, which is equivalent to
+every $n$-element subset of the frame being linearly independent. This
+is the \emph{full spark} property.
+\end{remark*}
+
+\begin{definition}[Full spark]
+\label{def:full-spark}
+A frame $\{f_i\}_{i=1}^m$ for $\F^n$ has \emph{full spark} if every
+$n$-element subset of $\{f_1,\ldots,f_m\}$ is linearly independent. A
+full-spark frame achieves $\epsilon(F)=m-n$, the maximum possible
+erasure number.
+\end{definition}
+
+\begin{remark*}
+In the language of coding theory, the spark of a matrix $F$ is the
+smallest number of columns that are linearly dependent; a full-spark
+frame has spark $n+1$. The triangle has spark $3=n+1$; the pentagon has
+spark $3=n+1$ (any two vectors are independent); but the square has
+spark $2<n+1=3$, since two of its columns ($f_0$ and $f_2$) are linearly
+dependent.
+\end{remark*}
+
+\section{Worst-Case Erasure Error and ETFs}
+\label{sec:worst-case-etf}
+
+For a tight frame that is full-spark, we can reconstruct after any
+$k$-erasure pattern (with $k\le m-n$). But reconstruction quality varies
+by pattern: some erasures cause larger errors than others.
+Proposition~\ref{prop:tight-erasure-error} shows that a single erasure of
+index $j$ causes error $|\inner{x}{f_j}|/A$, which depends on both $x$
+and $j$. A natural worst-case measure for a single erasure is
+\[
+  \text{worst-case error} = \max_j\,\max_{\norm{x}=1}|\inner{x}{f_j}|/A
+  = \frac{\max_j \norm{f_j}}{A} = \frac{1}{A}
+\]
+for unit-norm frames (using $\max_{\norm{x}=1}|\inner{x}{f_j}|=\norm{f_j}$
+by Cauchy--Schwarz, and $\norm{f_j}=1$). All tight unit-norm frames give
+the same single-erasure worst case.
+
+The situation changes for \emph{multiple} erasures. For two simultaneous
+erasures $E=\{j,k\}$ and a unit-norm $x$, the naive error
+$\|\hat x-x\|=\|\tfrac{1}{A}(\inner{x}{f_j}f_j+\inner{x}{f_k}f_k)\|$
+depends on both the angle between $f_j$ and $f_k$ and their alignment
+with $x$. Maximizing this over $x$ gives
+\[
+  \max_{\norm{x}=1}\left\|\frac{1}{A}(\inner{x}{f_j}f_j+\inner{x}{f_k}f_k)\right\|
+  = \frac{\lambda_{\max}(S_{\{j,k\}})}{A},
+\]
+where $\lambda_{\max}(S_{\{j,k\}})$ is the largest eigenvalue of
+$S_{\{j,k\}}=f_jf_j^*+f_kf_k^*$. For unit-norm vectors,
+$\lambda_{\max}(S_{\{j,k\}})=1+|\inner{f_j}{f_k}|$ (a standard fact
+about the largest eigenvalue of a sum of two rank-one unit-norm
+projections). So the worst-case $2$-erasure naive error is
+$(1+|\inner{f_j}{f_k}|)/A$, and minimizing this over all pairs $(j,k)$
+(to find the most robust frame) requires \emph{minimizing} the
+off-diagonal inner products $|\inner{f_j}{f_k}|$ --- exactly what
+coherence minimization and the Welch bound from Chapter~9 do.
+
+\begin{theorem}[ETFs minimize worst-case erasure error]
+\label{thm:etf-erasure-optimal}
+Among all tight, unit-norm frames of $m$ vectors in $\F^n$ with $m>n$,
+the equiangular tight frames (ETFs) minimize the worst-case
+$2$-erasure naive reconstruction error. The minimum worst-case error
+equals $(1+c_{\mathrm{Welch}})/A$ where $c_{\mathrm{Welch}} =
+\sqrt{(m-n)/(n(m-1))}$ is the Welch bound coherence and $A=m/n$.
+\end{theorem}
+
+\begin{proof}
+By the analysis above, the worst-case $2$-erasure naive error over all
+pairs $(j,k)$ and all unit-norm signals is
+$\max_{j\ne k}(1+|\inner{f_j}{f_k}|)/A$. This is minimized by
+minimizing $\max_{j\ne k}|\inner{f_j}{f_k}|$, i.e.\ the coherence
+$\mu$. By the Welch bound (Theorem~9.3.1), $\mu\ge c_{\mathrm{Welch}}$
+for any tight unit-norm frame, with equality iff the frame is an ETF.
+\end{proof}
+
+\begin{keyidea}
+\textbf{ETFs are optimal for erasure robustness, coherence minimization,
+and Grassmannian packing --- simultaneously.} All three criteria reduce to
+the same underlying condition: equal off-diagonal inner products achieving
+the Welch bound. The equivalence established in Theorem~\ref{thm:etf-erasure-optimal}
+shows that the three different motivations (information theory, geometry,
+coding theory) converge to the same object.
+\end{keyidea}
+
+\section{NumPy Implementation}
+\label{sec:numpy-erasures}
+
+\begin{lstlisting}[caption={Erasure robustness tools in NumPy}]
+import numpy as np
+from itertools import combinations
+
+def subframe_spans(F, erased_indices):
+    """
+    Return True if the sub-frame (columns NOT in erased_indices) spans R^n.
+    """
+    n, m = F.shape
+    kept = [i for i in range(m) if i not in erased_indices]
+    if len(kept) < n:
+        return False
+    return np.linalg.matrix_rank(F[:, kept]) == n
+
+def erasure_number(F):
+    """
+    Maximum k such that every k-erasure pattern leaves a spanning sub-frame.
+    """
+    n, m = F.shape
+    for k in range(1, m - n + 2):
+        all_span = all(
+            subframe_spans(F, list(E))
+            for E in combinations(range(m), k)
+        )
+        if not all_span:
+            return k - 1
+    return m - n
+
+def reconstruct_after_erasure(F, x, erased_indices):
+    """
+    Reconstruct x from surviving frame coefficients.
+    Returns (x_hat, error_norm) using sub-frame canonical dual.
+    """
+    n, m = F.shape
+    kept = [i for i in range(m) if i not in erased_indices]
+    F_sub = F[:, kept]
+    S_sub = F_sub @ F_sub.T
+    F_sub_tilde = np.linalg.solve(S_sub, F_sub)
+    c_sub = F_sub.T @ x
+    x_hat = F_sub_tilde @ c_sub
+    return x_hat, np.linalg.norm(x_hat - x)
+
+def tight_erasure_error_formula(F, x, erased_indices, A):
+    """
+    Error using ORIGINAL tight dual with erased coefficients set to zero.
+    Returns error vector via Proposition 10.3.3.
+    """
+    erased = np.array(erased_indices)
+    c_erased = F[:, erased].T @ x
+    error = -(1/A) * (F[:, erased] @ c_erased)
+    return error
+
+# -------------------------------------------------------------------
+# Example 10.1: Triangle, square, pentagon
+# -------------------------------------------------------------------
+# Triangular frame (tight, A=3/2)
+f1,f2,f3 = ([1.,0.],[-0.5,np.sqrt(3)/2],[-0.5,-np.sqrt(3)/2])
+F_tri = np.array([f1,f2,f3]).T
+
+# Square frame (tight, A=2)
+angles4 = np.array([0,np.pi/2,np.pi,3*np.pi/2])
+F_sq = np.vstack([np.cos(angles4), np.sin(angles4)])
+
+# Pentagon frame (tight, A=5/2)
+angles5 = 2*np.pi*np.arange(5)/5
+F_pent = np.vstack([np.cos(angles5), np.sin(angles5)])
+
+print("=== Erasure numbers ===")
+for name, F in [("Triangle (m=3,n=2)", F_tri),
+                ("Square   (m=4,n=2)", F_sq),
+                ("Pentagon (m=5,n=2)", F_pent)]:
+    n, m = F.shape
+    eps = erasure_number(F)
+    print(f"  {name}: epsilon(F)={eps}, m-n={m-n} "
+          f"{'(full spark!)' if eps==m-n else '(sub-optimal)'}")
+
+# -------------------------------------------------------------------
+# Example 10.3: Tight-frame erasure error formula
+# -------------------------------------------------------------------
+x = np.array([3., -1.])
+A_tri = 3/2
+print("\n=== Tight-frame erasure error formula (triangle, erase f1) ===")
+# Erase index 0 (f1)
+err_vec = tight_erasure_error_formula(F_tri, x, [0], A_tri)
+x_hat_naive = (1/A_tri) * (F_tri[:, 1:] @ (F_tri[:, 1:].T @ x))
+err_actual = x_hat_naive - x
+print(f"  Formula predicts: {err_vec.round(4)}")
+print(f"  Actual error:     {err_actual.round(4)}")
+print(f"  Match: {np.allclose(err_vec, err_actual)}")
+print(f"  Error norm = |c1|/A = {abs(np.dot(x,F_tri[:,0])):.4f}/{A_tri} "
+      f"= {abs(np.dot(x,F_tri[:,0]))/A_tri:.4f}")
+
+# -------------------------------------------------------------------
+# Example 10.4: Exact reconstruction after erasure (sub-frame dual)
+# -------------------------------------------------------------------
+print("\n=== Exact reconstruction (sub-frame dual) ===")
+for i in range(3):
+    x_hat, err = reconstruct_after_erasure(F_tri, x, [i])
+    print(f"  Triangle, erase f{i+1}: error = {err:.2e}")
+
+for i in range(4):
+    x_hat, err = reconstruct_after_erasure(F_sq, x, [i])
+    print(f"  Square, erase f{i+1}: error = {err:.2e}")
+
+# Demonstrate square failure for 2 erasures (antipodal pair)
+print("\n=== Square: which 2-erasure patterns fail? ===")
+for pair in combinations(range(4), 2):
+    spans = subframe_spans(F_sq, list(pair))
+    print(f"  Erase {pair}: sub-frame spans = {spans}")
+\end{lstlisting}
+
+\section{Chapter Summary}
+\label{sec:summary-ch10}
+
+\begin{itemize}
+  \item A frame is \textbf{$k$-erasure robust} if every erasure pattern
+        of size $k$ leaves a spanning sub-frame (Definition~\ref{def:k-erasure-robustness}).
+        The \textbf{erasure number} $\epsilon(F)$ is the maximum
+        guaranteed-survivable number of erasures; it satisfies
+        $\epsilon(F)\le m-n$ for any frame in $\F^n$.
+
+  \item \textbf{Exact reconstruction} after $k$ erasures is always
+        possible when the sub-frame spans, via the sub-frame's canonical
+        dual $S_J^{-1}$ (Proposition~\ref{prop:exact-recon-after-erasure}).
+        The sub-frame operator is $S_J = S - S_E$
+        (Proposition~\ref{prop:subframe-operator}).
+
+  \item For a \textbf{tight frame}, if the receiver uses the original
+        tight formula with erased coefficients set to zero, the error
+        is $\hat x - x = -\tfrac{1}{A}\sum_{i\in E}\inner{x}{f_i}f_i$
+        (Proposition~\ref{prop:tight-erasure-error}) --- a clean,
+        computable expression pointing exactly in the direction of the
+        erased frame vectors.
+
+  \item The \textbf{full spark} property ($\epsilon(F)=m-n$) requires
+        every $n$-element subset to be linearly independent. The triangle
+        and pentagon in $\R^2$ are full-spark; the square is not (its
+        antipodal pairs have spark $2 < n+1$).
+
+  \item \textbf{Theorem~\ref{thm:etf-erasure-optimal}}: Among tight
+        unit-norm frames, ETFs minimize worst-case $2$-erasure error.
+        The optimal error is $(1+c_{\text{Welch}})/A$, achieved exactly
+        when $\mu = c_{\text{Welch}}$ (the Welch bound from Chapter~9).
+        ETFs are simultaneously optimal for coherence, Grassmannian
+        packing, and worst-case erasure robustness.
+\end{itemize}
+
+\section{Lab Exercises}
+\label{sec:lab-ch10}
+
+\begin{exercisebox}[title={Lab Exercise 10.1: Erasure Numbers}]
+Implement \texttt{erasure\_number(F)} and compute it for:
+(a)~the triangular frame, (b)~the square frame, (c)~the pentagon,
+(d)~the ONB $\{e_1,e_2\}$ in $\R^2$. For each, compare to the theoretical
+maximum $m-n$. Identify which are full-spark and which are not.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 10.2: Sub-Frame Reconstruction}]
+Using the triangular frame and $x=(3,-1)^T$:
+\begin{enumerate}[label=(\alph*)]
+  \item For each single-erasure pattern, use \texttt{reconstruct\_after\_erasure}
+        and confirm the error is zero (exact reconstruction).
+  \item For each single-erasure pattern, also apply the original tight formula
+        with the missing coefficient set to zero. Compute the error and verify
+        it matches the formula $-\tfrac{1}{A}\inner{x}{f_j}f_j$.
+  \item Which erasure is ``cheapest'' (smallest error in (b))? Explain in terms
+        of which coefficient carries the least information about $x$.
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 10.3: The Square's Weakness}]
+For the square frame, run \texttt{subframe\_spans} on all $\binom{4}{2}=6$
+size-2 erasure patterns and identify exactly which two patterns cause failure.
+What is special about the erased pairs? Now construct a modified
+$4$-vector frame in $\R^2$ by slightly rotating two vectors so that no pair
+is antipodal; verify that the modified frame is full-spark (\texttt{erasure\_number}~$=m-n=2$). Does the modified frame remain tight? (Use \texttt{is\_etf} from Chapter~9.)
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 10.4: Worst-Case Erasure Error}]
+For each of the triangle, square, and pentagon frames and a fixed random $x$:
+\begin{enumerate}[label=(\alph*)]
+  \item Compute the tight-formula error $\|\hat x-x\|$ for every possible
+        single erasure, and report the maximum (worst case) over the $m$
+        erasure patterns.
+  \item Repeat for all $\binom{m}{2}$ double-erasure patterns (where applicable
+        --- use only spanning ones for the square).
+  \item Verify Theorem~\ref{thm:etf-erasure-optimal} numerically: among
+        the three frames, which achieves the smallest worst-case
+        double-erasure error, and is it the one with smallest coherence?
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 10.5 (Challenge): Full-Spark Random Frames}]
+In theory, a ``generic'' frame (i.e.\ one drawn from a continuous
+probability distribution on $(\F^n)^m$) is almost surely full-spark.
+Verify this numerically: generate $100$ random unit-norm frames with
+$(n,m)=(2,5)$ (draw Gaussian and normalize columns), and for each
+compute \texttt{erasure\_number}. What fraction achieve $\epsilon(F)=m-n=3$?
+Then try $(n,m)=(3,6)$. Explain briefly why full-spark is generic but
+not universal.
+\end{exercisebox}
+\newpage
+\section{Supplementary Exercises}
+\label{sec:extra-ch10}
+
+\subsection*{Theoretical Exercises}
+\begin{theoexercises}
+	\item Prove $\epsilon(F)\le m-n$ for any frame (a counting argument).
+	Separately, give a full proof that a frame is full-spark if and
+	only if every $n$-element subset of $\{f_1,\ldots,f_m\}$ is
+	linearly independent.
+	
+	\item Prove that the full-spark property is preserved under \emph{any}
+	invertible linear transformation $T$ (not merely orthogonal
+	ones): if $\{f_i\}$ is full-spark, so is $\{Tf_i\}$. Contrast this
+	with tightness (Chapter~4 Supplementary Exercise T2), which is
+	only preserved under \emph{orthogonal} transformations.
+	
+	\item Prove that the set of non-full-spark configurations of $m$
+	vectors in $\R^n$ has Lebesgue measure zero (as a subset of
+	$\R^{n\times m}$), justifying the empirical finding of Lab
+	Exercise~10.5 that full-spark is generic. (Hint: express
+	``some $n$-subset is dependent'' as a finite union of zero sets
+	of polynomials --- namely the relevant $n\times n$ minors --- and
+	argue each such zero set has measure zero unless the polynomial
+	is identically zero.)
+	
+	\item Using $S_J=S-S_E$ (Proposition~10.3.2) and Weyl's inequality for
+	eigenvalues of a perturbed symmetric matrix, prove the computable
+	lower bound $A_J\ge A-\lambda_{\max}(S_E)$ on the sub-frame's
+	lower bound after erasing the index set $E$, without needing to
+	verify spanning by brute force.
+	
+	\item Prove that the erasure number $\epsilon(F)$ is invariant under
+	scaling all frame vectors by a common nonzero constant $c$:
+	$\epsilon(cF)=\epsilon(F)$.
+\end{theoexercises}
+
+\subsection*{Computational Exercises}
+\begin{compexercises}
+	\item For the triangle, square, and pentagon, directly verify the
+	equivalence from T1: check that ``full-spark'' (as computed by
+	\texttt{erasure\_number}) agrees with ``every $n$-subset is
+	linearly independent'' (checked directly via
+	\texttt{np.linalg.matrix\_rank} on each $n$-subset).
+	
+	\item Apply a random invertible (non-orthogonal) $2\times2$ matrix to
+	the pentagon and confirm the transformed configuration is still
+	full-spark, illustrating T2.
+	
+	\item For the triangular frame, erase each single vector in turn,
+	compute the exact sub-frame bound $A_J$, and compare to the Weyl
+	lower bound $A-\lambda_{\max}(S_E)$ from T4. Report whether the
+	bound is tight (achieved with equality) or merely a strict
+	inequality in each case.
+	
+	\item Scale the pentagon by factors $c=0.5,2,10$ and confirm the
+	erasure number is unchanged in every case, verifying T5.
+\end{compexercises}

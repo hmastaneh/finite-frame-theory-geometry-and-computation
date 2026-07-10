@@ -1,0 +1,752 @@
+\chapter{The Frame Operator}
+\label{ch:frame-operator}
+\fancyhead[R]{\small\textit{Chapter 3: The Frame Operator}}
+\section{Overview: What This Chapter Delivers}
+\label{sec:ch3-overview}
+
+Chapter 2 ended with two explicit promises. First, that the optimal frame
+bounds---the largest valid $A$ and smallest valid $B$---have an exact,
+closed-form description, not merely a numerical estimate via random
+sampling. Second, that this description would come from a certain matrix
+called the \emph{frame operator}. Both promises are fulfilled here.
+
+The frame operator is the mathematical heart of finite frame theory. Once
+you understand it, nearly every important property of a frame---its
+bounds, its tightness, its reconstruction formula---can be read off
+directly from the operator's spectral structure. It also makes the theory
+fully computable: given the $n\times m$ synthesis matrix $F$, all frame
+properties reduce to a single matrix computation.
+
+This chapter introduces three related linear maps---the synthesis
+operator, the analysis operator, and the frame operator---shows how they
+relate to one another, proves the main eigenvalue theorem
+(Theorem~\ref{thm:frame-bounds-eigenvalues}), and returns to every
+running example from Chapters~1--2 to verify all previously stated claims
+exactly.
+
+\section{The Synthesis Operator}
+\label{sec:synthesis-operator}
+
+We begin with the map that turns a sequence of scalar coefficients into a
+vector in $V$.
+
+\begin{definition}[Synthesis operator]
+\label{def:synthesis-operator}
+Let $\{f_i\}_{i=1}^m$ be a frame for $V = \F^n$. The
+\emph{synthesis operator} is the linear map $F : \F^m \to \F^n$ defined
+by
+\[
+  F c := \sum_{i=1}^m c_i\, f_i, \qquad c = (c_1,\ldots,c_m)\in\F^m.
+\]
+\end{definition}
+
+In matrix terms, if each $f_i\in\F^n$ is treated as a column vector, then
+$F$ is the $n\times m$ matrix whose $i$-th column is $f_i$:
+\[
+  F =
+  \begin{pmatrix}
+    | & | & & | \\
+    f_1 & f_2 & \cdots & f_m \\
+    | & | & & |
+  \end{pmatrix}
+  \;\in\; \F^{n\times m}.
+\]
+The action $Fc = \sum_i c_i f_i$ is the standard matrix--vector product.
+The name \emph{synthesis} reflects signal-processing usage: the operator
+takes a sequence of coefficients $(c_1,\ldots,c_m)$ and
+\emph{synthesises} the corresponding signal $\sum_i c_i f_i\in V$.
+
+\begin{remark*}
+When $m > n$ (the redundant case), $F$ is a \emph{wide} matrix with more
+columns than rows, so $\ker F \ne \{0\}$. Elements of $\ker F$ are
+exactly the coefficient sequences $c$ for which $\sum_i c_i f_i = 0$,
+i.e.\ the linear relations among the frame vectors. Redundancy in the
+frame is reflected algebraically in the nontrivial null space of $F$. We
+will see in Chapter~5 (dual frames) that this null space parametrises the
+family of all possible duals.
+\end{remark*}
+
+\begin{examplebox}[title={Example 3.1: Synthesis matrix of the triangular frame}]
+\label{ex:synthesis-triangle}
+For $f_1=(1,0)^T$,
+$f_2=(-\tfrac12,\tfrac{\sqrt3}{2})^T$,
+$f_3=(-\tfrac12,-\tfrac{\sqrt3}{2})^T$ in $\R^2$, the synthesis operator
+is the $2\times 3$ matrix
+\[
+  F =
+  \begin{pmatrix}
+    1 & -\tfrac{1}{2} & -\tfrac{1}{2} \\[4pt]
+    0 & \tfrac{\sqrt{3}}{2} & -\tfrac{\sqrt{3}}{2}
+  \end{pmatrix}.
+\]
+As a check: $F(1,1,1)^T = f_1+f_2+f_3 = (0,0)^T = 0$, confirming that
+$(1,1,1)^T\in\ker F$, corresponding to the linear relation $f_1+f_2+f_3=0$
+noted in Chapter~1.
+\end{examplebox}
+
+\section{The Analysis Operator}
+\label{sec:analysis-operator}
+
+The synthesis operator maps coefficients to vectors. Its adjoint does the
+reverse: it takes a vector $x\in V$ and \emph{analyses} it into the
+sequence of frame coefficients $(\inner{x}{f_1},\ldots,\inner{x}{f_m})$.
+
+\begin{definition}[Analysis operator]
+\label{def:analysis-operator}
+The \emph{analysis operator} of $\{f_i\}_{i=1}^m$ is the adjoint
+$F^*:\F^n\to\F^m$ of the synthesis operator, given by
+\[
+  F^* x :=
+  \bigl(\inner{x}{f_1},\,\inner{x}{f_2},\,\ldots,\inner{x}{f_m}\bigr),
+  \qquad x\in\F^n.
+\]
+\end{definition}
+
+The matrix of $F^*$ is the conjugate transpose of $F$. In the real case
+$\F=\R$ this is simply the ordinary transpose, and the $i$-th entry of
+$F^*x$ is $(F^*x)_i = f_i^T x = \inner{x}{f_i}$, as required.
+
+\begin{proposition}[Adjoint formula]
+\label{prop:adjoint-formula}
+For all $c\in\F^m$ and $x\in\F^n$,
+\[
+  \inner{Fc}{x} = \inner{c}{F^*x}.
+\]
+\end{proposition}
+
+\begin{proof}
+$\displaystyle
+\inner{Fc}{x}
+= \inner{\sum_{i=1}^m c_i f_i}{x}
+= \sum_{i=1}^m c_i\,\inner{f_i}{x}
+= \sum_{i=1}^m c_i\,\overline{\inner{x}{f_i}}
+= \inner{c}{F^*x}$.
+\end{proof}
+
+\medskip
+A key observation: the frame inequality from Definition~2.1.1 can be
+rewritten compactly using $F^*$. Since
+$F^*x = (\inner{x}{f_i})_{i=1}^m$, we have
+\[
+  \sum_{i=1}^m |\inner{x}{f_i}|^2 = \norm{F^*x}^2,
+\]
+so the frame condition $A\norm{x}^2 \le \sum_i|\inner{x}{f_i}|^2\le
+B\norm{x}^2$ is equivalent to
+\begin{equation}
+\label{eq:frame-ineq-compact}
+  A\norm{x}^2 \;\le\; \norm{F^*x}^2 \;\le\; B\norm{x}^2
+  \qquad\forall\,x\in V.
+\end{equation}
+The lower bound $A>0$ requires $F^*$ to be injective (i.e.\ $\ker
+F^*=\{0\}$). Since $\ker F^* = (\operatorname{range} F)^\perp$,
+injectivity of $F^*$ is equivalent to $\operatorname{range} F = V$, i.e.\
+the frame vectors span $V$---recovering Theorem~2.2.1 from the operator
+perspective.
+
+\section{The Frame Operator}
+\label{sec:frame-operator}
+
+\begin{definition}[Frame operator]
+\label{def:frame-operator}
+The \emph{frame operator} of $\{f_i\}_{i=1}^m$ is the composition
+$S:=FF^*:\F^n\to\F^n$.
+\end{definition}
+
+Unfolding the composition:
+\[
+  Sx = F(F^*x) = \sum_{i=1}^m \inner{x}{f_i}\,f_i.
+\]
+Equivalently, $S$ is a sum of rank-one outer products:
+\begin{equation}
+\label{eq:frame-op-outer}
+  S = FF^* = \sum_{i=1}^m f_i f_i^*.
+\end{equation}
+In the real case each $f_i f_i^* = f_i f_i^T$ is the $n\times n$ matrix
+with $(j,k)$ entry $(f_i)_j(f_i)_k$. In NumPy: \texttt{S = F @ F.T}.
+
+\begin{keyidea}
+The frame operator $S=FF^*=\sum_i f_i f_i^*$ is a \textbf{positive
+(semi)definite} $n\times n$ matrix. Its eigenvalues are the exact
+optimal frame bounds. Tightness ($A=B$) is equivalent to $S$ being a
+scalar multiple of the identity. All of this is computable in two lines
+of NumPy.
+\end{keyidea}
+
+\subsection{Properties of the Frame Operator}
+\label{subsec:frame-op-properties}
+
+\begin{proposition}[Properties of $S$]
+\label{prop:frame-op-properties}
+Let $S=FF^*$ be the frame operator of a frame $\{f_i\}_{i=1}^m$ for
+$\F^n$. Then:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Self-adjoint:} $S^*=S$.
+  \item \textbf{Positive semidefinite:} $\inner{Sx}{x}\ge 0$ for all
+        $x\in\F^n$.
+  \item \textbf{Positive definite} iff $\{f_i\}$ spans $\F^n$.
+  \item \textbf{Trace formula:} $\tr(S)=\sum_{i=1}^m\norm{f_i}^2$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+\textbf{(i)} $(FF^*)^*=(F^*)^*F^*=FF^*=S$.\quad
+\textbf{(ii)} $\inner{Sx}{x}=\inner{FF^*x}{x}=\inner{F^*x}{F^*x}
+=\norm{F^*x}^2\ge 0$.\quad
+\textbf{(iii)} $\inner{Sx}{x}=0\Leftrightarrow F^*x=0\Leftrightarrow
+\inner{x}{f_i}=0\;\forall i\Leftrightarrow
+x\in(\spn\{f_i\})^\perp$. This is $\{0\}$ iff the frame spans.\quad
+\textbf{(iv)} $\tr(S)=\sum_{j=1}^n S_{jj}
+=\sum_{j=1}^n\sum_{i=1}^m|(f_i)_j|^2
+=\sum_{i=1}^m\sum_{j=1}^n|(f_i)_j|^2=\sum_{i=1}^m\norm{f_i}^2$.
+\end{proof}
+
+\begin{remark*}
+The trace formula (iv) will be used repeatedly: it connects an algebraic
+invariant of $S$ (its trace) to a geometric property of the configuration
+(the total squared norm of all frame vectors). For a tight frame with $m$
+unit-norm vectors in $\R^n$, we have $S=AI$, so $\tr(S)=An$ on one hand,
+and $\tr(S)=m$ on the other. Therefore $A=m/n$ is \emph{forced} by
+tightness and unit-norm. This is a constraint we will use constantly in
+Chapter~4.
+\end{remark*}
+
+\section{Frame Bounds Are Eigenvalues of $S$}
+\label{sec:frame-bounds-are-eigenvalues}
+
+We now prove the theorem promised in Chapters~1 and~2.
+
+\begin{theorem}[Frame bounds are extreme eigenvalues of $S$]
+\label{thm:frame-bounds-eigenvalues}
+Let $\{f_i\}_{i=1}^m$ be a frame for $\F^n$ with frame operator $S$.
+Denote the eigenvalues of $S$ in descending order by
+$\lambda_1\ge\lambda_2\ge\cdots\ge\lambda_n>0$ (all positive since the
+frame spans $\F^n$). Then:
+\begin{enumerate}[label=(\roman*)]
+  \item The optimal upper bound is $B_{\mathrm{opt}}=\lambda_1=\lambda_{\max}(S)$.
+  \item The optimal lower bound is $A_{\mathrm{opt}}=\lambda_n=\lambda_{\min}(S)$.
+  \item The frame is tight iff $\lambda_1=\lambda_n$, i.e.\ $S=\lambda I$
+        for some $\lambda>0$.
+  \item Any valid pair $(A,B)$ satisfies $A\le\lambda_n$ and
+        $B\ge\lambda_1$; the optimal bounds are the tightest possible.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Let $\{u_k\}_{k=1}^n$ be an orthonormal eigenbasis of $S$ with $Su_k=\lambda_k
+u_k$. Write $x=\sum_k\inner{x}{u_k}u_k$. Then
+\[
+  \inner{Sx}{x}
+  = \Bigl\langle S\sum_k\inner{x}{u_k}u_k,\;\sum_j\inner{x}{u_j}u_j\Bigr\rangle
+  = \sum_{k=1}^n \lambda_k|\inner{x}{u_k}|^2.
+\]
+By Proposition~\ref{prop:frame-op-properties}(ii), $\inner{Sx}{x}=\norm{F^*x}^2
+=\sum_i|\inner{x}{f_i}|^2$. So the frame inequality \eqref{eq:frame-ineq-compact}
+is equivalent to
+\begin{equation}
+\label{eq:rayleigh-form}
+  A\norm{x}^2 \;\le\; \inner{Sx}{x} \;\le\; B\norm{x}^2
+  \qquad\forall\,x\in V.
+\end{equation}
+Dividing by $\norm{x}^2$ (for $x\ne 0$), the middle term becomes the
+\emph{Rayleigh quotient} $R(x) := \inner{Sx}{x}/\norm{x}^2$. We may write
+\[
+  R(x) = \sum_{k=1}^n \lambda_k\,\alpha_k^2, \qquad
+  \text{where } \alpha_k = |\inner{x/\norm{x}}{u_k}|
+  \;\text{ and }\; \sum_{k=1}^n \alpha_k^2 = 1.
+\]
+The Rayleigh quotient is a convex combination of the eigenvalues
+$\lambda_1,\ldots,\lambda_n$ with nonneg\-ative weights summing to one.
+Such a convex combination satisfies
+\[
+  \lambda_n = \lambda_{\min} \;\le\; R(x) \;\le\; \lambda_{\max} = \lambda_1,
+\]
+with equality $R(u_n)=\lambda_n$ (all weight on $\lambda_n$) and
+$R(u_1)=\lambda_1$ (all weight on $\lambda_1$). Therefore the sharpest
+valid bounds in \eqref{eq:rayleigh-form} are $A_{\mathrm{opt}}=\lambda_n$ and
+$B_{\mathrm{opt}}=\lambda_1$, proving (i) and (ii). Part~(iii) is
+immediate: $\lambda_n=\lambda_1$ iff all eigenvalues are equal to some
+$\lambda$, i.e.\ $S=\lambda I$. Part~(iv) follows since any valid $A$
+must satisfy $A\le R(u_n)=\lambda_n$, and any valid $B$ must satisfy
+$B\ge R(u_1)=\lambda_1$.
+\end{proof}
+
+\begin{keyidea}
+The optimal frame bounds are the \textbf{smallest and largest eigenvalues
+of} $S=FF^*$:
+\[
+  A_{\mathrm{opt}} = \lambda_{\min}(S),\qquad
+  B_{\mathrm{opt}} = \lambda_{\max}(S).
+\]
+In NumPy: \texttt{eigenvalues, \_ = np.linalg.eigh(S)}, then
+\texttt{A, B = eigenvalues.min(), eigenvalues.max()}.
+The random-sampling method of Chapter~2 is now superseded by this exact
+computation.
+\end{keyidea}
+
+\subsection{The Non-Spanning Case Revisited}
+\label{subsec:nonspanning-revisited}
+
+If $\{f_i\}$ does not span $\F^n$, Proposition~\ref{prop:frame-op-properties}(iii)
+gives $\lambda_{\min}(S)=0$. The promised lower bound $A>0$ would then
+require $0 < A\le\lambda_{\min}(S)=0$, a contradiction. The zero eigenvector
+$u_n$ satisfies $\inner{u_n}{f_i}=0$ for all $i$---it is the
+``invisible'' direction the frame does not reach---and the Rayleigh
+quotient at $u_n$ gives $R(u_n)=0<A$ for any $A>0$, confirming the
+failure.
+
+\section{Computing the Frame Operator: Worked Examples}
+\label{sec:worked-examples}
+
+We now return to every running example, computing $S$, its eigenvalues,
+and the exact frame bounds.
+
+\begin{examplebox}[title={Example 3.2: Triangular frame}]
+\label{ex:frame-op-triangle}
+With $F=\begin{pmatrix}1&-\frac12&-\frac12\\0&\frac{\sqrt3}{2}&-\frac{\sqrt3}{2}
+\end{pmatrix}$:
+\[
+  S = FF^T
+  = \begin{pmatrix}1&-\frac12&-\frac12\\0&\frac{\sqrt3}{2}&-\frac{\sqrt3}{2}\end{pmatrix}
+    \begin{pmatrix}1&0\\-\frac12&\frac{\sqrt3}{2}\\-\frac12&-\frac{\sqrt3}{2}\end{pmatrix}
+  = \begin{pmatrix}\frac32&0\\0&\frac32\end{pmatrix}
+  = \tfrac32 I.
+\]
+Both eigenvalues equal $\tfrac32$, so $A=B=\tfrac32$ and the frame is
+tight. This confirms the exact bounds stated in Example~2.2.5 and
+provides the matrix-level explanation: $S=\tfrac32 I$ means
+$\sum_i\inner{x}{f_i}f_i = \tfrac32 x$ for all $x$, which is precisely
+the tight frame identity.
+\end{examplebox}
+
+\begin{examplebox}[title={Example 3.3: Non-tight frame $\{h_1,h_2,h_3\}$}]
+\label{ex:frame-op-h}
+With $H=\begin{pmatrix}1&0&1\\0&1&1\end{pmatrix}$:
+\[
+  S = HH^T
+  = \begin{pmatrix}1&0&1\\0&1&1\end{pmatrix}
+    \begin{pmatrix}1&0\\0&1\\1&1\end{pmatrix}
+  = \begin{pmatrix}2&1\\1&2\end{pmatrix}.
+\]
+The characteristic polynomial is $(2-\lambda)^2-1=0$, giving
+$\lambda_{1}=3$ and $\lambda_{2}=1$. Thus $B=3$, $A=1$, confirming the
+numerical estimate from Example~2.2.6. The eigenvector for $\lambda_1=3$
+is $u_1=(1,1)^T/\sqrt{2}$---exactly the direction of $h_3=(1,1)^T$---
+explaining geometrically why that direction is most illuminated.
+\end{examplebox}
+
+\begin{examplebox}[title={Example 3.4: Standard orthonormal basis}]
+\label{ex:frame-op-onb}
+For $F=I_n$ (synthesis matrix of any ONB), $S=II^T=I$, so
+$\lambda_1=\cdots=\lambda_n=1$ and $A=B=1$: every ONB is a Parseval
+tight frame.
+\end{examplebox}
+
+\begin{examplebox}[title={Example 3.5: Non-spanning set $\{g_1,g_2\}$ in $\R^3$}]
+\label{ex:frame-op-nonspan}
+With $G=\begin{pmatrix}1&0\\0&1\\0&0\end{pmatrix}$ (a $3\times 2$
+matrix):
+\[
+  S=GG^T = \begin{pmatrix}1&0&0\\0&1&0\\0&0&0\end{pmatrix}.
+\]
+Eigenvalues: $1,1,0$. The zero eigenvalue corresponds to $e_3=(0,0,1)^T$,
+the direction not covered by $g_1,g_2$. Since $\lambda_{\min}=0$, no
+positive lower bound $A$ exists---confirming Example~2.2.4.
+\end{examplebox}
+
+\begin{examplebox}[title={Example 3.6: Square vertices in $\R^2$}]
+\label{ex:frame-op-square}
+The four vertices of a unit square at angles
+$0,\tfrac\pi2,\pi,\tfrac{3\pi}{2}$ give
+$f_k=(\cos(k\pi/2),\sin(k\pi/2))^T$ for $k=0,1,2,3$. The synthesis
+matrix is
+\[
+  F = \begin{pmatrix}1&0&-1&0\\0&1&0&-1\end{pmatrix}.
+\]
+Computing:
+\[
+  S = FF^T = \begin{pmatrix}1&0&-1&0\\0&1&0&-1\end{pmatrix}
+  \begin{pmatrix}1&0\\0&1\\-1&0\\0&-1\end{pmatrix}
+  = \begin{pmatrix}2&0\\0&2\end{pmatrix} = 2I.
+\]
+Both eigenvalues equal $2$, so $A=B=2$: the four square vertices form a
+tight frame for $\R^2$ with bound $A=2$. This confirms the conjecture
+from Lab Exercise~1.4, and Lab Exercise~2.3's finding. Comparing with the
+triangular frame ($A=\tfrac32$, three vectors) and the square ($A=2$,
+four vectors): more unit-norm vectors $\Rightarrow$ larger frame bound, as
+expected from the trace formula $A=m/n$ for tight unit-norm frames.
+\end{examplebox}
+
+\section{NumPy Implementation}
+\label{sec:numpy-implementation}
+
+All the computations above reduce to a handful of NumPy functions.
+
+\begin{lstlisting}[caption={Frame operator and exact bounds via eigenvalues}]
+import numpy as np
+
+def frame_operator(F):
+    """Frame operator S = F @ F.T (real frames)."""
+    return F @ F.T
+
+def exact_frame_bounds(F):
+    """
+    Exact optimal frame bounds via eigenvalues of S = F F^T.
+
+    Parameters
+    ----------
+    F : ndarray, shape (n, m)
+        Synthesis matrix: columns are frame vectors.
+
+    Returns
+    -------
+    A : float
+        Optimal lower frame bound (lambda_min of S).
+    B : float
+        Optimal upper frame bound (lambda_max of S).
+    eigenvalues : ndarray, shape (n,)
+        All eigenvalues of S in ascending order.
+    eigenvectors : ndarray, shape (n, n)
+        Orthonormal eigenvectors (columns) in the same order.
+    """
+    S = frame_operator(F)
+    # eigh: specialized for symmetric/Hermitian matrices;
+    # returns real eigenvalues in ascending order.
+    eigenvalues, eigenvectors = np.linalg.eigh(S)
+    A = float(eigenvalues[0])   # ascending order -> first = min
+    B = float(eigenvalues[-1])  # last = max
+    return A, B, eigenvalues, eigenvectors
+
+def is_tight(F, tol=1e-10):
+    """True if A == B up to the given tolerance."""
+    A, B, _, _ = exact_frame_bounds(F)
+    return (B - A) < tol * max(1.0, B)
+
+# ---------------------------------------------------------------
+# Example 3.2: Triangular frame
+# ---------------------------------------------------------------
+F_tri = np.array([
+    [1.0,   -0.5,        -0.5],
+    [0.0,    np.sqrt(3)/2, -np.sqrt(3)/2]
+])
+
+S_tri = frame_operator(F_tri)
+A_tri, B_tri, eigs_tri, _ = exact_frame_bounds(F_tri)
+
+print("=== Triangular frame ===")
+print("S =\n", S_tri.round(10))
+print(f"Eigenvalues: {eigs_tri.round(10)}")
+print(f"A = {A_tri:.6f},  B = {B_tri:.6f}")
+print(f"Tight: {is_tight(F_tri)}")
+
+# ---------------------------------------------------------------
+# Example 3.3: Non-tight frame {h1, h2, h3}
+# ---------------------------------------------------------------
+H = np.array([[1., 0., 1.],
+              [0., 1., 1.]])
+
+A_h, B_h, eigs_h, vecs_h = exact_frame_bounds(H)
+print("\n=== Non-tight frame {h1, h2, h3} ===")
+print("S =\n", frame_operator(H))
+print(f"Eigenvalues: {eigs_h}")
+print(f"A = {A_h:.4f},  B = {B_h:.4f}")
+print(f"Eigenvector for lambda_max = {eigs_h[-1]:.0f}:",
+      vecs_h[:, -1].round(4))
+
+# ---------------------------------------------------------------
+# Example 3.6: Square vertices
+# ---------------------------------------------------------------
+angles = np.array([0, np.pi/2, np.pi, 3*np.pi/2])
+F_sq = np.vstack([np.cos(angles), np.sin(angles)])   # shape (2,4)
+A_sq, B_sq, eigs_sq, _ = exact_frame_bounds(F_sq)
+print("\n=== Square vertices ===")
+print("S =\n", frame_operator(F_sq).round(10))
+print(f"Eigenvalues: {eigs_sq.round(10)}")
+print(f"A = {A_sq:.6f},  B = {B_sq:.6f},  Tight: {is_tight(F_sq)}")
+
+# ---------------------------------------------------------------
+# Sanity check: compare with random-sampling estimates
+# ---------------------------------------------------------------
+def sampling_bounds(F, num_samples=100_000, seed=0):
+    """Estimate frame bounds by random sampling (Chapter 2 method)."""
+    n = F.shape[0]
+    rng = np.random.default_rng(seed)
+    vals = []
+    for _ in range(num_samples):
+        x = rng.standard_normal(n)
+        x /= np.linalg.norm(x)
+        vals.append(x @ frame_operator(F) @ x)
+    vals = np.array(vals)
+    return vals.min(), vals.max()
+
+for name, Fmat in [("Triangular", F_tri), ("Non-tight H", H)]:
+    A_ex, B_ex, _, _ = exact_frame_bounds(Fmat)
+    A_est, B_est = sampling_bounds(Fmat)
+    print(f"\n{name}: exact A={A_ex:.6f}, sampled A={A_est:.6f} "
+          f"| exact B={B_ex:.6f}, sampled B={B_est:.6f}")
+\end{lstlisting}
+
+\begin{remark*}
+We use \texttt{np.linalg.eigh} rather than \texttt{np.linalg.eig} for two
+reasons. First, \texttt{eigh} is specialized for symmetric (Hermitian)
+matrices and guaranteed to return \emph{real} eigenvalues in
+\emph{ascending} order with an \emph{orthonormal} eigenvector matrix.
+Second, it is numerically more stable for symmetric matrices.
+The general-purpose \texttt{eig} may return spurious small imaginary parts
+even for perfectly symmetric inputs. Since $S=FF^T$ is always symmetric
+by Proposition~\ref{prop:frame-op-properties}(i), \texttt{eigh} is always
+the correct choice.
+\end{remark*}
+
+\section{Reconstruction via the Frame Operator}
+\label{sec:reconstruction}
+
+The frame operator provides not just frame bounds but also a direct
+reconstruction formula---a preview of the full dual-frame theory of
+Chapter~5.
+
+\begin{proposition}[Reconstruction via $S$]
+\label{prop:reconstruction}
+Let $\{f_i\}_{i=1}^m$ be a frame for $V$ with frame operator $S$. Since
+$\{f_i\}$ spans $V$, $S$ is invertible. For every $x\in V$:
+\begin{equation}
+\label{eq:canonical-recon}
+  x \;=\; S^{-1}\!\left(\sum_{i=1}^m \inner{x}{f_i}f_i\right)
+    \;=\; \sum_{i=1}^m \inner{x}{f_i}\,(S^{-1}f_i).
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+$Sx = \sum_i\inner{x}{f_i}f_i$ by definition of $S$. Apply $S^{-1}$ to
+both sides.
+\end{proof}
+
+The vectors $\tilde f_i := S^{-1}f_i$ are the \emph{canonical dual frame
+vectors}, to be studied in depth in Chapter~5. For a tight frame
+($S=AI$), $S^{-1}=\tfrac1A I$, and~\eqref{eq:canonical-recon} becomes
+\begin{equation}
+\label{eq:tight-recon}
+  x = \frac{1}{A}\sum_{i=1}^m \inner{x}{f_i}f_i
+  \qquad (\text{tight frame, bound }A).
+\end{equation}
+This is one of the key practical advantages of tight frames: reconstruction
+requires only a scalar rescaling, with no matrix inversion needed.
+
+\begin{examplebox}[title={Example 3.7: Reconstruction with the triangular frame}]
+\label{ex:reconstruction-triangle}
+Let $x=(3,-1)^T\in\R^2$ and use the triangular frame (tight, $A=\tfrac32$).
+The frame coefficients are
+\[
+  c_1 = \inner{x}{f_1} = 3,\quad
+  c_2 = \inner{x}{f_2} = -\tfrac32 - \tfrac{\sqrt3}{2}\approx -2.366,\quad
+  c_3 = \inner{x}{f_3} = -\tfrac32 + \tfrac{\sqrt3}{2}\approx 0.366.
+\]
+Reconstruction via~\eqref{eq:tight-recon}:
+\[
+  \hat x = \frac{1}{\tfrac32}(c_1 f_1 + c_2 f_2 + c_3 f_3)
+  = \frac23\Bigl(3(1,0)^T + c_2(-\tfrac12,\tfrac{\sqrt3}{2})^T
+    + c_3(-\tfrac12,-\tfrac{\sqrt3}{2})^T\Bigr).
+\]
+One can verify algebraically (or in NumPy) that $\hat x = (3,-1)^T = x$.
+The redundancy---three coefficients representing a 2-vector---does not
+prevent exact reconstruction; it merely means the coefficients are not
+unique (any choice in the affine family $c + \ker F$ also reconstructs
+$x$, but the canonical choice $c_i=\inner{x}{f_i}$ is the most natural).
+\end{examplebox}
+
+\section{Chapter Summary}
+\label{sec:summary-ch3}
+
+\begin{itemize}
+  \item Three linear maps organise the algebra: the \textbf{synthesis
+        operator} $F:\F^m\to\F^n$ (coefficients $\to$ signals), the
+        \textbf{analysis operator} $F^*:\F^n\to\F^m$ (signals $\to$
+        frame coefficients), and the \textbf{frame operator}
+        $S=FF^*:\F^n\to\F^n$ (a positive-definite $n\times n$ matrix).
+  \item $S$ admits two equivalent expressions: $S=FF^*$ (product form,
+        one NumPy line) and $S=\sum_i f_if_i^*$ (outer-product sum,
+        revealing each vector's individual contribution).
+  \item \textbf{Theorem~\ref{thm:frame-bounds-eigenvalues}}: the optimal
+        frame bounds are the extreme eigenvalues of $S$,
+        \[
+          A_{\mathrm{opt}}=\lambda_{\min}(S),\qquad
+          B_{\mathrm{opt}}=\lambda_{\max}(S),
+        \]
+        with the frame tight iff $S=\lambda I$.
+        Proof: the frame inequality $A\norm x^2\le\inner{Sx}{x}\le
+        B\norm x^2$ is equivalent to bounding the Rayleigh quotient
+        $\inner{Sx}{x}/\norm x^2$, which ranges exactly between
+        $\lambda_{\min}$ and $\lambda_{\max}$.
+  \item The \textbf{trace formula} $\tr(S)=\sum_i\norm{f_i}^2$ forces
+        $A=m/n$ for any tight unit-norm frame with $m$ vectors in $\R^n$.
+  \item \textbf{Reconstruction}: $x=\sum_i\inner{x}{f_i}\tilde f_i$
+        where $\tilde f_i=S^{-1}f_i$; for tight frames, $\tilde
+        f_i=\tfrac1A f_i$ and no matrix inversion is needed.
+  \item \textbf{Zero eigenvalue $\Leftrightarrow$ non-spanning}: the
+        failure mode for non-frames is always $\lambda_{\min}(S)=0$, with
+        the zero eigenvector being the direction not reached by the frame.
+\end{itemize}
+
+\section{Lab Exercises}
+\label{sec:lab-ch3}
+
+\begin{exercisebox}[title={Lab Exercise 3.1: The Full Frame Operator Pipeline}]
+Implement \texttt{frame\_operator(F)}, \texttt{exact\_frame\_bounds(F)},
+and \texttt{is\_tight(F)} from Section~\ref{sec:numpy-implementation}.
+Run them on all six frames from this chapter:
+\begin{enumerate}[label=(\alph*)]
+  \item Triangular frame (Example~\ref{ex:frame-op-triangle}).
+  \item Non-tight frame $\{h_1,h_2,h_3\}$ (Example~\ref{ex:frame-op-h}).
+  \item Standard ONB $\{e_1,e_2\}$ in $\R^2$ (Example~\ref{ex:frame-op-onb}).
+  \item Non-spanning $\{g_1,g_2\}$ in $\R^3$ (Example~\ref{ex:frame-op-nonspan}).
+  \item Square vertices in $\R^2$ (Example~\ref{ex:frame-op-square}).
+  \item The non-tight frame $\{e_1, 2e_2\}$ in $\R^2$ (from Exercise~1.1
+        in Chapter~1's pencil-and-paper exercises: $f_1=(1,0)$,
+        $f_2=(0,2)$).
+\end{enumerate}
+For each, print $S$, its eigenvalues, $A$, $B$, and whether the frame is
+tight. Then verify the trace formula: check that
+\texttt{np.trace(S)} equals \texttt{sum(np.dot(f,f) for f in columns\_of\_F)}
+in every case.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 3.2: Tightness from the Trace}]
+For a tight unit-norm frame with $m$ vectors in $\R^n$, the trace formula
+forces $A = m/n$. Verify this numerically for:
+(a)~$m=3,\,n=2$ (triangular frame),
+(b)~$m=4,\,n=2$ (square vertices).
+Then answer: if you want a tight unit-norm frame with $m=6$ vectors in
+$\R^3$, what \emph{must} $A$ equal, before constructing any such frame?
+No code needed for this last part---just algebra.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 3.3: Reconstruction Accuracy}]
+Using the triangular frame and the reconstruction formula
+\eqref{eq:tight-recon}:
+\begin{enumerate}[label=(\alph*)]
+  \item Pick five random vectors $x\in\R^2$ (\texttt{np.random.default\_rng(42).standard\_normal((2,5))}).
+        For each, compute the frame coefficients $c_i=\inner{x}{f_i}$
+        and reconstruct $\hat x = \tfrac23\sum_i c_i f_i$.
+        Report $\norm{\hat x - x}$ for each; it should be at or below
+        machine precision ($\sim 10^{-15}$).
+  \item Now corrupt one coefficient: replace $c_1$ with $c_1+\delta$
+        for $\delta=0.1, 0.5, 1.0$. Reconstruct and report
+        $\norm{\hat x_\delta - x}$ for each $\delta$.
+        How does the reconstruction error scale with $\delta$?
+  \item Repeat part~(b) but using the \emph{two-vector} frame
+        $\{e_1, e_2\}$ (the standard basis), where corrupting $c_1$
+        by $\delta$ means replacing $\inner{x}{e_1}$ with
+        $\inner{x}{e_1}+\delta$. Compare with part~(b): which frame is
+        more robust to the same perturbation, and why?
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 3.4: Exact vs.\ Sampled Bounds}]
+Run \texttt{exact\_frame\_bounds} and \texttt{sampling\_bounds}
+(with $100{,}000$ samples) on both the triangular frame and
+$\{h_1,h_2,h_3\}$. Tabulate the four pairs $(A_{\text{exact}},
+A_{\text{sampled}})$ and $(B_{\text{exact}}, B_{\text{sampled}})$.
+In one or two sentences: why does the sampled estimate always satisfy
+$A_{\text{sampled}} \ge A_{\text{exact}}$ and
+$B_{\text{sampled}} \le B_{\text{exact}}$?
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 3.5: Eigenvectors as Extremal Directions}]
+For the non-tight frame $\{h_1,h_2,h_3\}$ with $A=1$, $B=3$:
+\begin{enumerate}[label=(\alph*)]
+  \item Retrieve the eigenvectors $u_1$ (for $\lambda_1=3$) and
+        $u_2$ (for $\lambda_2=1$) from \texttt{exact\_frame\_bounds}.
+  \item Verify that $\inner{Su_1}{u_1}=3$ and $\inner{Su_2}{u_2}=1$
+        numerically, confirming that the Rayleigh quotient indeed equals
+        $\lambda_k$ at $u_k$.
+  \item Plot the ``illumination function'' $\varphi(\theta)=
+        \sum_i|\inner{x(\theta)}{h_i}|^2$ for
+        $x(\theta)=(\cos\theta,\sin\theta)^T$ over $\theta\in[0,2\pi]$
+        (using \texttt{matplotlib}). Mark the angles corresponding to
+        $u_1$ and $u_2$ on the plot, and verify that these angles
+        correspond to the maximum ($B=3$) and minimum ($A=1$) of
+        $\varphi$.
+\end{enumerate}
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 3.6 (Optional, Challenge): Pentagonal Frame}]
+Consider five vectors in $\R^2$ at equally spaced angles:
+$f_k = (\cos(2\pi k/5), \sin(2\pi k/5))^T$, $k=0,1,2,3,4$.
+\begin{enumerate}[label=(\alph*)]
+  \item Compute $S$, its eigenvalues, and $A$, $B$. Is this a tight
+        frame? Predict the answer using the trace formula before running
+        the code.
+  \item Without computing the frame operator, predict whether
+        \emph{any} regular $m$-gon configuration in $\R^2$ (i.e.\
+        $f_k=(\cos(2\pi k/m),\sin(2\pi k/m))^T$) gives a tight frame.
+        Test your prediction numerically for $m=5,6,7,8$ by running
+        \texttt{is\_tight} for each. Formulate a conjecture. (This will
+        be proved in Chapter~4.)
+  \item Compute $\tr(S)$ for each of the regular $m$-gons and verify
+        the trace formula $\tr(S) = m$ (since all vectors have unit
+        norm). From this and tightness, deduce the frame bound $A = m/2$
+        for each.
+\end{enumerate}
+\end{exercisebox}
+
+\newpage
+\section{Supplementary Exercises}
+\label{sec:extra-ch3}
+
+\subsection*{Theoretical Exercises}
+\begin{theoexercises}
+	\item Let $F$ be an $n\times m$ matrix. Prove that $FF^*$ (size
+	$n\times n$) and $F^*F$ (size $m\times m$) have the same nonzero
+	eigenvalues, counted with multiplicity. (This fact underlies the
+	identity $\tr(G^2)=\tr(S^2)$ used in the Welch bound proof of
+	Chapter~9.)
+	
+	\item Let $S$ be the frame operator of $\{f_i\}_{i=1}^m$ for $\R^n$,
+	and let $S^{-1/2}$ denote its unique positive definite inverse
+	square root. Prove that $\{S^{-1/2}f_i\}_{i=1}^m$ is a Parseval
+	frame for $\R^n$.
+	
+	\item Let $\tilde f_i=S^{-1}f_i$ be the canonical dual vectors
+	(Proposition~3.8.1). Prove that the frame operator of
+	$\{\tilde f_i\}_{i=1}^m$ is exactly $S^{-1}$.
+	
+	\item Prove a converse to Theorem~3.5.1: given \emph{any} symmetric
+	positive definite $n\times n$ matrix $S_0$, show there exists a
+	frame $\{f_i\}_{i=1}^n$ for $\R^n$ whose frame operator is exactly
+	$S_0$. (Hint: use the symmetric square root of $S_0$.)
+	
+	\item Prove that a frame $\{f_i\}_{i=1}^m$ for $\R^n$ is Parseval if and
+	only if its synthesis matrix $F$ satisfies $FF^*=I_n$. Contrast
+	this with the (much stronger) condition $F^*F=I_m$, and explain
+	why the latter can only hold when $m\le n$.
+	
+	\item The frame operator $S$ maps the unit sphere in $\R^n$ to an
+	ellipsoid with semi-axis lengths equal to the eigenvalues of $S$.
+	Prove this, and express the ellipsoid's eccentricity (ratio of
+	longest to shortest semi-axis) in terms of the frame bounds $A,B$.
+	What does perfect roundness (eccentricity $1$) correspond to?
+\end{theoexercises}
+
+\subsection*{Computational Exercises}
+\begin{compexercises}
+	\item For a random $3\times5$ matrix $F$, compute the eigenvalues of
+	$FF^T$ and $F^TF$ and confirm the nonzero eigenvalues agree
+	(T1), while $F^TF$ has exactly $2$ extra zero eigenvalues.
+	
+	\item For the frame $\{h_1,h_2,h_3\}$, compute $S^{-1/2}$ via
+	eigendecomposition, apply it to build $\{S^{-1/2}h_i\}$, and
+	verify the resulting frame operator is exactly $I_2$ (T2).
+	
+	\item For each of the five example frames from Lab Exercise~3.1,
+	compute the canonical dual's frame operator directly and confirm
+	it equals $S^{-1}$ to machine precision (T3).
+	
+	\item Given the target matrix $S_0=\begin{pmatrix}3&1\\1&2\end{pmatrix}$,
+	construct a frame $\{f_1,f_2\}$ for $\R^2$ whose frame operator is
+	exactly $S_0$ (T4), and verify by direct computation.
+	
+	\item Plot the ellipse $\{Sx:\norm{x}=1\}$ for the triangular frame and
+	for $\{h_1,h_2,h_3\}$ in the same figure (parametrize the unit
+	circle, apply $S$, and plot the image). Confirm visually that the
+	tight frame's image is a circle and the non-tight frame's image
+	is a genuine ellipse, connecting to T6.
+\end{compexercises}

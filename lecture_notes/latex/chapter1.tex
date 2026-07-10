@@ -1,0 +1,470 @@
+\chapter{Motivation and Foundations}
+\label{ch:motivation}
+\fancyhead[R]{\small\textit{Chapter 1: Motivation and Foundations}}
+\section{Why Study Frames? Redundancy as a Feature}
+\label{sec:why-frames}
+
+Almost every linear algebra course you have taken builds toward the same destination: a \emph{basis}. A basis of a vector space $V$ is a set of vectors that is simultaneously \emph{spanning} (every vector in $V$ can be written as a combination of them) and \emph{linearly independent} (no vector in the set is redundant --- each one is doing essential work). This is an elegant and economical idea. If $\dim V = n$, a basis has exactly $n$ vectors: no more, no fewer.
+
+This chapter begins by asking you to set that economy aside, at least temporarily, and consider a different question.
+
+\begin{quote}
+\itshape What if we deliberately use \emph{more} vectors than the dimension of the space requires?
+\end{quote}
+
+At first this sounds wasteful. If $n$ vectors already span $\R^n$, why would anyone use $m > n$ vectors to do the same job? The answer, which is the entire motivation for this course, is that redundancy is not always waste --- it can be a resource. A redundant representation of a vector can be:
+
+\begin{itemize}
+  \item \textbf{Robust to noise.} If you measure a vector's coordinates with respect to a basis and one measurement is corrupted, you have lost information that cannot be recovered from the others. If you have redundant measurements, the corrupted one can sometimes be detected, discarded, or corrected using the rest.
+  \item \textbf{Robust to erasure.} In communication and signal processing, data is sometimes lost entirely in transmission (an ``erasure''). A redundant representation can often be perfectly reconstructed even when some of its pieces never arrive.
+  \item \textbf{Flexible.} A basis gives you exactly one way to write each vector as a combination of the basis elements. A redundant spanning set gives you a whole family of ways, and you are free to choose the representation best suited to your purposes (smallest coefficients, sparsest representation, most numerically stable, and so on).
+  \item \textbf{Symmetric.} Certain highly redundant, highly symmetric configurations of vectors (we will meet our first examples by the end of this chapter) treat every direction in space with perfect uniformity, in a sense we will make precise. No basis can do this --- the asymmetry of having exactly $n$ vectors in an $n$-dimensional space forces some directions to be treated differently from others.
+\end{itemize}
+
+\textbf{Frame theory} is the mathematical framework for making these ideas precise. A \emph{frame} is, roughly speaking, a spanning set of vectors --- typically with redundancy, i.e., more vectors than the dimension requires --- equipped with quantitative control over how that redundancy behaves. The formal definition is the subject of Chapter 2 (next week's notes); this week, we build the geometric intuition and the linear algebra toolkit that the definition will rest on.
+
+\begin{keyidea}
+A frame is a generalization of a basis that permits (and often deliberately uses) redundancy. The price of redundancy is that representations are no longer unique. The payoff is robustness, flexibility, and --- as we will soon see geometrically --- a kind of balance that no basis can achieve.
+\end{keyidea}
+
+\subsection{A First Picture}
+\label{subsec:first-picture}
+
+Consider the plane $\R^2$. A basis consists of exactly two linearly independent vectors. The standard basis $\{e_1, e_2\}$, with $e_1 = (1,0)$ and $e_2 = (0,1)$, is the most familiar example: it is orthonormal, meaning each vector has length $1$ and the two vectors are perpendicular.
+
+Now consider three vectors in $\R^2$ pointing toward the vertices of an equilateral triangle centered at the origin:
+$$
+f_1 = (1, 0), \qquad f_2 = \left(-\tfrac{1}{2}, \tfrac{\sqrt 3}{2}\right), \qquad f_3 = \left(-\tfrac{1}{2}, -\tfrac{\sqrt 3}{2}\right).
+$$
+These three vectors are linearly \emph{dependent} (any two of them already span $\R^2$, so the third is redundant; indeed $f_1+f_2+f_3=0$), but they still span $\R^2$, and they do so with a kind of $120^\circ$-rotational symmetry that no pair of vectors can replicate. We will see by the end of this chapter, and prove rigorously in Chapter 4, that this triangular configuration is an example of a \emph{tight frame}: a redundant spanning set that distributes ``energy'' perfectly evenly across every direction in the plane. Figure \ref{fig:basis-vs-frame} previews the visual difference between the two configurations.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=1.6]
+  % Left: orthonormal basis
+  \begin{scope}
+    \draw[->, gray!50, thin] (-1.5,0) -- (1.5,0);
+    \draw[->, gray!50, thin] (0,-1.5) -- (0,1.5);
+    \draw[->, frameblue, ultra thick] (0,0) -- (1,0) node[right] {$e_1$};
+    \draw[->, frameblue, ultra thick] (0,0) -- (0,1) node[above] {$e_2$};
+    \draw (0,0) circle (1);
+    \node at (0,-1.9) {\small Orthonormal basis $\{e_1, e_2\}$};
+  \end{scope}
+  % Right: triangular frame
+  \begin{scope}[xshift=4.5cm]
+    \draw[->, gray!50, thin] (-1.5,0) -- (1.5,0);
+    \draw[->, gray!50, thin] (0,-1.5) -- (0,1.5);
+    \draw[->, examplegreen, ultra thick] (0,0) -- (1,0) node[right] {$f_1$};
+    \draw[->, examplegreen, ultra thick] (0,0) -- (-0.5,0.866) node[above left] {$f_2$};
+    \draw[->, examplegreen, ultra thick] (0,0) -- (-0.5,-0.866) node[below left] {$f_3$};
+    \draw (0,0) circle (1);
+    \node at (0,-1.9) {\small Redundant frame $\{f_1, f_2, f_3\}$};
+  \end{scope}
+\end{tikzpicture}
+\caption{An orthonormal basis (left) versus a redundant, symmetric spanning set (right) in $\R^2$. Both span the plane. The right-hand configuration has three-fold rotational symmetry that two vectors alone cannot achieve.}
+\label{fig:basis-vs-frame}
+\end{figure}
+
+This picture is the geometric heart of the course, and we will return to it constantly. For now, simply notice: \emph{both} pictures span $\R^2$, but they are doing geometrically different things, and the difference is something we will learn to measure precisely.
+
+\subsection{Where Frames Show Up}
+\label{subsec:applications-preview}
+
+To motivate the abstract definitions to come, here is a brief, non-exhaustive preview of where redundant spanning sets are useful in practice. We will revisit several of these applications in detail later in the course (particularly Weeks 10 and 11).
+
+\begin{itemize}
+  \item \textbf{Signal and image processing.} Redundant systems of vectors (generalizing wavelets and Fourier bases) are used to represent signals in ways that are robust to quantization error and compression artifacts.
+  \item \textbf{Communications and coding theory.} When data is transmitted over a noisy or unreliable channel, redundant encodings allow the receiver to reconstruct the original message even if some pieces are lost (erasures) or corrupted (noise).
+  \item \textbf{Compressed sensing.} Modern signal acquisition techniques exploit redundant, highly incoherent systems of vectors to recover high-dimensional signals from surprisingly few measurements.
+  \item \textbf{Quantum information theory.} Certain highly symmetric finite frames (equiangular tight frames, in particular) are intimately connected to optimal quantum measurements.
+\end{itemize}
+
+You do not need to know anything about these fields to take this course. They are mentioned here only so that, as we develop the theory, you have a sense of why anyone bothered to develop it.
+
+\section{Linear Algebra Review}
+\label{sec:linalg-review}
+
+Frame theory is built on a small number of linear algebra concepts, used repeatedly and combined in new ways. This section reviews exactly the material we need: inner product spaces, orthonormal bases, and spanning sets/linear independence, with an eye toward the question that will occupy us for the rest of the course: \emph{what happens when a spanning set has more vectors than the dimension of the space?}
+
+Throughout, $\F$ denotes either $\R$ or $\C$; we work in the finite-dimensional space $\F^n$. The vast majority of examples in this course will use $\R^n$, especially in low dimensions where pictures are possible, but the complex case $\C^n$ is equally important in applications (especially quantum information theory and signal processing with complex exponentials) and the theory transfers with only minor modifications, which we flag as they arise.
+
+\subsection{Inner Product Spaces}
+\label{subsec:inner-product}
+
+\begin{definition}[Inner product]
+\label{def:inner-product}
+Let $V$ be a vector space over $\F$. An \emph{inner product} on $V$ is a function $\inner{\cdot}{\cdot} : V \times V \to \F$ satisfying, for all $x, y, z \in V$ and $\alpha \in \F$:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Conjugate symmetry:} $\inner{x}{y} = \overline{\inner{y}{x}}$.
+  \item \textbf{Linearity in the first argument:} $\inner{\alpha x + y}{z} = \alpha \inner{x}{z} + \inner{y}{z}$.
+  \item \textbf{Positive definiteness:} $\inner{x}{x} \geq 0$, with equality if and only if $x = 0$.
+\end{enumerate}
+\end{definition}
+
+\begin{remark*}
+When $\F = \R$, conjugate symmetry is simply symmetry: $\inner{x}{y} = \inner{y}{x}$. The standard inner product on $\R^n$ is the familiar dot product, $\inner{x}{y} = \sum_{k=1}^n x_k y_k$. On $\C^n$, the standard inner product is $\inner{x}{y} = \sum_{k=1}^n x_k \overline{y_k}$, where the conjugate on the second argument is exactly what is needed to make positive definiteness hold: $\inner{x}{x} = \sum_k |x_k|^2 \geq 0$.
+
+\emph{Convention check.} Some texts place the conjugate on the first argument instead of the second; this is purely a convention and has no mathematical consequence as long as it is used consistently. We will consistently conjugate the second argument, matching the most common convention in the signal processing and frame theory literature (and matching NumPy's \texttt{vdot} function, which we will use in the lab).
+\end{remark*}
+
+The inner product immediately gives us a notion of length:
+
+\begin{definition}[Norm]
+\label{def:norm}
+The \emph{norm} (or \emph{length}) induced by an inner product is
+$$
+\norm{x} := \sqrt{\inner{x}{x}}.
+$$
+\end{definition}
+
+The norm satisfies the triangle inequality $\norm{x+y} \le \norm{x} + \norm{y}$ and the homogeneity property $\norm{\alpha x} = |\alpha| \, \norm{x}$, both of which you likely proved in your linear algebra course using the following essential inequality.
+
+\begin{theorem}[Cauchy--Schwarz Inequality]
+\label{thm:cauchy-schwarz}
+For all $x, y \in V$,
+$$
+\left| \inner{x}{y} \right| \leq \norm{x} \, \norm{y},
+$$
+with equality if and only if $x$ and $y$ are linearly dependent (i.e., one is a scalar multiple of the other).
+\end{theorem}
+
+We state this without proof, as it is a standard result you should have already seen; if it is unfamiliar, any linear algebra textbook will supply a proof, and it is a worthwhile exercise to reconstruct.
+
+\begin{remark*}
+Cauchy--Schwarz will be the single most frequently invoked inequality in this entire course. The quantity $|\inner{x}{y}|$ measures, in a precise sense, how much $x$ and $y$ ``overlap'' or ``align,'' and Cauchy--Schwarz says this overlap can never exceed the product of their lengths. When we define frame bounds in Chapter 2, the quantity $\sum_i |\inner{x}{f_i}|^2$ --- a sum of squared overlaps between $x$ and each frame vector $f_i$ --- is the central object of study, and intuition for it is built entirely on intuition for $|\inner{x}{y}|$ itself.
+\end{remark*}
+
+\begin{definition}[Orthogonality]
+\label{def:orthogonal}
+Two vectors $x, y \in V$ are \emph{orthogonal} if $\inner{x}{y} = 0$. A set of vectors $\{v_1, \dots, v_k\}$ is \emph{orthogonal} if $\inner{v_i}{v_j} = 0$ for all $i \neq j$, and \emph{orthonormal} if it is orthogonal and, additionally, $\norm{v_i} = 1$ for every $i$.
+\end{definition}
+
+\subsection{Spanning Sets, Linear Independence, and Bases}
+\label{subsec:spanning-bases}
+
+\begin{definition}[Span]
+\label{def:span}
+Given vectors $v_1, \dots, v_m \in V$, their \emph{span} is the set of all linear combinations:
+$$
+\spn\{v_1, \dots, v_m\} := \setdef{\sum_{i=1}^m c_i v_i}{c_1, \dots, c_m \in \F}.
+$$
+If $\spn\{v_1, \dots, v_m\} = V$, we say the set $\{v_1, \dots, v_m\}$ \emph{spans} $V$, or is a \emph{spanning set} for $V$.
+\end{definition}
+
+\begin{definition}[Linear independence]
+\label{def:linear-independence}
+Vectors $v_1, \dots, v_m \in V$ are \emph{linearly independent} if the only solution to
+$$
+c_1 v_1 + c_2 v_2 + \cdots + c_m v_m = 0
+$$
+is $c_1 = c_2 = \cdots = c_m = 0$. If a nontrivial solution exists, the vectors are \emph{linearly dependent}.
+\end{definition}
+
+\begin{definition}[Basis]
+\label{def:basis}
+A set $\{v_1, \dots, v_n\} \subset V$ is a \emph{basis} for $V$ if it is both a spanning set and linearly independent.
+\end{definition}
+
+A fundamental fact, which you should have proven in your first linear algebra course, is that \emph{every basis of a finite-dimensional vector space $V$ has the same number of elements}; this common number is the \emph{dimension} of $V$, denoted $\dim V$. We will take $\dim V = n$ throughout, working in $V = \F^n$.
+
+Here is the observation that frame theory is built on, stated as a proposition so that we can refer back to it precisely.
+
+\begin{proposition}[Redundant spanning sets exist]
+\label{prop:redundant-spanning}
+Let $V$ be an $n$-dimensional vector space, and let $m > n$. Then there exist sets of $m$ vectors $\{v_1, \dots, v_m\} \subset V$ that span $V$. Any such set is necessarily linearly \emph{dependent}.
+\end{proposition}
+
+\begin{proof}
+For existence: take any basis $\{e_1, \dots, e_n\}$ of $V$, and adjoin any $m - n$ additional vectors of $V$ (for instance, repeat $e_1$ a total of $m-n$ times, or pick arbitrary vectors). The resulting set of $m$ vectors still spans $V$, since it contains a spanning set as a subset.
+
+For dependence: this is an immediate consequence of the fact (proved in any first linear algebra course, often called the Steinitz exchange lemma or a corollary of it) that no linearly independent set in an $n$-dimensional space can have more than $n$ elements. Since $m > n$, the set $\{v_1, \dots, v_m\}$ cannot be linearly independent.
+\end{proof}
+
+This proposition is almost trivial to prove, but its consequence is the entire subject of this course: \emph{whenever we use more vectors than the dimension requires, linear dependence is unavoidable, but this dependence can be harnessed rather than merely tolerated.} The redundant vectors are not ``wasted''; as we saw in Section \ref{subsec:first-picture}, they can be arranged to provide symmetry, robustness, and flexibility that no basis (with exactly $n$ vectors) could provide. Distinguishing a \emph{useful} redundant spanning set from an arbitrary, poorly-behaved one is precisely what the frame bounds $A$ and $B$ --- to be defined next week --- are designed to do.
+
+\subsection{Orthonormal Bases and Coordinate Representations}
+\label{subsec:onb}
+
+Orthonormal bases deserve special attention because they make the relationship between a vector and its ``coordinates'' completely transparent, and this transparency is exactly what we will have to work to recover in the redundant setting.
+
+\begin{theorem}[Orthonormal expansion]
+\label{thm:onb-expansion}
+Let $\{e_1, \dots, e_n\}$ be an orthonormal basis of $V$. Then every $x \in V$ can be written uniquely as
+$$
+x = \sum_{k=1}^n \inner{x}{e_k} \, e_k,
+$$
+and moreover,
+$$
+\norm{x}^2 = \sum_{k=1}^n \left| \inner{x}{e_k} \right|^2. \qquad \text{(Parseval's identity)}
+$$
+\end{theorem}
+
+\begin{proof}
+Since $\{e_1, \dots, e_n\}$ is a basis, we may write $x = \sum_k c_k e_k$ for some uniquely determined scalars $c_k$. Taking the inner product of both sides with $e_j$ and using orthonormality,
+$$
+\inner{x}{e_j} = \sum_{k=1}^n c_k \inner{e_k}{e_j} = c_j,
+$$
+since $\inner{e_k}{e_j} = 0$ for $k \neq j$ and $\inner{e_j}{e_j} = 1$. This proves $c_j = \inner{x}{e_j}$, giving the expansion formula. For Parseval's identity,
+$$
+\norm{x}^2 = \inner{x}{x} = \inner{\sum_k c_k e_k}{\sum_j c_j e_j} = \sum_{k,j} c_k \overline{c_j} \inner{e_k}{e_j} = \sum_{k=1}^n |c_k|^2 = \sum_{k=1}^n |\inner{x}{e_k}|^2,
+$$
+using orthonormality once more to collapse the double sum to a single sum.
+\end{proof}
+
+\begin{remark*}
+This theorem is the single most important fact to internalize before next week, because the entire definition of a frame is obtained by asking: \emph{what happens if we drop the requirement that $\{e_1, \dots, e_n\}$ be a basis (i.e., we allow redundancy, $m > n$, and we no longer require orthonormality), and ask only that an inequality version of Parseval's identity still hold?} That single question is the seed from which the formal definition of a frame, next week's central topic, will grow:
+$$
+A \norm{x}^2 \;\leq\; \sum_{i=1}^m |\inner{x}{f_i}|^2 \;\leq\; B \norm{x}^2 \qquad \text{for all } x \in V,
+$$
+for constants $0 < A \leq B < \infty$ called the \emph{frame bounds}. When $\{f_i\}$ happens to be an orthonormal basis, Theorem \ref{thm:onb-expansion} shows $A = B = 1$ exactly, with equality (not just inequality) in the middle expression. Frames generalize this by relaxing equality to a two-sided bound, and relaxing exact orthonormality to mere redundancy-with-control.
+\end{remark*}
+
+\subsection{Why Redundant Sets Need Two Numbers, Not One}
+\label{subsec:why-two-bounds}
+
+It is worth pausing on a subtlety that will matter enormously starting next week. Given a redundant spanning set $\{f_1, \dots, f_m\}$ with $m > n$, the quantity
+$$
+\sum_{i=1}^m |\inner{x}{f_i}|^2
+$$
+is no longer equal to $\norm{x}^2$ for every $x$ (as it was for an orthonormal basis by Parseval's identity); it merely lies between two multiples of $\norm{x}^2$, and \emph{which} multiples depends on the direction of $x$. Geometrically: a redundant set of vectors might ``illuminate'' some directions in space more than others. The smallest amount of illumination, over all directions $x$, is (essentially) the lower frame bound $A$; the largest amount of illumination is the upper frame bound $B$. A set is called \emph{tight} exactly when $A = B$ --- when every direction is illuminated equally --- and Section \ref{subsec:first-picture}'s triangular configuration was an example (which we will verify rigorously, and numerically, very soon).
+
+\begin{exercisebox}[title={Exercise 1.1}]
+Let $f_1 = (1,0)$ and $f_2 = (0, 2)$ in $\R^2$ (note: \emph{not} orthonormal, since $\norm{f_2} = 2 \ne 1$). Compute $\sum_{i=1}^2 |\inner{x}{f_i}|^2$ for $x = (1,0)$ and again for $x = (0,1)$. Observe that the two values are different, despite $\norm{x}^2 = 1$ in both cases. What does this tell you about how $\{f_1, f_2\}$ treats different directions in the plane?
+\end{exercisebox}
+
+\begin{exercisebox}[title={Exercise 1.2}]
+Prove the converse direction implicit in Theorem \ref{thm:onb-expansion}: if $\{e_1, \ldots, e_n\}$ is an orthonormal \emph{set} (not assumed to be a basis) and $\sum_{k=1}^n |\langle x, e_k\rangle|^2 = \|x\|^2$ for every $x \in V$, then $\{e_1, \ldots, e_n\}$ must in fact be a basis of $V$ (equivalently, $n = \dim V$). (Hint: argue by contradiction --- what would the inner product computation in the proof of Theorem \ref{thm:onb-expansion} look like if a basis vector were missing?)
+\end{exercisebox}
+
+\section{First Steps in Python}
+\label{sec:python-onramp}
+
+Numerical computation is a central theme of this course, not an afterthought: many of the most important properties of frames (the frame bounds, tightness, dual frames) are most easily understood by computing them. We use Python with the NumPy library throughout, because it makes vector and matrix computation immediate and because the syntax is close enough to mathematical notation to be readable at a glance.
+
+If you have never written a line of code before, this section is for you. If you have programmed before (in any language), you can skim this section and proceed directly to the lab exercises in Section \ref{sec:lab}.
+
+\subsection{Why Python and NumPy}
+\label{subsec:why-python}
+
+\textbf{Python} is a general-purpose programming language known for readable syntax. \textbf{NumPy} (Numerical Python) is a library --- a collection of pre-written code --- that adds fast, convenient array and matrix operations to Python. Without NumPy, representing a vector and computing an inner product would require writing your own loops; with NumPy, these become one-line operations that closely mirror mathematical notation. Every computational lab in this course will use NumPy as its foundation, and later weeks will add \texttt{SciPy} (for linear algebra routines like eigenvalue decompositions) and \texttt{Matplotlib} (for plotting).
+
+\subsection{Vectors as Arrays}
+\label{subsec:vectors-as-arrays}
+
+In NumPy, a vector in $\R^n$ is represented as a one-dimensional array.
+
+\begin{lstlisting}[caption={Creating and inspecting vectors}]
+import numpy as np
+
+# A vector in R^2
+x = np.array([1.0, 0.0])
+y = np.array([0.0, 1.0])
+
+print(x)        # [1. 0.]
+print(x.shape)  # (2,)  -- this is a 1D array of length 2
+\end{lstlisting}
+
+The \texttt{.shape} attribute tells you the dimensions of an array; for a vector in $\R^n$, it will be \texttt{(n,)}.
+
+\subsection{Inner Products and Norms}
+\label{subsec:inner-products-numpy}
+
+The inner product of two real vectors is computed with \texttt{np.dot}, and the norm with \texttt{np.linalg.norm}.
+
+\begin{lstlisting}[caption={Computing inner products and norms}]
+import numpy as np
+
+x = np.array([1.0, 2.0])
+y = np.array([3.0, -1.0])
+
+inner_xy = np.dot(x, y)          # <x, y> = 1*3 + 2*(-1) = 1
+norm_x   = np.linalg.norm(x)     # sqrt(1^2 + 2^2) = sqrt(5)
+
+print(f"<x, y> = {inner_xy}")
+print(f"||x|| = {norm_x:.4f}")
+\end{lstlisting}
+
+\begin{remark*}
+For \emph{complex} vectors, recall from Section \ref{subsec:inner-product} that our inner product convention conjugates the second argument: $\inner{x}{y} = \sum_k x_k \overline{y_k}$. The function \texttt{np.dot} does \emph{not} conjugate, so for complex vectors you should use \texttt{np.vdot(y, x)} or write \texttt{np.dot(x, np.conj(y))} explicitly. We will need this starting in later chapters when complex frames appear; for this week's exercises, real vectors suffice.
+\end{remark*}
+
+\subsection{Verifying Cauchy--Schwarz Numerically}
+\label{subsec:verify-cs}
+
+A nice first programming exercise is to numerically verify the Cauchy--Schwarz inequality (Theorem \ref{thm:cauchy-schwarz}) on a few examples, as a sanity check on both the mathematics and your NumPy syntax.
+
+\begin{lstlisting}[caption={Checking Cauchy--Schwarz on random vectors}]
+import numpy as np
+
+np.random.seed(0)  # for reproducibility
+
+for trial in range(5):
+    x = np.random.randn(3)   # random vector in R^3
+    y = np.random.randn(3)
+
+    lhs = abs(np.dot(x, y))
+    rhs = np.linalg.norm(x) * np.linalg.norm(y)
+
+    print(f"Trial {trial}: |<x,y>| = {lhs:.4f}, "
+          f"||x|| ||y|| = {rhs:.4f}, "
+          f"inequality holds: {lhs <= rhs}")
+\end{lstlisting}
+
+Running this will print \texttt{True} for every trial (up to floating-point rounding, the inequality should never be violated). This kind of numerical sanity check --- verifying a theorem on random or specific examples --- is a habit we will use throughout the course, especially when working with frame bounds, where direct computation by hand becomes impractical for $m$ and $n$ larger than $2$ or $3$.
+
+\subsection{Plotting Vectors in the Plane}
+\label{subsec:plotting}
+
+Visualizing vectors in $\R^2$ is one of the best ways to build geometric intuition, and we will do this constantly. Matplotlib's \texttt{quiver} function draws arrows from the origin.
+
+\begin{lstlisting}[caption={Plotting the basis and the triangular frame from Figure 1.1}]
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Orthonormal basis
+e1 = np.array([1.0, 0.0])
+e2 = np.array([0.0, 1.0])
+
+# Triangular frame (3 vectors, 120 degrees apart)
+f1 = np.array([1.0, 0.0])
+f2 = np.array([-0.5, np.sqrt(3)/2])
+f3 = np.array([-0.5, -np.sqrt(3)/2])
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+
+# Left subplot: orthonormal basis
+ax = axes[0]
+ax.quiver(0, 0, e1[0], e1[1], angles='xy', scale_units='xy',
+          scale=1, color='steelblue', width=0.012)
+ax.quiver(0, 0, e2[0], e2[1], angles='xy', scale_units='xy',
+          scale=1, color='steelblue', width=0.012)
+ax.set_xlim(-1.5, 1.5)
+ax.set_ylim(-1.5, 1.5)
+ax.set_aspect('equal')
+ax.set_title('Orthonormal basis')
+ax.grid(True, alpha=0.3)
+
+# Right subplot: triangular frame
+ax = axes[1]
+for f in [f1, f2, f3]:
+    ax.quiver(0, 0, f[0], f[1], angles='xy', scale_units='xy',
+              scale=1, color='seagreen', width=0.012)
+ax.set_xlim(-1.5, 1.5)
+ax.set_ylim(-1.5, 1.5)
+ax.set_aspect('equal')
+ax.set_title('Redundant, symmetric frame')
+ax.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.savefig('basis_vs_frame.png', dpi=150)
+plt.show()
+\end{lstlisting}
+
+This code reproduces Figure \ref{fig:basis-vs-frame} programmatically. Reproducing a figure from the notes in code is a good way to confirm you understand both the mathematics and the plotting syntax simultaneously.
+
+\section{Chapter Summary}
+\label{sec:summary}
+
+\begin{itemize}
+  \item Frame theory generalizes the idea of a basis by permitting (and exploiting) redundancy: more vectors than the dimension of the space strictly requires.
+  \item Redundancy is valuable because it provides robustness to noise and erasures, flexibility in choosing representations, and --- in highly symmetric configurations --- a geometric balance that no basis can achieve.
+  \item Proposition \ref{prop:redundant-spanning} shows that redundant spanning sets always exist and are automatically linearly dependent; the interesting mathematical content is in \emph{how} that dependence is structured.
+  \item Theorem \ref{thm:onb-expansion} (orthonormal expansion and Parseval's identity) is the template that the definition of a frame, to come in Chapter 2, directly generalizes: the equality $\norm{x}^2 = \sum_k |\inner{x}{e_k}|^2$ becomes a two-sided inequality $A\norm{x}^2 \le \sum_i |\inner{x}{f_i}|^2 \le B \norm{x}^2$ once the orthonormal basis $\{e_k\}$ is replaced by an arbitrary, possibly redundant set $\{f_i\}$.
+  \item Python and NumPy provide the computational backbone of the course; Section \ref{sec:python-onramp} covered vectors as arrays, inner products, norms, and basic plotting, all of which will be used immediately in this week's lab.
+\end{itemize}
+
+\section{Lab Exercises}
+\label{sec:lab}
+
+These exercises are meant to be completed in a Jupyter notebook. Submit your code together with printed output and, where requested, plots.
+
+\begin{exercisebox}[title={Lab Exercise 1.1: Basis vs.\ Frame, Visually}]
+Reproduce Figure \ref{fig:basis-vs-frame} using the code template in Section \ref{subsec:plotting}. Then, add a \emph{third} subplot showing a third configuration of your choosing: pick any two non-orthogonal, non-unit-length vectors in $\R^2$ that still span the plane (i.e., an arbitrary basis), and plot them. Comment (in a code comment or markdown cell) on how this third picture differs visually from both the orthonormal basis and the triangular frame.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 1.2: Cauchy--Schwarz at Scale}]
+Modify the code in Section \ref{subsec:verify-cs} to run $10{,}000$ trials instead of $5$, using random vectors in $\R^{10}$ instead of $\R^3$ (hint: \texttt{np.random.randn(10)}). Confirm that the Cauchy--Schwarz inequality holds in every trial. Then, modify your code to report the \emph{ratio} $|\inner{x}{y}| / (\norm{x}\norm{y})$ for each trial, and plot a histogram of this ratio over all $10{,}000$ trials using \texttt{plt.hist}. What is the approximate range of values you observe, and does this match your geometric intuition for what this ratio represents? (Hint: think about the angle between $x$ and $y$.)
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 1.3: The Asymmetry of Redundant Sets}]
+This exercise makes Exercise 1.1 (the pencil-and-paper one from Section \ref{subsec:why-two-bounds}) computational. Let $f_1 = (1,0)$ and $f_2 = (0,2)$ as in that exercise.
+\begin{enumerate}[label=(\alph*)]
+  \item Write a Python function \texttt{illumination(x, vectors)} that takes a vector \texttt{x} and a list of vectors, and returns $\sum_i |\inner{x}{f_i}|^2$.
+  \item Evaluate your function at $x = (\cos\theta, \sin\theta)$ for $\theta$ ranging over $200$ equally spaced points in $[0, 2\pi]$ (hint: \texttt{np.linspace(0, 2*np.pi, 200)}), using $\{f_1, f_2\}$ as above.
+  \item Plot the resulting values against $\theta$. At which angle(s) $\theta$ is the illumination smallest? Largest? Do these extreme values match the squared lengths of $f_1$ and $f_2$ in any way you can identify?
+\end{enumerate}
+This exercise previews exactly the numerical method we will use next week to estimate frame bounds $A$ and $B$ directly from data, before we have any closed-form formula for them.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 1.4 (Optional, Challenge): A Square Configuration}]
+Consider four vectors in $\R^2$ pointing toward the vertices of a square: $f_k = (\cos(k\pi/2), \sin(k\pi/2))$ for $k = 0, 1, 2, 3$. Using the \texttt{illumination} function from Lab Exercise 1.3, numerically investigate whether this configuration is \emph{tight} in the sense of Section \ref{subsec:why-two-bounds} (i.e., whether the illumination is the same for every direction $x$, not just at a few sample angles). Compare your numerical finding to the triangular configuration from Figure \ref{fig:basis-vs-frame}, and form a conjecture about \emph{which} regular polygon configurations in $\R^2$ might always be tight. We will prove the general result in Chapter 4.
+\end{exercisebox}
+\newpage
+\section{Supplementary Exercises}
+\subsection*{Theoretical Exercises}
+\begin{theoexercises}
+	\item Prove the \emph{parallelogram law}: for any $x,y$ in an inner
+	product space, $\norm{x+y}^2+\norm{x-y}^2=2\norm{x}^2+2\norm{y}^2$.
+	Then use the equality condition of Cauchy--Schwarz (Theorem~1.2.3)
+	to characterize exactly when $\norm{x+y}=\norm{x}+\norm{y}$ holds
+	for real vectors $x,y$.
+	
+	\item Chapter~2's proof of Theorem~2.2.1 uses, without proof, the fact
+	that a proper subspace of $\F^n$ has a nontrivial orthogonal
+	complement. Prove this fact: if $W\subsetneq\F^n$ is a subspace
+	with $\dim W<n$, show there exists a nonzero $x\in\F^n$ with
+	$\inner{x}{w}=0$ for all $w\in W$. (Hint: extend a basis of $W$ to
+	a basis of $\F^n$ and apply Gram--Schmidt.)
+	
+	\item Show that for unit vectors $u,v\in\R^n$,
+	$\norm{u-v}^2=2-2\inner{u}{v}$. Use this identity to re-express
+	the illumination quantity $\varphi(x)=\sum_i|\inner{x}{f_i}|^2$
+	from Section~1.3 purely in terms of the distances $\norm{x-f_i}$
+	when $x$ and every $f_i$ are unit vectors.
+	
+	\item Let $f_1,f_2,f_3,f_4\in\R^3$ be unit vectors pointing to the four
+	vertices of a regular tetrahedron centered at the origin. Prove
+	$f_1+f_2+f_3+f_4=0$, generalizing the identity
+	$f_1+f_2+f_3=0$ noted for the triangular configuration in
+	Section~1.1.1. (Hint: argue by symmetry --- what linear map fixes
+	the configuration but could only fix the sum vector if the sum is
+	zero?)
+	
+	\item Prove that for any $m$ unit vectors $f_1,\ldots,f_m\in\R^n$,
+	$\bigl\|\sum_{i=1}^m f_i\bigr\|\le m$, with equality if and only if
+	all $f_i$ are equal.
+	
+	\item Prove or disprove: if $\{v_1,\ldots,v_n\}$ is \emph{any} basis of
+	$\R^n$ (not necessarily orthonormal), then
+	$\sum_{i=1}^n|\inner{x}{v_i}|^2=\norm{x}^2$ for every $x\in\R^n$.
+\end{theoexercises}
+
+\subsection*{Computational Exercises}
+\begin{compexercises}
+	\item Extend \texttt{illumination} to $\R^3$ using the four standard
+	basis-adjacent vectors $e_1,e_2,e_3,e_1+e_2+e_3$ (normalized).
+	Sample $500$ random points on the unit sphere in $\R^3$ (normalize
+	random Gaussian vectors) and plot a histogram of the resulting
+	illumination values.
+	
+	\item Numerically verify the parallelogram law from T1 for $1000$ random
+	pairs of vectors in $\R^5$, and report the maximum absolute
+	deviation from equality (should be at machine precision).
+	
+	\item Construct the regular tetrahedron vectors from T4 explicitly as
+	$(\pm1,\pm1,\pm1)/\sqrt3$ with an even number of minus signs (four
+	such sign patterns), verify $f_1+f_2+f_3+f_4=0$ numerically, and
+	confirm all six pairwise angles equal $\arccos(-1/3)\approx
+	109.47^\circ$.
+	
+	\item For the basis $v_1=(1,0.3)$, $v_2=(0.4,1.2)$ from Lab
+	Exercise~1.1, numerically evaluate the ratio
+	$\varphi(x)/\norm{x}^2$ for $50$ random unit vectors $x$, and plot
+	the ratio against the angle of $x$. Confirm the ratio is not
+	constant, resolving T6.
+	
+	\item Implement Gram--Schmidt orthogonalization from scratch (no
+	\texttt{np.linalg.qr}) for three linearly independent vectors in
+	$\R^3$ of your choosing, and verify the output is orthonormal to
+	within $10^{-10}$.
+\end{compexercises}

@@ -1,0 +1,680 @@
+\chapter{Tight Frames}
+\label{ch:tight-frames}
+\fancyhead[R]{\small\textit{Chapter 4: Tight Frames}}
+\section{Overview: Closing the Loop on Tightness}
+\label{sec:ch4-overview}
+
+Three separate promises from Chapters~1--3 converge in this chapter.
+Chapter~1 conjectured, from a single picture, that the vertices of an
+equilateral triangle form a tight frame for $\R^2$. Chapter~2 verified
+this by direct computation for $m=3$ and asked you to guess, in Lab
+Exercise~1.4, whether the same holds for a square. Chapter~3 confirmed
+the square case too ($A=B=2$) and asked you, in Lab Exercise~3.6, to
+test pentagons, hexagons, heptagons, and octagons, and to conjecture a
+general pattern. By now the pattern should be unmistakable: \emph{every}
+regular polygon, of any number of sides $m\ge 2$, gives a tight frame for
+$\R^2$. This chapter proves that conjecture in full generality
+(Theorem~\ref{thm:regular-polygon-tight}), and along the way develops the
+algebraic mechanism---cancellation of trigonometric cross-terms via roots
+of unity---that explains \emph{why} it is true, not merely \emph{that}
+it is true.
+
+We also deliver on a second promise: Chapter~2 noted that Parseval
+frames need not be orthonormal bases, and deferred examples to this
+chapter. Section~\ref{sec:parseval-from-projection} gives a general,
+constructive method---projecting an orthonormal basis of a larger space
+down into a subspace---that produces Parseval frames with as much
+redundancy as you like, and explains geometrically why this construction
+always works.
+
+\section{Tight Frames: Definitions Revisited}
+\label{sec:tight-revisited}
+
+Recall Definition~2.4.1: a frame $\{f_i\}_{i=1}^m$ for $V$ is \emph{tight}
+if its frame bounds satisfy $A = B$, and \emph{Parseval} if additionally
+$A=1$. Chapter~3 gave the matrix characterization that organizes this
+entire chapter:
+
+\begin{quote}
+\itshape A frame is tight with bound $A$ if and only if its frame
+operator satisfies $S = AI$ (Theorem~3.5.1(iii)).
+\end{quote}
+
+This single equation, $S = AI$, is the lens through which we will view
+every result in this chapter. Unfolding $S = \sum_i f_if_i^* = AI$ gives
+the following equivalent, and extremely useful, restatement.
+
+\begin{proposition}[Tightness as a resolution of the identity]
+\label{prop:tightness-resolution}
+A frame $\{f_i\}_{i=1}^m$ for $V=\F^n$ is tight with bound $A$ if and
+only if
+\begin{equation}
+\label{eq:resolution-of-identity}
+  \sum_{i=1}^m f_i f_i^* = A I_n.
+\end{equation}
+Equivalently, for every pair of standard basis vectors $e_j, e_k$,
+\begin{equation}
+\label{eq:entrywise-tight}
+  \sum_{i=1}^m (f_i)_j \overline{(f_i)_k} =
+  \begin{cases} A, & j = k, \\ 0, & j \ne k. \end{cases}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+This is immediate from $S = \sum_i f_if_i^* = AI$ together with the fact
+that the $(j,k)$ entry of $f_if_i^*$ is $(f_i)_j\overline{(f_i)_k}$, and
+the $(j,k)$ entry of $AI$ is $A$ when $j=k$ and $0$ otherwise.
+\end{proof}
+
+\begin{remark*}
+Equation~\eqref{eq:resolution-of-identity} is sometimes called a
+\emph{resolution of the identity}: the frame vectors' outer products sum
+exactly to (a multiple of) the identity. This is the precise algebraic
+form of the informal phrase from Chapter~1, ``every direction is treated
+equally.'' Equation~\eqref{eq:entrywise-tight} is the same statement
+written entrywise, and it is this entrywise form that we will verify
+directly, by trigonometric computation, in the regular polygon theorem
+below: the off-diagonal cancellation in
+Example~2.2.5---the vanishing of the cross term
+$-\tfrac{\sqrt3}{2}x_1x_2+\tfrac{\sqrt3}{2}x_1x_2$---is exactly an
+instance of the $j\ne k$ case of~\eqref{eq:entrywise-tight}.
+\end{remark*}
+
+\section{The Regular Polygon Theorem}
+\label{sec:regular-polygon}
+
+We now state and prove the general result toward which Chapters~1--3
+have been building.
+
+\begin{theorem}[Regular polygons are tight frames]
+\label{thm:regular-polygon-tight}
+Let $m \ge 2$ be an integer, and let
+\[
+  f_k = \bigl(\cos(2\pi k/m),\, \sin(2\pi k/m)\bigr), \qquad k = 0, 1, \ldots, m-1,
+\]
+be the $m$ vectors pointing toward the vertices of a regular $m$-gon
+inscribed in the unit circle in $\R^2$. Then $\{f_k\}_{k=0}^{m-1}$ is a
+tight frame for $\R^2$ with frame bound $A = m/2$.
+\end{theorem}
+
+We give two proofs. The first is a direct trigonometric computation,
+generalizing exactly the calculation of Example~2.2.5. The second is
+shorter and more conceptual, using complex exponentials and roots of
+unity; it is the ``systematic'' technique promised in Chapter~2; and it
+will generalize far more easily to other constructions later in the
+course.
+
+\begin{proof}[Proof 1: Direct trigonometric computation]
+Let $\theta_k = 2\pi k/m$, so $f_k = (\cos\theta_k, \sin\theta_k)$. By
+Proposition~\ref{prop:tightness-resolution}, it suffices to verify
+\eqref{eq:entrywise-tight} for $A = m/2$, i.e.\ to show
+\[
+  \sum_{k=0}^{m-1}\cos^2\theta_k = \frac{m}{2}, \qquad
+  \sum_{k=0}^{m-1}\sin^2\theta_k = \frac{m}{2}, \qquad
+  \sum_{k=0}^{m-1}\cos\theta_k\sin\theta_k = 0.
+\]
+Using the double-angle identities $\cos^2\theta = \tfrac12(1+\cos2\theta)$,
+$\sin^2\theta = \tfrac12(1-\cos2\theta)$, and
+$\cos\theta\sin\theta = \tfrac12\sin2\theta$:
+\[
+  \sum_{k=0}^{m-1}\cos^2\theta_k = \frac{m}{2} + \frac12\sum_{k=0}^{m-1}\cos(2\theta_k),
+  \qquad
+  \sum_{k=0}^{m-1}\sin^2\theta_k = \frac{m}{2} - \frac12\sum_{k=0}^{m-1}\cos(2\theta_k),
+\]
+\[
+  \sum_{k=0}^{m-1}\cos\theta_k\sin\theta_k = \frac12\sum_{k=0}^{m-1}\sin(2\theta_k).
+\]
+So it suffices to show that both sums $\sum_{k=0}^{m-1}\cos(2\theta_k)$
+and $\sum_{k=0}^{m-1}\sin(2\theta_k)$ vanish, where $2\theta_k = 4\pi
+k/m$. These are the real and imaginary parts of the geometric series
+\[
+  \sum_{k=0}^{m-1} e^{i \cdot 4\pi k/m} = \sum_{k=0}^{m-1} \bigl(e^{i4\pi/m}\bigr)^k.
+\]
+If $m \ne 2$, then $\zeta := e^{i4\pi/m} \ne 1$ (since $4\pi/m$ is not a
+multiple of $2\pi$ for $m \ge 3$), and the finite geometric series formula
+gives
+\[
+  \sum_{k=0}^{m-1}\zeta^k = \frac{\zeta^m - 1}{\zeta - 1} = \frac{e^{i4\pi}-1}{\zeta-1} = \frac{1-1}{\zeta-1} = 0,
+\]
+using $e^{i4\pi}=1$. Taking real and imaginary parts gives
+$\sum_k\cos(2\theta_k)=0$ and $\sum_k\sin(2\theta_k)=0$, as required.
+(The case $m=2$ gives $f_0=(1,0)$, $f_1=(-1,0)$, which one checks
+directly: $\sum\cos^2\theta_k = 1+1=2=m/2\cdot 2$... we revisit $m=2$
+explicitly in Remark~\ref{rmk:m-equals-2} below, since the geometric
+series argument needs $\zeta\ne1$.) This proves
+$\sum_k\cos^2\theta_k=\sum_k\sin^2\theta_k=m/2$ and
+$\sum_k\cos\theta_k\sin\theta_k=0$, which is exactly
+\eqref{eq:entrywise-tight} with $A=m/2$.
+\end{proof}
+
+\begin{proof}[Proof 2: Roots of unity (the systematic technique)]
+Identify $\R^2$ with $\C$ via $(\cos\theta,\sin\theta)\leftrightarrow
+e^{i\theta}$. Let $\omega = e^{2\pi i/m}$, a primitive $m$-th root of
+unity, so that $f_k \leftrightarrow \omega^k$ for $k=0,\ldots,m-1$. We
+argue directly with the frame operator acting on a vector $w \in \C$
+(thought of as a vector in $\R^2$ under the identification above). Since
+$f_k\leftrightarrow\omega^k$, the real inner product
+$\inner{w}{f_k}$ corresponds to $\Real(\bar w\,\omega^k)$, so
+\[
+  \sum_{k=0}^{m-1}|\inner{w}{f_k}|^2
+  = \sum_{k=0}^{m-1}\Real(\bar w\,\omega^k)^2
+  = \sum_{k=0}^{m-1}\frac{(\bar w\,\omega^k+w\,\bar\omega^k)^2}{4}.
+\]
+Expanding the square,
+\[
+  (\bar w\,\omega^k+w\,\bar\omega^k)^2
+  = \bar w^2\omega^{2k} + 2|w|^2 + w^2\bar\omega^{2k},
+\]
+so
+\[
+  \sum_{k=0}^{m-1}|\inner{w}{f_k}|^2
+  = \frac{\bar w^2}{4}\sum_{k=0}^{m-1}\omega^{2k}
+  + \frac{|w|^2}{2}\cdot m
+  + \frac{w^2}{4}\sum_{k=0}^{m-1}\bar\omega^{2k}.
+\]
+The key fact about roots of unity (the \emph{discrete orthogonality
+relation}) is
+\begin{equation}
+\label{eq:roots-of-unity-sum}
+  \sum_{k=0}^{m-1} \omega^{jk} =
+  \begin{cases}
+    m, & \omega^j = 1 \text{ (i.e.\ } m \mid j), \\
+    0, & \text{otherwise},
+  \end{cases}
+\end{equation}
+which follows from the same finite geometric series identity as in
+Proof~1: if $\omega^j\ne1$ then
+$\sum_k(\omega^j)^k=\frac{(\omega^j)^m-1}{\omega^j-1}=\frac{1-1}{\omega^j-1}=0$,
+since $(\omega^j)^m=(\omega^m)^j=1^j=1$. Applying
+\eqref{eq:roots-of-unity-sum} with $j=2$: if $m\ge 3$, then $\omega^2\ne
+1$ (as $2$ is not a multiple of $m$ for $m\ge3$), so $\sum_k\omega^{2k}=0$
+and likewise $\sum_k\bar\omega^{2k}=0$. The two outer sums vanish, leaving
+only the middle term:
+\[
+  \sum_{k=0}^{m-1}|\inner{w}{f_k}|^2 = \frac{|w|^2}{2}\cdot m = \frac{m}{2}|w|^2.
+\]
+Since $|w|^2 = \norm{w}^2$ under the identification $\C\cong\R^2$, this is
+exactly the tight frame identity with $A=m/2$, for every $w\in\R^2$.
+\end{proof}
+
+\begin{remark*}[The case $m=2$]
+\label{rmk:m-equals-2}
+When $m=2$, $\omega^2=e^{4\pi i/2}=e^{2\pi i}=1$, so the cancellation
+argument above does not apply directly to the $j=2$ case of
+\eqref{eq:roots-of-unity-sum}---indeed $\sum_{k=0}^1\omega^{2k}=2\ne 0$ in
+that case. Let us check $m=2$ by hand instead: $f_0=(1,0)$,
+$f_1=(-1,0)$ (antipodal points, not really a ``polygon'' in the usual
+sense). Direct computation gives $S = f_0f_0^T+f_1f_1^T =
+\begin{pmatrix}1&0\\0&0\end{pmatrix}+\begin{pmatrix}1&0\\0&0\end{pmatrix}
+=\begin{pmatrix}2&0\\0&0\end{pmatrix}$, which is \emph{not} a multiple of
+the identity ($\lambda_{\min}=0\ne\lambda_{\max}=2$). So $m=2$ is
+genuinely an exception: two antipodal points do not form a tight frame
+(indeed they do not even span $\R^2$!). The theorem's hypothesis $m\ge2$
+should really be sharpened to $m\ge3$ for the conclusion to hold without
+further case-checking; we keep $m \ge 3$ as the operative hypothesis from
+here on, consistent with every genuine ``polygon'' (which needs at least
+three vertices).
+\end{remark*}
+
+\begin{keyidea}
+\textbf{Every regular $m$-gon, $m\ge3$, is a tight frame for $\R^2$},
+with frame bound $A = m/2$. The proof reduces to the discrete
+orthogonality relation for roots of unity,
+$\sum_{k=0}^{m-1}\omega^{jk}=0$ unless $m\mid j$. This is the rigorous,
+general version of the cross-term cancellation you first saw by hand in
+Example~2.2.5 for $m=3$, and it explains why the cancellation was never a
+coincidence: the angles $2\pi k/m$ are always symmetric enough, for any
+$m\ge3$, to force the relevant trigonometric sums to vanish.
+\end{keyidea}
+
+\begin{remark*}
+The value $A=m/2$ matches the trace-formula prediction from
+Chapter~3: each $f_k$ has unit norm, so $\tr(S)=\sum_k\norm{f_k}^2=m$;
+since the frame is tight in $\R^2$ ($n=2$), tightness forces
+$\tr(S)=An=2A$, giving $A=m/2$ exactly as derived above. This consistency
+check is a good habit to develop: whenever a tight unit-norm frame
+construction is proposed, the trace formula instantly predicts what $A$
+\emph{must} be, before any cancellation argument is carried out.
+\end{remark*}
+
+\begin{examplebox}[title={Example 4.1: Checking the formula against Chapter 3}]
+\label{ex:check-polygon-formula}
+Theorem~\ref{thm:regular-polygon-tight} gives $A=m/2$. For $m=3$ (the
+triangular frame, Chapter~3's Example~3.2): $A=3/2$, matching the value
+$A=B=\tfrac32$ computed there from the explicit matrix $S=\tfrac32I$.
+For $m=4$ (the square vertices, Chapter~3's Example~3.6): $A=4/2=2$,
+matching the computed value $A=B=2$. Both match exactly, as they must.
+\end{examplebox}
+
+\subsection{Why Roots of Unity? A Wider Lens}
+\label{subsec:why-roots-of-unity}
+
+It is worth pausing to explain why the roots-of-unity proof is the
+``right'' one, beyond simply being shorter. The vectors $f_k = \omega^k$
+(under $\C\cong\R^2$) are the orbit of the single vector $f_0=1$ under
+repeated rotation by the angle $2\pi/m$. Any construction with this kind
+of \emph{cyclic symmetry}---an orbit under a rotation (or more generally,
+a unitary matrix) of finite order $m$---will produce cancellation
+identities of exactly this type, because the discrete orthogonality
+relation~\eqref{eq:roots-of-unity-sum} depends only on the algebraic fact
+that $\omega$ is an $m$-th root of unity, not on any special geometric
+feature of $\R^2$. This is the first hint of a theme that recurs
+throughout frame theory: \textbf{highly symmetric frames are often tight
+frames, and group-theoretic symmetry is a systematic tool for
+constructing and verifying tightness}, far more powerful than checking
+cancellation by hand for each new example. We will see a more general
+version of this principle (orbits of finite groups acting on $\R^n$ or
+$\C^n$) in Chapter 10 when we discuss equiangular and Grassmannian frames.
+
+\section{Constructing Parseval Frames by Projection}
+\label{sec:parseval-from-projection}
+
+We now turn to the second promise of this chapter: explicit examples of
+Parseval frames ($A=B=1$) that are not orthonormal bases. Chapter~2
+observed this must be possible in principle (a Parseval frame need not be
+linearly independent) but gave no construction. Here is a general one.
+
+\begin{theorem}[Projection of an orthonormal basis is Parseval]
+\label{thm:projection-parseval}
+Let $\{e_1,\ldots,e_N\}$ be an orthonormal basis of $\F^N$, let
+$V\subset\F^N$ be an $n$-dimensional subspace ($n \le N$), and let
+$P:\F^N\to V$ be the orthogonal projection onto $V$. Then
+$\{Pe_1,\ldots,Pe_N\}$ is a Parseval frame for $V$ (viewed as an
+$n$-dimensional inner product space in its own right).
+\end{theorem}
+
+\begin{proof}
+For any $x \in V$, since $P$ is the orthogonal projection onto $V \ni x$,
+we have $Px = x$ and $P^*=P=P^2$ (standard properties of orthogonal
+projections: self-adjoint and idempotent). Using
+$\inner{x}{Pe_k}_{V} = \inner{Px}{Pe_k} = \inner{P^*Px}{e_k} =
+\inner{Px}{e_k} = \inner{x}{e_k}$ (the inner product on $V$ is just the
+restriction of the inner product on $\F^N$), we compute
+\[
+  \sum_{k=1}^N |\inner{x}{Pe_k}|^2
+  = \sum_{k=1}^N |\inner{x}{e_k}|^2
+  = \norm{x}^2,
+\]
+where the last equality is Parseval's identity (Theorem~1.2.9) for the
+orthonormal basis $\{e_k\}$ of $\F^N$, applied to $x \in V \subset \F^N$.
+This shows $\{Pe_k\}_{k=1}^N$ satisfies the Parseval identity for every
+$x \in V$, i.e.\ it is a Parseval frame for $V$.
+\end{proof}
+
+\begin{remark*}
+This construction is extremely flexible: start with \emph{any}
+orthonormal basis of \emph{any} larger space $\F^N$, project down onto
+\emph{any} subspace $V$, and the projected vectors automatically form a
+Parseval frame for $V$---regardless of how the subspace sits inside
+$\F^N$. Since $N$ can be made as large as we like relative to
+$n=\dim V$, this produces Parseval frames with arbitrarily high
+redundancy $N/n$. Crucially, the projected vectors $\{Pe_k\}$ are
+generally \emph{not} linearly independent once $N>n$ (there are $N>n$ of
+them in an $n$-dimensional space), and they are typically not even
+distinct or nonzero, so this is genuinely different from an orthonormal
+basis while retaining the exact Parseval identity.
+\end{remark*}
+
+\begin{examplebox}[title={Example 4.2: A Parseval frame from projecting $\R^3$ onto $\R^2$}]
+\label{ex:parseval-projection-example}
+Let $N=3$, $\{e_1,e_2,e_3\}$ the standard basis of $\R^3$, and let
+$V = \setdef{(x_1,x_2,x_3)\in\R^3}{x_1+x_2+x_3=0}$, the plane through the
+origin perpendicular to $(1,1,1)$. This is a $2$-dimensional subspace.
+The orthogonal projection onto $V$ is $P = I - \tfrac13 uu^T$ where
+$u=(1,1,1)^T/\sqrt3$ is the unit normal to $V$. Computing:
+\[
+  Pe_1 = e_1 - \tfrac13(1,1,1)^T = \tfrac13(2,-1,-1)^T, \quad\text{and similarly for } Pe_2, Pe_3
+\]
+by symmetry. The three vectors $Pe_1, Pe_2, Pe_3$ all have the same
+length $\sqrt{(2/3)^2+(1/3)^2+(1/3)^2}=\sqrt{6}/3$ and, viewed inside the
+$2$-dimensional plane $V$, turn out to be at $120^\circ$ to one another:
+this is, geometrically, exactly the triangular frame of
+Chapter~1 (up to rotation and an overall scale factor), now arrived at
+by an entirely different route---projection from $\R^3$, rather than
+direct placement in $\R^2$. By Theorem~\ref{thm:projection-parseval},
+$\{Pe_1,Pe_2,Pe_3\}$ is automatically Parseval ($A=B=1$) for $V$, even
+though the three vectors are linearly dependent (they live in a
+$2$-dimensional space) and are not the standard basis of anything. This
+example is verified numerically in Lab Exercise~4.2 below.
+\end{examplebox}
+
+\section{A Full Geometric Characterization of Tightness in $\R^2$}
+\label{sec:geometric-characterization}
+
+The regular polygon theorem shows that rotational symmetry is
+\emph{sufficient} for tightness. It is natural to ask whether it is
+\emph{necessary}---must a tight frame in $\R^2$ look like a regular
+polygon? The answer is no, and understanding why illuminates the true
+geometric content of tightness.
+
+\begin{proposition}[Tight frames in $\R^2$ need not be regular polygons]
+\label{prop:tight-not-regular}
+There exist tight frames for $\R^2$ whose vectors do not have equal
+norms and are not symmetrically arranged.
+\end{proposition}
+
+\begin{proof}
+We exhibit one. Let $g_1=(1,0)$, $g_2=(0,1)$, $g_3=(1,0)$, $g_4=(0,1)$
+(each standard basis vector repeated twice). Then
+\[
+  S = \sum_{i=1}^4 g_ig_i^T = 2e_1e_1^T + 2e_2e_2^T = 2I,
+\]
+so this is tight with $A=2$, yet the four vectors are not at equal
+angles to one another (two coincide with $e_1$, two with $e_2$; the
+angle between the two \emph{distinct} directions present is $90^\circ$,
+not the $120^\circ$ a genuine $4$-fold symmetric picture would need) ---
+this tight frame is not the vertex set of any regular polygon, and is
+simply two copies of an orthonormal basis stacked together.
+
+For a less degenerate example, with vectors of \emph{unequal} norm, fix
+any $a, b, c, d > 0$ satisfying $a^2+b^2 = c^2+d^2$ (for instance
+$a=1.5,\,b=0.5,\,c=1,\,d=\sqrt{1.5^2+0.5^2-1^2}=\sqrt{1.5}$), and set
+\[
+  g_1 = (a, 0), \quad g_2 = (-b, 0), \quad g_3 = (0, c), \quad g_4 = (0, -d).
+\]
+Since $g_1, g_2$ lie on the $x$-axis and $g_3, g_4$ lie on the $y$-axis,
+the frame operator is automatically diagonal:
+\[
+  S = (a^2+b^2)\,e_1e_1^T + (c^2+d^2)\,e_2e_2^T,
+\]
+which equals $A\cdot I$ for $A = a^2+b^2 = c^2+d^2$ by our choice of
+constants. Here the four vectors visibly have four different lengths
+($a=1.5,\,b=0.5,\,c=1,\,d\approx1.225$ in the example above) and are
+certainly not the vertices of any regular polygon, yet the frame is
+exactly tight. This proves the proposition. (A fully asymmetric example
+--- vectors at generic, non-axis-aligned angles, with unequal norms and
+no special structure at all --- is also possible, but is more easily
+found numerically than by hand; Lab Exercise~4.4 asks you to search for
+one.)
+\end{proof}
+
+\begin{remark*}
+The correct general statement (which we will prove rigorously in
+Chapter~9 using the \emph{frame potential}) is this: a set of $m$
+unit-norm vectors in $\R^n$ is a tight frame if and only if it is a
+\emph{critical point}---in fact a global minimizer---of the total
+pairwise-correlation energy $\sum_{i\ne j}|\inner{f_i}{f_j}|^2$. Regular
+polygons are tight because their symmetry forces them to be minimizers,
+but they are far from the only minimizers once $m$ or $n$ grow: there is
+generally a large family of inequivalent tight configurations. Tightness
+is therefore better understood as an \emph{energy-minimization}
+(equivalently, \emph{balance}) condition than as a symmetry condition;
+symmetry is a convenient sufficient mechanism for achieving it; but it is
+not the only mechanism, and Chapter~9 develops the energy perspective in
+full.
+\end{remark*}
+
+\section{Computing and Verifying Tight Frames in NumPy}
+\label{sec:numpy-tight-frames}
+
+We now translate the regular polygon theorem and the projection
+construction into code, building tools to construct and verify tight
+frames numerically.
+
+\begin{lstlisting}[caption={Regular polygon frames and the projection construction}]
+import numpy as np
+
+def regular_polygon_frame(m):
+    """
+    Return the n=2 synthesis matrix (shape (2, m)) for the
+    vertices of a regular m-gon inscribed in the unit circle.
+    """
+    angles = 2 * np.pi * np.arange(m) / m
+    return np.vstack([np.cos(angles), np.sin(angles)])
+
+def frame_operator(F):
+    return F @ F.T
+
+def exact_frame_bounds(F):
+    S = frame_operator(F)
+    eigenvalues, eigenvectors = np.linalg.eigh(S)
+    return float(eigenvalues[0]), float(eigenvalues[-1]), eigenvalues, eigenvectors
+
+def is_tight(F, tol=1e-9):
+    A, B, _, _ = exact_frame_bounds(F)
+    return (B - A) < tol * max(1.0, B)
+
+# ---------------------------------------------------------------
+# Theorem 4.3.1: verify A = m/2 for many regular polygons
+# ---------------------------------------------------------------
+print("=== Regular polygon frames ===")
+for m in range(3, 13):
+    F = regular_polygon_frame(m)
+    A, B, eigs, _ = exact_frame_bounds(F)
+    predicted_A = m / 2
+    print(f"m={m:2d}:  A={A:.6f}  B={B:.6f}  "
+          f"predicted m/2={predicted_A:.4f}  "
+          f"tight={is_tight(F)}  match={np.isclose(A, predicted_A)}")
+
+# ---------------------------------------------------------------
+# Theorem 4.4.1: Parseval frame via projection (Example 4.2)
+# ---------------------------------------------------------------
+def projection_parseval_frame(N, V_basis):
+    """
+    Given an orthonormal basis (columns) of a subspace V of R^N,
+    return the Parseval frame for V obtained by projecting the
+    standard basis of R^N onto V, expressed in V's own coordinates.
+
+    V_basis: ndarray of shape (N, n), orthonormal columns spanning V.
+    Returns: ndarray of shape (n, N) -- N frame vectors for the
+             n-dimensional space V, in V's coordinate system.
+    """
+    # P = V_basis @ V_basis.T projects R^N onto V (as vectors in R^N).
+    # Expressed in V's own n-dimensional coordinates, the projection
+    # of e_k is simply the k-th row of V_basis (i.e. V_basis.T @ e_k).
+    return V_basis.T  # shape (n, N): columns are the N frame vectors
+
+# Example 4.2: V = {x : x1+x2+x3=0} subset of R^3
+u = np.array([1., 1., 1.]) / np.sqrt(3)   # unit normal to V
+# Build an orthonormal basis of V (2-dimensional):
+v1 = np.array([1., -1., 0.]) / np.sqrt(2)
+v2 = np.array([1., 1., -2.]) / np.sqrt(6)
+V_basis = np.column_stack([v1, v2])        # shape (3, 2)
+
+F_proj = projection_parseval_frame(3, V_basis)   # shape (2, 3)
+A_proj, B_proj, eigs_proj, _ = exact_frame_bounds(F_proj)
+print("\n=== Parseval frame via projection (Example 4.2) ===")
+print("Frame vectors (in V's 2D coordinates):\n", F_proj.round(4))
+print(f"A = {A_proj:.6f}, B = {B_proj:.6f}  (expect A=B=1)")
+\end{lstlisting}
+
+Running the first loop confirms Theorem~\ref{thm:regular-polygon-tight}
+for $m=3,\ldots,12$ in a single pass: every regular polygon is tight,
+with $A$ matching $m/2$ to numerical precision. The second block
+constructs the projection-based Parseval frame of Example~4.2 from
+scratch and confirms $A=B=1$ exactly.
+
+\begin{remark*}
+A subtlety in the \texttt{projection\_parseval\_frame} function: rather
+than literally constructing the $N\times N$ projection matrix $P$ and
+then re-expressing each $Pe_k\in\R^N$ inside the lower-dimensional
+subspace $V$, we exploit a shortcut. If $V\_basis$ has orthonormal
+columns $v_1,\ldots,v_n$ spanning $V$, then the coordinates of $Pe_k$
+\emph{within} $V$ (relative to the basis $\{v_j\}$) are exactly
+$(\inner{e_k}{v_1},\ldots,\inner{e_k}{v_n}) = $ the $k$-th row of
+\texttt{V\_basis}. This avoids ever forming the $N\times N$ matrix $P$
+explicitly, which matters for efficiency when $N$ is large, and is worth
+internalizing as a general pattern: orthogonal projection coordinates are
+just inner products against an orthonormal basis of the target subspace.
+\end{remark*}
+
+\section{Chapter Summary}
+\label{sec:summary-ch4}
+
+\begin{itemize}
+  \item Tightness is equivalent to a \textbf{resolution of the
+        identity}: $\sum_i f_if_i^* = AI$
+        (Proposition~\ref{prop:tightness-resolution}), which entrywise
+        says diagonal sums equal $A$ and off-diagonal sums vanish.
+  \item \textbf{Theorem~\ref{thm:regular-polygon-tight}}: every regular
+        $m$-gon ($m\ge3$) inscribed in the unit circle is a tight frame
+        for $\R^2$ with bound $A=m/2$, matching the trace-formula
+        prediction $A=\tr(S)/n=m/2$. The proof reduces to the
+        \textbf{discrete orthogonality relation for roots of unity},
+        $\sum_{k=0}^{m-1}\omega^{jk}=0$ unless $m\mid j$---the rigorous,
+        general mechanism behind the $120^\circ$ cross-term cancellation
+        first seen by hand in Example~2.2.5.
+  \item The case $m=2$ is a genuine exception (antipodal points do not
+        even span $\R^2$); the theorem requires $m\ge3$.
+  \item \textbf{Theorem~\ref{thm:projection-parseval}}: projecting any
+        orthonormal basis of a larger space $\F^N$ onto a subspace $V$
+        always produces a Parseval frame for $V$, regardless of how $V$
+        sits inside $\F^N$. This gives explicit, flexible examples of
+        Parseval frames that are not orthonormal bases, fulfilling the
+        promise of Chapter~2.
+  \item Tightness is best understood as an \textbf{energy-balance}
+        condition (to be made precise via the frame potential in
+        Chapter~9), not merely a symmetry condition: symmetric
+        configurations (regular polygons, roots of unity) are a
+        convenient sufficient mechanism, but not the only tight
+        configurations.
+\end{itemize}
+
+\section{Lab Exercises}
+\label{sec:lab-ch4}
+
+\begin{exercisebox}[title={Lab Exercise 4.1: The Full Regular Polygon Table}]
+Implement \texttt{regular\_polygon\_frame(m)} and
+\texttt{exact\_frame\_bounds(F)} from
+Section~\ref{sec:numpy-tight-frames}. Build a table of $A$, $B$, and
+$\tr(S)$ for $m=3,4,\ldots,20$. Verify in every row that (i) $A=B$
+(tight), (ii) $A=m/2$, and (iii) $\tr(S)=m$. Then check $m=2$ separately
+and confirm it breaks the pattern, consistent with
+Remark~\ref{rmk:m-equals-2}.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 4.2: Verifying the Projection Construction}]
+Implement \texttt{projection\_parseval\_frame} from
+Section~\ref{sec:numpy-tight-frames} and reproduce Example~4.2 exactly.
+Then construct a second example: let $V\subset\R^4$ be the
+$2$-dimensional subspace spanned by an orthonormal basis of your choosing
+(e.g.\ via \texttt{np.linalg.qr} applied to two random vectors in
+$\R^4$), and verify that projecting the standard basis $\{e_1,e_2,e_3,e_4\}$
+of $\R^4$ onto $V$ produces a $4$-vector Parseval frame for the
+$2$-dimensional space $V$. Confirm $A=B=1$ numerically.
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 4.3: Partial Regular Polygons Are Not Tight}]
+Theorem~\ref{thm:regular-polygon-tight} requires using \emph{all} $m$
+vertices of the regular polygon. Investigate what happens with a
+\emph{partial} set: for $m=8$, compute the frame operator and exact
+bounds for the first $m'=2,3,4,5,6,7$ vertices only (i.e.\
+$f_k=(\cos(2\pi k/8),\sin(2\pi k/8))$ for $k=0,\ldots,m'-1$, omitting the
+rest). For which values of $m'$ (if any) is the resulting frame still
+tight? Reconcile your numerical finding with the roots-of-unity proof:
+which step of Proof~2 specifically breaks down when the sum is only over
+a partial set of $k$ values?
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 4.4: Hunting for Asymmetric Tight Frames}]
+Proposition~\ref{prop:tight-not-regular} claims tight frames need not be
+regular polygons. Investigate numerically: starting from the repeated
+basis vectors example in the proof
+($g_1=g_3=(1,0)$, $g_2=g_4=(0,1)$), perturb each vector slightly by a
+small random rotation (a few degrees) and a small random rescaling
+(within $\pm10\%$ of unit length), and check whether the perturbed frame
+is still (approximately) tight. Report the ratio $B/A$ before and after
+perturbation. Then try to manually construct (by trial and error, or
+using \texttt{scipy.optimize}) a 4-vector frame in $\R^2$ that is exactly
+tight but visibly \emph{not} a regular polygon and \emph{not} two
+repeated orthonormal bases --- i.e.\ four genuinely distinct directions,
+no two equal or antipodal, with no obvious rotational symmetry, that
+still satisfies $S=AI$. (Hint: you have 4 vectors $\times$ 2 coordinates
+$=8$ real degrees of freedom, and the tight-frame condition $S=AI$ in
+$\R^2$ imposes only 3 real constraints---2 diagonal entries equal, 1
+off-diagonal entry zero--- so a $5$-real-dimensional family of solutions
+should exist; you only need to find one element of it.)
+\end{exercisebox}
+
+\begin{exercisebox}[title={Lab Exercise 4.5 (Optional, Challenge): Roots of Unity in $\C^n$}]
+The roots-of-unity proof technique generalizes beyond $\R^2$. Consider
+the $n$-dimensional complex vectors
+\[
+  f_k = \frac{1}{\sqrt{n}}\bigl(1, \omega^k, \omega^{2k}, \ldots, \omega^{(n-1)k}\bigr) \in \C^n,
+  \qquad k = 0, 1, \ldots, n-1,
+\]
+where $\omega = e^{2\pi i/n}$ (these are the columns of the
+\emph{discrete Fourier transform matrix}, up to normalization).
+\begin{enumerate}[label=(\alph*)]
+  \item For $n=4$, construct these vectors numerically (using complex
+        NumPy arrays, \texttt{dtype=complex}) and verify that
+        $\{f_k\}_{k=0}^{n-1}$ is an orthonormal basis of $\C^n$ (hence,
+        trivially, a tight frame with $A=B=1$) by checking
+        $\inner{f_j}{f_k}=\delta_{jk}$ for all $j,k$ (recall: for
+        complex vectors, use \texttt{np.vdot} as discussed in
+        Chapter~1's remark on conventions).
+  \item Now take only the first $n-1$ of these vectors (drop $f_{n-1}$)
+        for $n=4$. Is the resulting $3$-vector set still a tight frame
+        for $\C^4$? (It cannot be, by Theorem~2.2.1, for a reason you
+        should be able to state immediately --- what is it?)
+  \item This construction --- equally spaced points on the unit circle
+        in each coordinate, built from roots of unity --- is the
+        starting point for an entire family of frames called
+        \emph{harmonic frames}, which we will study properly in
+        Chapter~10 alongside equiangular frames. For now, simply record
+        your numerical observations as a preview.
+\end{enumerate}
+\end{exercisebox}
+
+\newpage
+\section{Supplementary Exercises}
+\label{sec:extra-ch4}
+
+\subsection*{Theoretical Exercises}
+\begin{theoexercises}
+	\item Prove that if $\{f_i\}_{i=1}^m$ is a tight frame for $\R^n$ with
+	bound $A$, then taking $k$ copies of each vector (each vector
+	repeated $k$ times, for a total of $km$ vectors) is also tight,
+	with bound $kA$.
+	
+	\item Prove that if $\{f_i\}_{i=1}^m$ is a tight frame for $\R^n$ with
+	bound $A_1$ and $\{g_j\}_{j=1}^{m'}$ is a tight frame for $\R^n$
+	with bound $A_2$ (independently, on a disjoint index set), then
+	the combined set $\{f_i\}\cup\{g_j\}$ is a tight frame for $\R^n$
+	with bound $A_1+A_2$ --- \emph{regardless of whether $A_1=A_2$}.
+	
+	\item Prove directly, via a symmetric summation argument (not the
+	roots-of-unity technique of Section~4.3), that
+	$\{\pm e_1,\pm e_2,\pm e_3\}$ is a tight frame for $\R^3$, and
+	determine its bound $A$.
+	
+	\item Prove that adding a single unit vector $v$ to an orthonormal
+	basis $\{e_1,\ldots,e_n\}$ of $\R^n$ ($n\ge2$) never produces a
+	tight frame, for any choice of $v$. (Hint: the resulting frame
+	operator is $I+vv^T$; compare its rank structure to a scalar
+	multiple of $I$.)
+	
+	\item Generalize the axis-aligned construction of
+	Proposition~4.5.1 to $\R^3$: using six vectors, two along each
+	coordinate axis with possibly unequal norms $a,b$ (on the first
+	axis), $c,d$ (second), $e,f$ (third), state and prove the precise
+	condition on these six numbers for the configuration to be tight.
+	
+	\item Using Theorem~8.3.1 (frame potential $\ge m^2/n$, with equality
+	iff tight), give an alternative proof that the regular $m$-gon is
+	a tight frame: compute its frame potential directly using a
+	double-angle identity, compare to the lower bound $m^2/n$ with
+	$n=2$, and conclude.
+\end{theoexercises}
+
+\subsection*{Computational Exercises}
+\begin{compexercises}
+	\item Numerically verify T1 for the triangular frame with $k=2,3,4$
+	copies, confirming the bound scales as $kA$.
+	
+	\item Numerically verify T2 using the triangular frame ($A=1.5$) and
+	the square ($A=2$) as the two tight frames being combined, and
+	confirm the union is tight with bound $3.5$.
+	
+	\item Compute the frame operator of $\{\pm e_1,\pm e_2,\pm e_3\}$
+	directly and confirm the eigenvalues found in T3.
+	
+	\item For $n=2$ and $n=3$, add a random unit vector to the standard
+	orthonormal basis and confirm numerically that the result is
+	never tight (T4), across at least $10$ random choices of the
+	extra vector in each dimension.
+	
+	\item Construct the $6$-vector $\R^3$ configuration from T5 with a
+	specific numeric target bound (e.g.\ $A=5$), verify tightness
+	directly, and confirm the frame operator is exactly $5I$.
+\end{compexercises}

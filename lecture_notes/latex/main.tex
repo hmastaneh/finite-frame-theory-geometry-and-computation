@@ -1,0 +1,178 @@
+\documentclass[11pt]{book}
+
+% ---------- Packages ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems}
+\usepackage{booktabs}
+\usepackage{array}
+
+\geometry{margin=1in}
+
+% ---------- Colors ----------
+\definecolor{frameblue}{RGB}{20,60,120}
+\definecolor{framegray}{RGB}{245,245,245}
+\definecolor{codebg}{RGB}{248,248,248}
+\definecolor{examplegreen}{RGB}{20,90,50}
+\definecolor{reviewred}{RGB}{140,20,20}
+
+% ---------- Header/Footer ----------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{Finite Frame Theory}}
+
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ---------- Theorem environments ----------
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem*{remark*}{Remark}
+
+% ---------- Custom boxes ----------
+\newtcolorbox{keyidea}[1][]{
+	colback=framegray,
+	colframe=frameblue,
+	boxrule=0.8pt,
+	arc=2pt,
+	left=8pt, right=8pt, top=6pt, bottom=6pt,
+	title={\textbf{Key Idea}},
+	fonttitle=\bfseries\color{white},
+	coltitle=white,
+	colbacktitle=frameblue,
+	#1
+}
+
+\newtcolorbox{examplebox}[1][]{
+	colback=white,
+	colframe=examplegreen,
+	boxrule=0.8pt,
+	arc=2pt,
+	left=8pt, right=8pt, top=6pt, bottom=6pt,
+	#1
+}
+
+\newtcolorbox{exercisebox}[1][]{
+	colback=white,
+	colframe=black!60,
+	boxrule=0.6pt,
+	arc=1pt,
+	left=8pt, right=8pt, top=6pt, bottom=6pt,
+	#1
+}
+\newtcolorbox{reviewbox}[1][]{
+	colback=red!3,
+	colframe=reviewred,
+	boxrule=0.8pt,
+	arc=2pt,
+	left=8pt, right=8pt, top=6pt, bottom=6pt,
+	title={\textbf{Exam Tip}},
+	fonttitle=\bfseries\color{white},
+	coltitle=white,
+	colbacktitle=reviewred,
+	#1
+}
+% ---------- Code listing style ----------
+\lstdefinestyle{pythonstyle}{
+	backgroundcolor=\color{codebg},
+	basicstyle=\ttfamily\small,
+	keywordstyle=\color{blue!70!black}\bfseries,
+	commentstyle=\color{green!40!black}\itshape,
+	stringstyle=\color{orange!70!black},
+	numbers=left,
+	numberstyle=\tiny\color{gray},
+	stepnumber=1,
+	numbersep=8pt,
+	frame=single,
+	rulecolor=\color{gray!40},
+	breaklines=true,
+	showstringspaces=false,
+	language=Python,
+	tabsize=4,
+}
+\lstset{style=pythonstyle}
+
+% ---------- Custom commands ----------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\F}{\mathbb{F}} % field, R or C
+\newcommand{\norm}[1]{\left\| #1 \right\|}
+\newcommand{\inner}[2]{\left\langle #1, #2 \right\rangle}
+\newcommand{\setdef}[2]{\left\{ #1 \;:\; #2 \right\}}
+\newcommand{\spn}{\operatorname{span}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\Real}{\operatorname{Re}}
+\newcommand{\Imag}{\operatorname{Im}}
+\newcommand{\FP}{\operatorname{FP}}
+\newcommand{\Gr}{\operatorname{Gr}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\minimize}{\operatorname*{minimize}}
+\newcommand{\argmin}{\operatorname*{argmin}}
+
+\newlist{theoexercises}{enumerate}{1}
+\setlist[theoexercises]{label=\textbf{T\arabic*.}, itemsep=5pt, topsep=4pt, leftmargin=1.8em}
+\newlist{compexercises}{enumerate}{1}
+\setlist[compexercises]{label=\textbf{C\arabic*.}, itemsep=5pt, topsep=4pt, leftmargin=1.8em}
+
+
+\title{\textbf{Finite Frame Theory:\\Geometry and Computation}}
+\author{Lecture Notes}
+\date{}
+
+\begin{document}
+	
+	\begin{titlepage}
+		\centering
+		\vspace*{2cm}
+		{\Huge \textbf{Finite Frame Theory}}\\[0.5cm]
+		{\Large Geometry and Computation}\\[2cm]
+		{\LARGE \textbf{Hussein Mastaneh}}\\[0.3cm]
+		{\Large Persian Gulf University of Bushehr}\\[1cm]
+		{\large h.mastaneh@gmail.com}\\[3cm]
+		{\large Lecture Notes}\\[1cm]
+		\vfill
+		{\large \today}
+	\end{titlepage}
+	
+	\tableofcontents
+	\newpage
+
+%%%%%%%%%%%%%%%%%%%Chapters%%%%%%%%%%%
+\include{chapter1}
+\include{chapter2}
+\include{chapter3}
+\include{chapter4}
+\include{chapter5}
+\include{chapter6}
+\include{chapter7}
+\include{chapter8}
+\include{chapter9}
+\include{chapter10}
+\include{chapter11}
+\include{chapter12}
+
+
+\end{document}
