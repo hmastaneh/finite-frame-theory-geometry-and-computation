@@ -117,3 +117,7 @@ The source code in this repository is released under the MIT License.
 ## Acknowledgements
 
 These lecture notes were developed for the course **Finite Frame Theory: Geometry and Computation** at Persian Gulf University.
+
+## Updates
+
+Last updated: 20 July 2026
